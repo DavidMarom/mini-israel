@@ -1,6 +1,6 @@
 "use client";
 
-import styles from "../app/page.module.css";
+import styles from "./NameModal.module.css";
 
 export default function NameModal({ name, onChangeName, onSave }) {
   return (

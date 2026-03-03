@@ -10,7 +10,7 @@ import {
   signOut,
 } from "firebase/auth";
 import GameBoard from "../components/GameBoard";
-import NameModal from "../components/NameModal";
+import NameModal from "../components/NameModal/NameModal";
 import AuthCard from "../components/AuthCard/AuthCard";
 import useUserStore from "../store/useUserStore";
 

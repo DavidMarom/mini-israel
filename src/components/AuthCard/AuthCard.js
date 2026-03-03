@@ -3,17 +3,8 @@
 import { useState } from "react";
 import styles from "./AuthCard.module.css";
 
-export default function AuthCard({
-  loading,
-  user,
-  displayName,
-  money,
-  photoURL,
-  onGoogleSignIn,
-  onLogout,
-  error,
-  onUpdateName,
-}) {
+export default function AuthCard({ loading, user, displayName, money, photoURL, onGoogleSignIn, onLogout, error, onUpdateName }) {
+
   const [avatarBroken, setAvatarBroken] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState(displayName || "");
@@ -41,12 +32,8 @@ export default function AuthCard({
 
       {!loading && !user && (
         <>
-          <p className={styles.text}>
-            התחבר/י כדי להתחיל לשחק
-          </p>
-          <button onClick={onGoogleSignIn} className={styles.primaryButton}>
-            התחבר/י
-          </button>
+          <p className={styles.text}>התחבר/י כדי להתחיל לשחק</p>
+          <button onClick={onGoogleSignIn} className={styles.primaryButton}>התחבר/י</button>
         </>
       )}
 
@@ -54,55 +41,26 @@ export default function AuthCard({
         <>
           <div className={styles.userRow}>
             {photoURL && !avatarBroken ? (
-              <img
-                src={photoURL}
-                alt={displayName || "Player avatar"}
-                className={styles.avatar}
-                referrerPolicy="no-referrer"
-                onError={() => setAvatarBroken(true)}
-              />
+              <img src={photoURL} alt={displayName || "Player avatar"} className={styles.avatar} referrerPolicy="no-referrer" onError={() => setAvatarBroken(true)} />
             ) : (
-              <div className={styles.avatarFallback}>
-                {(displayName || "?").charAt(0)}
-              </div>
+              <div className={styles.avatarFallback}>{(displayName || "?").charAt(0)}</div>
             )}
+
             {isEditingName ? (
               <div className={styles.nameEditColumn}>
-                <input
-                  className={styles.nameInput}
-                  value={editedName}
-                  onChange={(e) => setEditedName(e.target.value)}
-                />
-                <button
-                  type="button"
-                  className={styles.saveNameButton}
-                  onClick={handleSaveEdit}
-                >
-                  שמור
-                </button>
+                <input className={styles.nameInput} value={editedName} onChange={(e) => setEditedName(e.target.value)} />
+                <button type="button" className={styles.saveNameButton} onClick={handleSaveEdit}>שמור</button>
               </div>
             ) : (
               <div className={styles.nameRow}>
                 <p className={styles.text}>{displayName}</p>
-                <button
-                  type="button"
-                  className={styles.editButton}
-                  onClick={handleStartEdit}
-                  aria-label="עריכת שם"
-                >
-                  ✎
-                </button>
+                <button type="button" className={styles.editButton} onClick={handleStartEdit} aria-label="עריכת שם">✎</button>
               </div>
             )}
           </div>
 
-          <p className={styles.balanceText}>
-            מטבעות: <span className={styles.balanceValue}>{money ?? 0}</span>
-          </p>
-
-          <button onClick={onLogout} className={styles.secondaryButton}>
-            התנתק
-          </button>
+          <p className={styles.balanceText}>מטבעות: <span className={styles.balanceValue}>{money ?? 0}</span> שקלים</p>
+          <button onClick={onLogout} className={styles.secondaryButton}>התנתק</button>
         </>
       )}
 
