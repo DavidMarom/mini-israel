@@ -3,15 +3,8 @@
 import { useEffect, useState } from "react";
 import styles from "./page.module.css";
 import { auth } from "../services/fb";
-import {
-  GoogleAuthProvider,
-  onAuthStateChanged,
-  signInWithPopup,
-  signOut,
-} from "firebase/auth";
-import GameBoard from "../components/GameBoard";
-import NameModal from "../components/NameModal/NameModal";
-import AuthCard from "../components/AuthCard/AuthCard";
+import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut, } from "firebase/auth";
+import { GameBoard, NameModal, AuthCard } from "../components";
 import useUserStore from "../store/useUserStore";
 
 const provider = new GoogleAuthProvider();
@@ -198,13 +191,8 @@ export default function Home() {
         />
       </div>
 
-      {showNameModal && (
-        <NameModal
-          name={nameInput}
-          onChangeName={setNameInput}
-          onSave={handleSaveName}
-        />
-      )}
+      {showNameModal && (<NameModal name={nameInput} onChangeName={setNameInput} onSave={handleSaveName} />)}
+      
     </div>
   );
 }

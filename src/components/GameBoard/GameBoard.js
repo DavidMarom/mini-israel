@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import styles from "./GameBoard.module.css";
-import useUserStore from "../store/useUserStore";
+import useUserStore from "../../store/useUserStore";
 
 const ROWS = 30;
 const COLS = 15;
@@ -235,7 +235,7 @@ export default function GameBoard() {
                       className={styles.mainHouse}
                     />
                   </div>
-              )}
+                )}
             </div>
           );
         })
@@ -243,6 +243,4 @@ export default function GameBoard() {
     </div>
   );
 }
-
-
 
