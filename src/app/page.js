@@ -10,6 +10,7 @@ import {
   signOut,
 } from "firebase/auth";
 import GameBoard from "../components/GameBoard";
+import NameModal from "../components/NameModal";
 import useUserStore from "../store/useUserStore";
 
 const provider = new GoogleAuthProvider();
@@ -33,7 +34,7 @@ export default function Home() {
         // Ensure the user exists in MongoDB
         syncUserWithBackend(firebaseUser).catch((err) => {
           console.error("Failed to sync user with backend", err);
-          setError("Could not save your profile. Please try again later.");
+          setError("לא ניתן לשמור את הפרופיל שלך, נסה שוב מאוחר יותר.");
         });
       }
     });
@@ -96,7 +97,7 @@ export default function Home() {
       await signInWithPopup(auth, provider);
     } catch (err) {
       console.error(err);
-      setError("Google sign-in failed. Please try again.");
+      setError("ההתחברות באמצעות Google נכשלה, נסה שוב.");
       setLoading(false);
     }
   };
@@ -109,7 +110,7 @@ export default function Home() {
       setBackendUser(null);
     } catch (err) {
       console.error(err);
-      setError("Failed to log out. Please try again.");
+      setError("ההתנתקות נכשלה, נסה שוב.");
     }
   };
 
@@ -148,7 +149,7 @@ export default function Home() {
       setShowNameModal(false);
     } catch (err) {
       console.error(err);
-      setError("Could not save your name. Please try again.");
+      setError("לא ניתן לשמור את השם, נסה שוב.");
     }
   };
 
@@ -159,72 +160,54 @@ export default function Home() {
       </div>
 
       <div className={styles.overlay}>
-        <div className={styles.card}>
         
+        <div className={styles.card}>
 
-        {loading && <p className={styles.text}>Loading...</p>}
 
-        {!loading && !user && (
-          <>
-            <p className={styles.text}>
-              Sign in with Google to create your village and start building.
-            </p>
-            <button
-              onClick={handleGoogleSignIn}
-              className={styles.primaryButton}
-            >
-              Continue with Google
-            </button>
-          </>
-        )}
+          {loading && <p className={styles.text}>טוען...</p>}
 
-        {!loading && user && (
-          <>
-            <div className={styles.userRow}>
-              {user.photoURL && (
-                <img
-                  src={user.photoURL}
-                  alt={user.displayName || "Player avatar"}
-                  className={styles.avatar}
-                />
-              )}
-              <div>
-                <p className={styles.text}>
-                  {storedUser?.name || user.displayName || user.email}
-                </p>
+          {!loading && !user && (
+            <>
+              <p className={styles.text}>
+                התחבר באמצעות Google כדי ליצור את הכפר שלך ולהתחיל לבנות.
+              </p>
+              <button
+                onClick={handleGoogleSignIn}
+                className={styles.primaryButton}
+              >
+                המשך עם Google
+              </button>
+            </>
+          )}
+
+          {!loading && user && (
+            <>
+              <div className={styles.userRow}>
+                {user.photoURL && (
+                  <img
+                    src={user.photoURL}
+                    alt={user.displayName || "Player avatar"}
+                    className={styles.avatar}
+                  />
+                )}
+                <div>
+                  <p className={styles.text}>
+                    {storedUser?.name || user.displayName || user.email}
+                  </p>
+                </div>
               </div>
-            </div>
 
-            <button onClick={handleLogout} className={styles.secondaryButton}>
-              Log out
-            </button>
-          </>
-        )}
+              <button onClick={handleLogout} className={styles.secondaryButton}>
+                התנתק
+              </button>
+            </>
+          )}
 
-        {error && <p className={styles.error}>{error}</p>}
+          {error && <p className={styles.error}>{error}</p>}
         </div>
 
         {showNameModal && (
-          <div className={styles.modalBackdrop}>
-            <div className={styles.modal}>
-              <h2 className={styles.modalTitle}>Choose your name</h2>
-              <p className={styles.modalText}>
-                This is how other players will see you in the world.
-              </p>
-              <input
-                className={styles.modalInput}
-                value={nameInput}
-                onChange={(e) => setNameInput(e.target.value)}
-                placeholder="Your name"
-              />
-              <button
-                className={styles.primaryButton}
-                onClick={handleSaveName}
-              >
-                Save
-              </button>
-            </div>
-          </div>
+          <NameModal name={nameInput} onChangeName={setNameInput} onSave={handleSaveName} />
         )}
       </div>
     </div>
