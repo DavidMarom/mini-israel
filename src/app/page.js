@@ -11,6 +11,7 @@ import {
 } from "firebase/auth";
 import GameBoard from "../components/GameBoard";
 import NameModal from "../components/NameModal";
+import AuthCard from "../components/AuthCard/AuthCard";
 import useUserStore from "../store/useUserStore";
 
 const provider = new GoogleAuthProvider();
@@ -114,10 +115,10 @@ export default function Home() {
     }
   };
 
-  const handleSaveName = async () => {
-    if (!backendUser) return;
-    const trimmed = nameInput.trim();
-    if (!trimmed) return;
+  const saveName = async (newName) => {
+    if (!backendUser) return false;
+    const trimmed = newName.trim();
+    if (!trimmed) return false;
 
     try {
       const res = await fetch("/api/auth/user", {
@@ -146,10 +147,18 @@ export default function Home() {
         }));
       }
 
-      setShowNameModal(false);
+      return true;
     } catch (err) {
       console.error(err);
       setError("לא ניתן לשמור את השם, נסה שוב.");
+      return false;
+    }
+  };
+
+  const handleSaveName = async () => {
+    const ok = await saveName(nameInput);
+    if (ok) {
+      setShowNameModal(false);
     }
   };
 
@@ -160,51 +169,20 @@ export default function Home() {
       </div>
 
       <div className={styles.overlay}>
-        
-        <div className={styles.card}>
-
-
-          {loading && <p className={styles.text}>טוען...</p>}
-
-          {!loading && !user && (
-            <>
-              <p className={styles.text}>
-                התחבר באמצעות Google כדי ליצור את הכפר שלך ולהתחיל לבנות.
-              </p>
-              <button
-                onClick={handleGoogleSignIn}
-                className={styles.primaryButton}
-              >
-                המשך עם Google
-              </button>
-            </>
-          )}
-
-          {!loading && user && (
-            <>
-              <div className={styles.userRow}>
-                {user.photoURL && (
-                  <img
-                    src={user.photoURL}
-                    alt={user.displayName || "Player avatar"}
-                    className={styles.avatar}
-                  />
-                )}
-                <div>
-                  <p className={styles.text}>
-                    {storedUser?.name || user.displayName || user.email}
-                  </p>
-                </div>
-              </div>
-
-              <button onClick={handleLogout} className={styles.secondaryButton}>
-                התנתק
-              </button>
-            </>
-          )}
-
-          {error && <p className={styles.error}>{error}</p>}
-        </div>
+        <AuthCard
+          loading={loading}
+          user={user}
+          displayName={
+            (storedUser && storedUser.name) ||
+            (user && (user.displayName || user.email)) ||
+            ""
+          }
+          photoURL={user ? user.photoURL : null}
+          onGoogleSignIn={handleGoogleSignIn}
+          onLogout={handleLogout}
+          error={error}
+          onUpdateName={saveName}
+        />
 
         {showNameModal && (
           <NameModal name={nameInput} onChangeName={setNameInput} onSave={handleSaveName} />

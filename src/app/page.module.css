@@ -31,32 +31,7 @@
   pointer-events: none;
 }
 
-.card {
-  background-color: var(--foreground);
-  border-radius: 16px;
-  padding: 32px 28px;
-  max-width: 440px;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  pointer-events: auto;
-}
-
-.text {
-  margin: 0;
-  font-size: 14px;
-  color: var(--text-primary);
-}
-
-.textSmall {
-  margin: 0;
-  font-size: 12px;
-  color: var(--text-secondary);
-}
-
-.primaryButton,
-.secondaryButton {
+.primaryButton {
   border-radius: 999px;
   padding: 10px 18px;
   border: 1px solid transparent;
@@ -75,34 +50,6 @@
 .primaryButton:hover {
   background-color: var(--button-primary-hover);
   transform: translateY(-1px);
-}
-
-.secondaryButton {
-  background-color: transparent;
-  color: var(--text-primary);
-  border-color: var(--button-secondary-border);
-}
-
-.secondaryButton:hover {
-  background-color: var(--button-secondary-hover);
-}
-
-.userRow {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 999px;
-}
-
-.error {
-  margin: 0;
-  font-size: 13px;
-  color: #b91c1c;
 }
 
 .modalBackdrop {
