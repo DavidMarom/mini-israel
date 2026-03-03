@@ -24,7 +24,12 @@ export default function Home() {
   const [showNameModal, setShowNameModal] = useState(false);
   const [nameInput, setNameInput] = useState("");
 
-  const { user: storedUser, setUser: setUserStore, clearUser } = useUserStore();
+  const {
+    user: storedUser,
+    setUser: setUserStore,
+    clearUser,
+    setNeedsHousePlacement,
+  } = useUserStore();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
@@ -83,6 +88,7 @@ export default function Home() {
         if (data.created) {
           setNameInput(mergedUser.name || "");
           setShowNameModal(true);
+          setNeedsHousePlacement(true);
         }
       }
     } catch (err) {
@@ -174,7 +180,8 @@ export default function Home() {
           user={user}
           displayName={
             (storedUser && storedUser.name) ||
-            (user && (user.displayName || user.email)) ||
+            (backendUser && (backendUser.name || backendUser.email)) ||
+            (user && user.email) ||
             ""
           }
           photoURL={user ? user.photoURL : null}
@@ -183,11 +190,15 @@ export default function Home() {
           error={error}
           onUpdateName={saveName}
         />
-
-        {showNameModal && (
-          <NameModal name={nameInput} onChangeName={setNameInput} onSave={handleSaveName} />
-        )}
       </div>
+
+      {showNameModal && (
+        <NameModal
+          name={nameInput}
+          onChangeName={setNameInput}
+          onSave={handleSaveName}
+        />
+      )}
     </div>
   );
 }

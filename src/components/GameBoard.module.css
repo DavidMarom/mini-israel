@@ -10,17 +10,44 @@
 }
 
 .tile {
-  border: 1px solid rgba(15, 23, 42, 0.7);
+  border: none;
   background-color: #044504;
-  transition: background-color 0.15s ease;
   cursor: pointer;
 }
 
 .tile:hover {
-  background-color: #0a7a0a;
+  background-color: #0a540a;
 }
 
 .tileSelected {
-  background: #ef4444;
+  background-color: #044504;
+}
+
+.mainHouse {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.houseWrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.houseLabel {
+  position: absolute;
+  left: 4px;
+  bottom: 4px;
+  padding: 1px 4px;
+  font-size: 10px;
+  line-height: 1.2;
+  color: #f9fafb;
+  background-color: rgba(15, 23, 42, 0.7);
+  border-radius: 3px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 

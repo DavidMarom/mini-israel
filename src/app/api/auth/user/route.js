@@ -21,19 +21,23 @@ export async function POST(request) {
     const now = new Date();
 
     if (existing) {
-      let updatedUser = existing;
+      let update = {};
 
-      // Allow updating the user's name if it changed
       if (name && name !== existing.name) {
-        await users.updateOne(
-          { _id: existing._id },
-          { $set: { name, updatedAt: now } }
+        update.name = name;
+      }
+
+      if (Object.keys(update).length > 0) {
+        update.updatedAt = now;
+        await users.updateOne({ _id: existing._id }, { $set: update });
+        return NextResponse.json(
+          { user: { ...existing, ...update }, created: false },
+          { status: 200 }
         );
-        updatedUser = { ...existing, name, updatedAt: now };
       }
 
       return NextResponse.json(
-        { user: updatedUser, created: false },
+        { user: existing, created: false },
         { status: 200 }
       );
     }
