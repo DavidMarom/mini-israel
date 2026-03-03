@@ -7,6 +7,7 @@ export default function AuthCard({
   loading,
   user,
   displayName,
+  money,
   photoURL,
   onGoogleSignIn,
   onLogout,
@@ -94,6 +95,10 @@ export default function AuthCard({
               </div>
             )}
           </div>
+
+          <p className={styles.balanceText}>
+            מטבעות: <span className={styles.balanceValue}>{money ?? 0}</span>
+          </p>
 
           <button onClick={onLogout} className={styles.secondaryButton}>
             התנתק

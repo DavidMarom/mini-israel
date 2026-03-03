@@ -47,6 +47,7 @@ export async function POST(request) {
       email,
       name: name || null,
       photoURL: photoURL || null,
+      money: 180,
       createdAt: now,
       updatedAt: now,
     };

@@ -129,3 +129,14 @@
   color: #b91c1c;
 }
 
+.balanceText {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.balanceValue {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+

@@ -79,6 +79,7 @@ export default function Home() {
           name: data.user.name || firebaseUser.displayName || firebaseUser.email,
           photoURL: firebaseUser.photoURL,
           mongoId: data.user._id,
+          money: typeof data.user.money === "number" ? data.user.money : 0,
           createdAt: data.user.createdAt,
           updatedAt: data.user.updatedAt,
         };
@@ -183,6 +184,11 @@ export default function Home() {
             (backendUser && (backendUser.name || backendUser.email)) ||
             (user && user.email) ||
             ""
+          }
+          money={
+            (storedUser && storedUser.money) ||
+            (backendUser && backendUser.money) ||
+            0
           }
           photoURL={user ? user.photoURL : null}
           onGoogleSignIn={handleGoogleSignIn}
