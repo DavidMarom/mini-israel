@@ -1,1 +1,3 @@
 # Mini Israel
+
+## Features
