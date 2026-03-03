@@ -8,7 +8,11 @@ const useUserStore = create(
     (set) => ({
       user: null,
       needsHousePlacement: false,
-      setUser: (user) => set({ user }),
+      setUser: (updater) =>
+        set((state) => ({
+          user:
+            typeof updater === "function" ? updater(state.user) : updater,
+        })),
       clearUser: () => set({ user: null, needsHousePlacement: false }),
       setNeedsHousePlacement: (value) => set({ needsHousePlacement: value }),
       setMainHouse: (mainHouse) =>

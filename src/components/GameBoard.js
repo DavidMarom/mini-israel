@@ -12,7 +12,8 @@ const createEmptyGrid = () =>
 
 export default function GameBoard() {
   const [grid, setGrid] = useState(createEmptyGrid);
-  const { user, setMainHouse } = useUserStore();
+  const [hover, setHover] = useState(null);
+  const { user, setMainHouse, needsHousePlacement } = useUserStore();
 
   useEffect(() => {
     let cancelled = false;
@@ -92,10 +93,59 @@ export default function GameBoard() {
     }
   };
 
+  // Keep house labels in sync when the user's name changes
+  useEffect(() => {
+    if (!user) return;
+    const ownerUid = user.firebaseUid || user.uid;
+    if (!ownerUid || !user.name) return;
+
+    let updated = null;
+    setGrid((prev) => {
+      let changed = false;
+      const next = prev.map((row) =>
+        row.map((cell) => {
+          if (
+            cell &&
+            cell.building === "main-house" &&
+            cell.ownerUid === ownerUid &&
+            cell.ownerName !== user.name
+          ) {
+            changed = true;
+            return { ...cell, ownerName: user.name };
+          }
+          return cell;
+        })
+      );
+      updated = changed ? next : null;
+      return changed ? next : prev;
+    });
+
+    if (updated) {
+      void persistBoard(updated);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user && user.name]);
+
   const handleClick = (row, col) => {
     if (!user) return;
     const ownerUid = user.firebaseUid || user.uid;
     if (!ownerUid) return;
+
+    // When guiding right after signup, enforce placement only in that mode
+    if (needsHousePlacement === true) {
+      // ok, we are in placement mode
+    } else {
+      // Outside explicit placement mode, only allow if user has no main house yet
+      const hasHouseAlready = grid.some((r) =>
+        r.some(
+          (cell) =>
+            cell &&
+            cell.building === "main-house" &&
+            cell.ownerUid === ownerUid
+        )
+      );
+      if (hasHouseAlready) return;
+    }
 
     // Prevent more than one main house per user
     const alreadyHasHouse = grid.some((r) =>
@@ -130,12 +180,36 @@ export default function GameBoard() {
           const key = `${row}-${col}`;
           const cell = grid[row][col];
           const hasMainHouse = cell && cell.building === "main-house";
+          const isEmpty = !cell;
+          const ownerUid = user && (user.firebaseUid || user.uid);
+          const userHasHouse =
+            !!ownerUid &&
+            grid.some((r) =>
+              r.some(
+                (c) =>
+                  c &&
+                  c.building === "main-house" &&
+                  c.ownerUid === ownerUid
+              )
+            );
+          const canPreview =
+            !!user &&
+            !!ownerUid &&
+            needsHousePlacement === true &&
+            !userHasHouse &&
+            isEmpty;
 
           return (
             <div
               key={key}
               className={styles.tile}
               onClick={() => handleClick(row, col)}
+              onMouseEnter={() => setHover({ row, col })}
+              onMouseLeave={() =>
+                setHover((prev) =>
+                  prev && prev.row === row && prev.col === col ? null : prev
+                )
+              }
             >
               {hasMainHouse && (
                 <div className={styles.houseWrapper}>
@@ -148,6 +222,19 @@ export default function GameBoard() {
                     <span className={styles.houseLabel}>{cell.ownerName}</span>
                   )}
                 </div>
+              )}
+              {!hasMainHouse &&
+                canPreview &&
+                hover &&
+                hover.row === row &&
+                hover.col === col && (
+                  <div className={styles.houseWrapper}>
+                    <img
+                      src="/assets/main-house.png"
+                      alt="מיקום בית ראשי"
+                      className={styles.mainHouse}
+                    />
+                  </div>
               )}
             </div>
           );

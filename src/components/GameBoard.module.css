@@ -15,10 +15,6 @@
   cursor: pointer;
 }
 
-.tile:hover {
-  background-color: #0a540a;
-}
-
 .tileSelected {
   background-color: #044504;
 }
