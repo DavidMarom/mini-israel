@@ -8,6 +8,20 @@ const ROWS = 30;
 const COLS = 15;
 const TILE_SIZE = 64;
 
+const URL_REGEX = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
+
+function renderWithLinks(text) {
+  return text.split(URL_REGEX).map((part, i) => {
+    if (!URL_REGEX.test(part)) return part;
+    const href = /^https?:\/\//i.test(part) ? part : `https://${part}`;
+    return (
+      <a key={i} href={href} target="_blank" rel="noopener noreferrer" className={styles.adLink}>
+        {part}
+      </a>
+    );
+  });
+}
+
 const AD_ROW = 7;
 const AD_COL = 6;
 const AD_W = 3;
@@ -401,7 +415,7 @@ export default function GameBoard({ onOtherHouseClick }) {
           )}
           <div className={styles.adContent}>
             {ads.length > 0 ? (
-              <span className={styles.adText}>{ads[adIndex]?.text}</span>
+              <span className={styles.adText}>{renderWithLinks(ads[adIndex]?.text ?? "")}</span>
             ) : (
               <span className={styles.adEmptyText}>פרסם כאן!</span>
             )}
@@ -423,6 +437,7 @@ export default function GameBoard({ onOtherHouseClick }) {
               maxLength={120}
             />
             <p className={styles.adPopupInfo}>עולה 100 מטבעות. הפרסום ישאר בלוח שבוע אחד.</p>
+            <p className={styles.adPopupInfo}>מותר לפרסם הכל, גם קישורים. אנא שימרו על שפה נאותה.</p>
             <div className={styles.adPopupActions}>
               <button
                 className={styles.adPopupSubmit}

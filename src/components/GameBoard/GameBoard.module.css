@@ -130,6 +130,13 @@
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
 }
 
+.adLink {
+  color: #ffd700;
+  text-decoration: underline;
+  cursor: pointer;
+  word-break: break-all;
+}
+
 .adEmptyText {
   font-size: 13px;
   color: #a08a55;
