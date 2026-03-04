@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import styles from "./GameBoard.module.css";
-import useUserStore from "../store/useUserStore";
+import useUserStore from "../../store/useUserStore";
 
 const ROWS = 30;
 const COLS = 15;
@@ -10,7 +10,7 @@ const COLS = 15;
 const createEmptyGrid = () =>
   Array.from({ length: ROWS }, () => Array(COLS).fill(null));
 
-export default function GameBoard() {
+export default function GameBoard({ onOtherHouseClick }) {
   const [grid, setGrid] = useState(createEmptyGrid);
   const [hover, setHover] = useState(null);
   const { user, setMainHouse, needsHousePlacement } = useUserStore();
@@ -131,6 +131,13 @@ export default function GameBoard() {
     const ownerUid = user.firebaseUid || user.uid;
     if (!ownerUid) return;
 
+    // Clicking another user's house → open message compose
+    const cell = grid[row][col];
+    if (cell && cell.building === "main-house" && cell.ownerUid !== ownerUid) {
+      onOtherHouseClick && onOtherHouseClick({ ownerUid: cell.ownerUid, ownerName: cell.ownerName });
+      return;
+    }
+
     // When guiding right after signup, enforce placement only in that mode
     if (needsHousePlacement === true) {
       // ok, we are in placement mode
@@ -235,7 +242,7 @@ export default function GameBoard() {
                       className={styles.mainHouse}
                     />
                   </div>
-              )}
+                )}
             </div>
           );
         })
@@ -243,6 +250,4 @@ export default function GameBoard() {
     </div>
   );
 }
-
-
 

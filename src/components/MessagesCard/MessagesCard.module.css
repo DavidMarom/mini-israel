@@ -1,0 +1,109 @@
+.card {
+  background-color: #c1c1c1;
+  border-radius: 16px;
+  max-width: 280px;
+  width: 100%;
+  pointer-events: auto;
+  margin-right: auto;
+  overflow: hidden;
+}
+
+.header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111;
+  text-align: right;
+}
+
+.badge {
+  background-color: #16a34a;
+  color: #fff;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 7px;
+  line-height: 1.4;
+}
+
+.chevron {
+  margin-right: auto;
+  font-size: 11px;
+  color: #555;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  max-height: 260px;
+  overflow-y: auto;
+  border-top: 1px solid #aaa;
+}
+
+.empty {
+  padding: 12px 20px;
+  font-size: 13px;
+  color: #666;
+  margin: 0;
+}
+
+.message {
+  padding: 10px 20px;
+  background-color: #d0d0d0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.unread {
+  background-color: #e8e8e8;
+  border-right: 3px solid #394a75;
+}
+
+.messageTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.from {
+  font-size: 12px;
+  font-weight: 700;
+  color: #394a75;
+}
+
+.deleteBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 0;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  line-height: 1;
+}
+
+.message:hover .deleteBtn {
+  opacity: 1;
+}
+
+.text {
+  font-size: 13px;
+  color: #222;
+  margin: 0;
+  word-break: break-word;
+}
+
+.time {
+  font-size: 11px;
+  color: #888;
+  align-self: flex-end;
+}
