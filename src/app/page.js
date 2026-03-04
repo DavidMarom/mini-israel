@@ -10,7 +10,15 @@ import useUserStore from "../store/useUserStore";
 const provider = new GoogleAuthProvider();
 
 export default function Home() {
+  const [isMobile, setIsMobile] = useState(false);
   const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [backendUser, setBackendUser] = useState(null);
@@ -192,6 +200,14 @@ export default function Home() {
       setComposeSending(false);
     }
   };
+
+  if (isMobile) {
+    return (
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100dvh", textAlign: "center", padding: "2rem", fontSize: "1.5rem", direction: "rtl" }}>
+        האתר בנוי לשימוש בטאבלט או מחשב
+      </div>
+    );
+  }
 
   return (
     <div className={styles.page}>
