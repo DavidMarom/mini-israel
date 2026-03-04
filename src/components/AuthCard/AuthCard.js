@@ -3,14 +3,16 @@
 import { useState } from "react";
 import styles from "./AuthCard.module.css";
 
-export default function AuthCard({ loading, user, displayName, money, photoURL, onGoogleSignIn, onLogout, error, onUpdateName }) {
+export default function AuthCard({ loading, user, displayName, bio, money, photoURL, onGoogleSignIn, onLogout, error, onUpdateName }) {
 
   const [avatarBroken, setAvatarBroken] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState(displayName || "");
+  const [editedBio, setEditedBio] = useState(bio || "");
 
   const handleStartEdit = () => {
     setEditedName(displayName || "");
+    setEditedBio(bio || "");
     setIsEditingName(true);
   };
 
@@ -20,7 +22,7 @@ export default function AuthCard({ loading, user, displayName, money, photoURL, 
       return;
     }
 
-    const success = await onUpdateName(editedName);
+    const success = await onUpdateName(editedName, editedBio);
     if (success) {
       setIsEditingName(false);
     }
@@ -48,7 +50,8 @@ export default function AuthCard({ loading, user, displayName, money, photoURL, 
 
             {isEditingName ? (
               <div className={styles.nameEditColumn}>
-                <input className={styles.nameInput} value={editedName} onChange={(e) => setEditedName(e.target.value)} />
+                <input className={styles.nameInput} value={editedName} onChange={(e) => setEditedName(e.target.value)} placeholder="שם תצוגה" />
+                <textarea className={styles.bioInput} value={editedBio} onChange={(e) => setEditedBio(e.target.value)} placeholder="ביו..." rows={2} />
                 <button type="button" className={styles.saveNameButton} onClick={handleSaveEdit}>שמור</button>
               </div>
             ) : (
@@ -59,6 +62,10 @@ export default function AuthCard({ loading, user, displayName, money, photoURL, 
             )}
           </div>
 
+          {!isEditingName && bio && (
+            <p className={styles.bio}>{bio}</p>
+          )}
+
           <p className={styles.balanceText}>מטבעות: <span className={styles.balanceValue}>{money ?? 0}</span> שקלים</p>
           <button onClick={onLogout} className={styles.secondaryButton}>התנתק</button>
         </>
@@ -68,5 +75,3 @@ export default function AuthCard({ loading, user, displayName, money, photoURL, 
     </div>
   );
 }
-
-
