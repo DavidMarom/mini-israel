@@ -22,6 +22,11 @@ function renderWithLinks(text) {
   });
 }
 
+const AZRIELI_ROW = 4;
+const AZRIELI_COL = 12;
+const AZRIELI_W = 2;
+const AZRIELI_H = 2;
+
 const AD_ROW = 7;
 const AD_COL = 6;
 const AD_W = 3;
@@ -36,6 +41,15 @@ export default function GameBoard({ onOtherHouseClick }) {
   const [houseTooltip, setHouseTooltip] = useState(null); // { x, y, ownerName, bio }
   const tooltipTimer = useRef(null);
   const { user, setUser, setMainHouse, needsHousePlacement } = useUserStore();
+
+  const [showAzrieliToast, setShowAzrieliToast] = useState(false);
+  const azrieliToastTimer = useRef(null);
+
+  const handleAzrieliClick = () => {
+    setShowAzrieliToast(true);
+    clearTimeout(azrieliToastTimer.current);
+    azrieliToastTimer.current = setTimeout(() => setShowAzrieliToast(false), 3000);
+  };
 
   const [ads, setAds] = useState([]);
   const [adIndex, setAdIndex] = useState(0);
@@ -393,6 +407,23 @@ export default function GameBoard({ onOtherHouseClick }) {
             );
           })
         )}
+
+        {/* Azrieli Building */}
+        <div
+          className={styles.azrieliBoard}
+          style={{
+            top: AZRIELI_ROW * TILE_SIZE,
+            left: AZRIELI_COL * TILE_SIZE,
+            width: AZRIELI_W * TILE_SIZE,
+            height: AZRIELI_H * TILE_SIZE,
+          }}
+          onClick={handleAzrieliClick}
+        >
+          <img src="/assets/Azrieli-Building.png" alt="בניין אזריאלי" className={styles.azrieliBuilding} />
+          {showAzrieliToast && (
+            <div className={styles.azrieliToast}>הקניון יפתח בקרוב!</div>
+          )}
+        </div>
 
         {/* Advertisement Board */}
         <div

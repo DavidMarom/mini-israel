@@ -23,6 +23,36 @@
   object-fit: contain;
 }
 
+.azrieliBoard {
+  position: absolute;
+  z-index: 10;
+  cursor: pointer;
+}
+
+.azrieliBuilding {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  pointer-events: none;
+}
+
+.azrieliToast {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(20, 20, 30, 0.92);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 8px;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
 .houseWrapper {
   position: relative;
   width: 100%;

@@ -6,6 +6,9 @@ const ROWS = 30;
 const COLS = 15;
 const APPLE_COUNT = 10;
 
+const AZRIELI_ROW = 4;
+const AZRIELI_COL = 12;
+
 function seedApples(existingCells) {
   const occupied = new Set(existingCells.map((c) => `${c.row}-${c.col}`));
   const apples = [];
@@ -28,18 +31,34 @@ export async function GET() {
     const board = db.collection("board");
 
     const existing = await board.findOne({ _id: BOARD_ID });
-    const cells = existing?.cells || [];
+    let cells = existing?.cells || [];
 
     const hasApples = cells.some((c) => c.item === "apple");
-    if (!hasApples) {
-      const apples = seedApples(cells);
-      const newCells = [...cells, ...apples];
+    const azrieliTiles = [
+      { row: AZRIELI_ROW,     col: AZRIELI_COL },
+      { row: AZRIELI_ROW,     col: AZRIELI_COL + 1 },
+      { row: AZRIELI_ROW + 1, col: AZRIELI_COL },
+      { row: AZRIELI_ROW + 1, col: AZRIELI_COL + 1 },
+    ];
+    const hasAzrieli = azrieliTiles.every((t) =>
+      cells.some((c) => c.row === t.row && c.col === t.col && c.building === "azrieli")
+    );
+
+    if (!hasApples || !hasAzrieli) {
+      if (!hasApples) {
+        const apples = seedApples(cells);
+        cells = [...cells, ...apples];
+      }
+      if (!hasAzrieli) {
+        cells = cells.filter((c) => !azrieliTiles.some((t) => t.row === c.row && t.col === c.col));
+        azrieliTiles.forEach((t) => cells.push({ row: t.row, col: t.col, building: "azrieli" }));
+      }
       await board.updateOne(
         { _id: BOARD_ID },
-        { $set: { rows: ROWS, cols: COLS, cells: newCells, updatedAt: new Date() } },
+        { $set: { rows: ROWS, cols: COLS, cells, updatedAt: new Date() } },
         { upsert: true }
       );
-      return NextResponse.json({ _id: BOARD_ID, rows: ROWS, cols: COLS, cells: newCells }, { status: 200 });
+      return NextResponse.json({ _id: BOARD_ID, rows: ROWS, cols: COLS, cells }, { status: 200 });
     }
 
     return NextResponse.json(existing, { status: 200 });
