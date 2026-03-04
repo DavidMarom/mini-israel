@@ -8,6 +8,25 @@ const ROWS = 30;
 const COLS = 15;
 const TILE_SIZE = 64;
 
+const URL_REGEX = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
+
+function renderWithLinks(text) {
+  return text.split(URL_REGEX).map((part, i) => {
+    if (!URL_REGEX.test(part)) return part;
+    const href = /^https?:\/\//i.test(part) ? part : `https://${part}`;
+    return (
+      <a key={i} href={href} target="_blank" rel="noopener noreferrer" className={styles.adLink}>
+        {part}
+      </a>
+    );
+  });
+}
+
+const AZRIELI_ROW = 4;
+const AZRIELI_COL = 12;
+const AZRIELI_W = 2;
+const AZRIELI_H = 2;
+
 const AD_ROW = 7;
 const AD_COL = 6;
 const AD_W = 3;
@@ -22,6 +41,15 @@ export default function GameBoard({ onOtherHouseClick }) {
   const [houseTooltip, setHouseTooltip] = useState(null); // { x, y, ownerName, bio }
   const tooltipTimer = useRef(null);
   const { user, setUser, setMainHouse, needsHousePlacement } = useUserStore();
+
+  const [showAzrieliToast, setShowAzrieliToast] = useState(false);
+  const azrieliToastTimer = useRef(null);
+
+  const handleAzrieliClick = () => {
+    setShowAzrieliToast(true);
+    clearTimeout(azrieliToastTimer.current);
+    azrieliToastTimer.current = setTimeout(() => setShowAzrieliToast(false), 3000);
+  };
 
   const [ads, setAds] = useState([]);
   const [adIndex, setAdIndex] = useState(0);
@@ -380,6 +408,23 @@ export default function GameBoard({ onOtherHouseClick }) {
           })
         )}
 
+        {/* Azrieli Building */}
+        <div
+          className={styles.azrieliBoard}
+          style={{
+            top: AZRIELI_ROW * TILE_SIZE,
+            left: AZRIELI_COL * TILE_SIZE,
+            width: AZRIELI_W * TILE_SIZE,
+            height: AZRIELI_H * TILE_SIZE,
+          }}
+          onClick={handleAzrieliClick}
+        >
+          <img src="/assets/Azrieli-Building.png" alt="בניין אזריאלי" className={styles.azrieliBuilding} />
+          {showAzrieliToast && (
+            <div className={styles.azrieliToast}>הקניון יפתח בקרוב!</div>
+          )}
+        </div>
+
         {/* Advertisement Board */}
         <div
           className={styles.adBoard}
@@ -401,7 +446,7 @@ export default function GameBoard({ onOtherHouseClick }) {
           )}
           <div className={styles.adContent}>
             {ads.length > 0 ? (
-              <span className={styles.adText}>{ads[adIndex]?.text}</span>
+              <span className={styles.adText}>{renderWithLinks(ads[adIndex]?.text ?? "")}</span>
             ) : (
               <span className={styles.adEmptyText}>פרסם כאן!</span>
             )}
@@ -423,6 +468,7 @@ export default function GameBoard({ onOtherHouseClick }) {
               maxLength={120}
             />
             <p className={styles.adPopupInfo}>עולה 100 מטבעות. הפרסום ישאר בלוח שבוע אחד.</p>
+            <p className={styles.adPopupInfo}>מותר לפרסם הכל, גם קישורים. אנא שימרו על שפה נאותה.</p>
             <div className={styles.adPopupActions}>
               <button
                 className={styles.adPopupSubmit}
