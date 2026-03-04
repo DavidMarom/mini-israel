@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./GameBoard.module.css";
 import useUserStore from "../../store/useUserStore";
 
@@ -13,7 +13,9 @@ const createEmptyGrid = () =>
 export default function GameBoard({ onOtherHouseClick }) {
   const [grid, setGrid] = useState(createEmptyGrid);
   const [hover, setHover] = useState(null);
-  const { user, setMainHouse, needsHousePlacement } = useUserStore();
+  const [houseTooltip, setHouseTooltip] = useState(null); // { x, y, ownerName, bio }
+  const tooltipTimer = useRef(null);
+  const { user, setUser, setMainHouse, needsHousePlacement } = useUserStore();
 
   useEffect(() => {
     let cancelled = false;
@@ -42,6 +44,7 @@ export default function GameBoard({ onOtherHouseClick }) {
                 building: cell.building || null,
                 ownerUid: cell.ownerUid || null,
                 ownerName: cell.ownerName || null,
+                item: cell.item || null,
               };
             }
           });
@@ -64,13 +67,14 @@ export default function GameBoard({ onOtherHouseClick }) {
     for (let row = 0; row < ROWS; row++) {
       for (let col = 0; col < COLS; col++) {
         const cell = g[row][col];
-        if (cell && cell.building) {
+        if (cell && (cell.building || cell.item)) {
           cells.push({
             row,
             col,
-            building: cell.building,
+            building: cell.building || null,
             ownerUid: cell.ownerUid || null,
             ownerName: cell.ownerName || null,
+            item: cell.item || null,
           });
         }
       }
@@ -131,8 +135,32 @@ export default function GameBoard({ onOtherHouseClick }) {
     const ownerUid = user.firebaseUid || user.uid;
     if (!ownerUid) return;
 
-    // Clicking another user's house → open message compose
     const cell = grid[row][col];
+
+    // Collecting an apple
+    if (cell && cell.item === "apple") {
+      const next = grid.map((r) => r.slice());
+      next[row][col] = null;
+      setGrid(next);
+      void persistBoard(next);
+
+      fetch("/api/user/money", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid: ownerUid, amount: 10 }),
+      })
+        .then((r) => r.json())
+        .then((data) => {
+          if (typeof data.money === "number") {
+            setUser((prev) => ({ ...prev, money: data.money }));
+          }
+        })
+        .catch(console.error);
+
+      return;
+    }
+
+    // Clicking another user's house → open message compose
     if (cell && cell.building === "main-house" && cell.ownerUid !== ownerUid) {
       onOtherHouseClick && onOtherHouseClick({ ownerUid: cell.ownerUid, ownerName: cell.ownerName });
       return;
@@ -180,13 +208,47 @@ export default function GameBoard({ onOtherHouseClick }) {
     setMainHouse({ row, col });
   };
 
+  const handleHouseMouseEnter = (e, cell) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    tooltipTimer.current = setTimeout(async () => {
+      let bio = null;
+      try {
+        const res = await fetch(`/api/user/profile?uid=${cell.ownerUid}`);
+        const data = await res.json();
+        bio = data.bio || null;
+      } catch (_) {}
+      setHouseTooltip({
+        x: rect.left + rect.width / 2,
+        y: rect.top,
+        ownerName: cell.ownerName,
+        bio,
+      });
+    }, 1000);
+  };
+
+  const handleHouseMouseLeave = () => {
+    clearTimeout(tooltipTimer.current);
+    setHouseTooltip(null);
+  };
+
   return (
+    <>
+    {houseTooltip && (
+      <div
+        className={styles.houseTooltip}
+        style={{ left: houseTooltip.x, top: houseTooltip.y }}
+      >
+        <span className={styles.houseTooltipName}>{houseTooltip.ownerName}</span>
+        {houseTooltip.bio && <span className={styles.houseTooltipBio}>{houseTooltip.bio}</span>}
+      </div>
+    )}
     <div className={styles.board}>
       {Array.from({ length: ROWS }).map((_, row) =>
         Array.from({ length: COLS }).map((_, col) => {
           const key = `${row}-${col}`;
           const cell = grid[row][col];
           const hasMainHouse = cell && cell.building === "main-house";
+          const hasApple = cell && cell.item === "apple";
           const isEmpty = !cell;
           const ownerUid = user && (user.firebaseUid || user.uid);
           const userHasHouse =
@@ -211,13 +273,20 @@ export default function GameBoard({ onOtherHouseClick }) {
               key={key}
               className={styles.tile}
               onClick={() => handleClick(row, col)}
-              onMouseEnter={() => setHover({ row, col })}
-              onMouseLeave={() =>
+              onMouseEnter={(e) => {
+                setHover({ row, col });
+                if (hasMainHouse) handleHouseMouseEnter(e, cell);
+              }}
+              onMouseLeave={() => {
                 setHover((prev) =>
                   prev && prev.row === row && prev.col === col ? null : prev
-                )
-              }
+                );
+                if (hasMainHouse) handleHouseMouseLeave();
+              }}
             >
+              {hasApple && (
+                <span className={styles.apple}>🍎</span>
+              )}
               {hasMainHouse && (
                 <div className={styles.houseWrapper}>
                   <img
@@ -248,6 +317,7 @@ export default function GameBoard({ onOtherHouseClick }) {
         })
       )}
     </div>
+    </>
   );
 }
 

@@ -76,6 +76,7 @@ export default function Home() {
           photoURL: firebaseUser.photoURL,
           mongoId: data.user._id,
           money: typeof data.user.money === "number" ? data.user.money : 0,
+          bio: data.user.bio ?? null,
           createdAt: data.user.createdAt,
           updatedAt: data.user.updatedAt,
         };
@@ -118,7 +119,7 @@ export default function Home() {
     }
   };
 
-  const saveName = async (newName) => {
+  const saveName = async (newName, newBio) => {
     if (!backendUser) return false;
     const trimmed = newName.trim();
     if (!trimmed) return false;
@@ -133,6 +134,7 @@ export default function Home() {
           uid: backendUser.uid,
           email: backendUser.email,
           name: trimmed,
+          bio: typeof newBio === "string" ? newBio.trim() : undefined,
           forceUpdate: true,
         }),
       });
@@ -147,6 +149,7 @@ export default function Home() {
         setUserStore((prev) => ({
           ...(prev || {}),
           name: data.user.name,
+          bio: data.user.bio ?? null,
           updatedAt: data.user.updatedAt,
         }));
       }
@@ -211,6 +214,7 @@ export default function Home() {
             (backendUser && backendUser.money) ||
             0
           }
+          bio={(storedUser && storedUser.bio) || (backendUser && backendUser.bio) || ""}
           photoURL={user ? user.photoURL : null}
           onGoogleSignIn={handleGoogleSignIn}
           onLogout={handleLogout}
@@ -218,6 +222,7 @@ export default function Home() {
           onUpdateName={saveName}
         />
         <MessagesCard user={storedUser} />
+        <p className={styles.tagline}>מיני ישראל מתחדשת כל הזמן! בכל יום פריטים חדשים ויכולות נוספות...</p>
       </div>
 
       {composeTarget && (
