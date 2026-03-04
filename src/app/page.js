@@ -223,6 +223,7 @@ export default function Home() {
         />
         <MessagesCard user={storedUser} />
         <p className={styles.tagline}>מיני ישראל מתחדשת כל הזמן! בכל יום פריטים חדשים ויכולות נוספות...</p>
+        <p className={styles.tagline}>אפשר לשלוח הודעות למשתמשים אחרים על ידי לחיצה על הבית שלהם</p>
       </div>
 
       {composeTarget && (
