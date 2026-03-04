@@ -1,5 +1,5 @@
 .page {
-  --background: #b6b16b;
+  --background: #a7a7a7;
   --foreground: #394a75;
   --text-primary: #000;
   --text-secondary: #777;
@@ -8,7 +8,7 @@
   --button-secondary-hover: #f2f2f2;
   --button-secondary-border: #ebebeb;
 
-  position: relative;
+  display: flex;
   width: 100vw;
   height: 100vh;
   overflow: hidden;
@@ -17,18 +17,94 @@
 }
 
 .boardLayer {
-  position: absolute;
-  inset: 0;
+  flex: 1;
 }
 
 .overlay {
-  position: absolute;
-  inset: 0;
+  width: 100%;
   display: flex;
+  flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
+  gap: 12px;
   padding: 24px;
-  pointer-events: none;
+  pointer-events: auto;
+}
+
+.composeBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+}
+
+.composeModal {
+  background: #1e1e2e;
+  border-radius: 16px;
+  padding: 28px 24px;
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.composeTitle {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #e0e0e0;
+}
+
+.composeTextarea {
+  resize: none;
+  border-radius: 10px;
+  border: 1px solid #3a3a55;
+  background: #2a2a3e;
+  color: #e0e0e0;
+  font-size: 14px;
+  padding: 10px 12px;
+  font-family: inherit;
+  outline: none;
+}
+
+.composeTextarea::placeholder {
+  color: #666;
+}
+
+.composeActions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.composeSend {
+  background: #394a75;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.composeSend:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.composeCancel {
+  background: transparent;
+  color: #aaa;
+  border: 1px solid #3a3a55;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  cursor: pointer;
 }
 
 

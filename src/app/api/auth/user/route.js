@@ -4,7 +4,7 @@ import clientPromise from "../../../../services/mongo";
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { uid, email, name, photoURL } = body || {};
+    const { uid, email, name, photoURL, forceUpdate } = body || {};
 
     if (!uid || !email) {
       return NextResponse.json(
@@ -23,7 +23,7 @@ export async function POST(request) {
     if (existing) {
       let update = {};
 
-      if (name && name !== existing.name) {
+      if (name && (forceUpdate || !existing.name)) {
         update.name = name;
       }
 

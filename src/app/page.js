@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import styles from "./page.module.css";
 import { auth } from "../services/fb";
 import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut, } from "firebase/auth";
-import { GameBoard, NameModal, AuthCard } from "../components";
+import { GameBoard, NameModal, AuthCard, MessagesCard } from "../components";
 import useUserStore from "../store/useUserStore";
 
 const provider = new GoogleAuthProvider();
@@ -16,6 +16,9 @@ export default function Home() {
   const [backendUser, setBackendUser] = useState(null);
   const [showNameModal, setShowNameModal] = useState(false);
   const [nameInput, setNameInput] = useState("");
+  const [composeTarget, setComposeTarget] = useState(null); // { ownerUid, ownerName }
+  const [composeText, setComposeText] = useState("");
+  const [composeSending, setComposeSending] = useState(false);
 
   const {
     user: storedUser,
@@ -130,6 +133,7 @@ export default function Home() {
           uid: backendUser.uid,
           email: backendUser.email,
           name: trimmed,
+          forceUpdate: true,
         }),
       });
 
@@ -162,10 +166,34 @@ export default function Home() {
     }
   };
 
+  const handleSendMessage = async () => {
+    if (!composeText.trim() || !composeTarget || !storedUser) return;
+    setComposeSending(true);
+    try {
+      await fetch("/api/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fromUid: storedUser.firebaseUid,
+          fromName: storedUser.name,
+          toUid: composeTarget.ownerUid,
+          toName: composeTarget.ownerName,
+          text: composeText,
+        }),
+      });
+      setComposeTarget(null);
+      setComposeText("");
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setComposeSending(false);
+    }
+  };
+
   return (
     <div className={styles.page}>
       <div className={styles.boardLayer}>
-        <GameBoard />
+        <GameBoard onOtherHouseClick={(target) => { setComposeTarget(target); setComposeText(""); }} />
       </div>
 
       <div className={styles.overlay}>
@@ -189,10 +217,32 @@ export default function Home() {
           error={error}
           onUpdateName={saveName}
         />
+        <MessagesCard user={storedUser} />
       </div>
 
+      {composeTarget && (
+        <div className={styles.composeBackdrop}>
+          <div className={styles.composeModal}>
+            <p className={styles.composeTitle}>הודעה ל{composeTarget.ownerName}</p>
+            <textarea
+              className={styles.composeTextarea}
+              value={composeText}
+              onChange={(e) => setComposeText(e.target.value)}
+              placeholder="כתוב הודעה..."
+              rows={4}
+            />
+            <div className={styles.composeActions}>
+              <button className={styles.composeSend} onClick={handleSendMessage} disabled={composeSending || !composeText.trim()}>
+                {composeSending ? "שולח..." : "שלח"}
+              </button>
+              <button className={styles.composeCancel} onClick={() => setComposeTarget(null)}>ביטול</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showNameModal && (<NameModal name={nameInput} onChangeName={setNameInput} onSave={handleSaveName} />)}
-      
+
     </div>
   );
 }
