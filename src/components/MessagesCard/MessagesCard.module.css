@@ -80,19 +80,112 @@
   color: #394a75;
 }
 
+.msgActions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.message:hover .msgActions {
+  opacity: 1;
+}
+
+.replyBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+  line-height: 1;
+  color: #394a75;
+}
+
 .deleteBtn {
   background: none;
   border: none;
   cursor: pointer;
   font-size: 13px;
   padding: 0;
-  opacity: 0;
-  transition: opacity 0.15s ease;
   line-height: 1;
 }
 
-.message:hover .deleteBtn {
-  opacity: 1;
+.replyBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+}
+
+.replyModal {
+  background: #1e1e2e;
+  border-radius: 16px;
+  padding: 28px 24px;
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  direction: rtl;
+}
+
+.replyTitle {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #e0e0e0;
+}
+
+.replyTextarea {
+  resize: none;
+  border-radius: 10px;
+  border: 1px solid #3a3a55;
+  background: #2a2a3e;
+  color: #e0e0e0;
+  font-size: 14px;
+  padding: 10px 12px;
+  font-family: inherit;
+  outline: none;
+}
+
+.replyTextarea::placeholder {
+  color: #666;
+}
+
+.replyActions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.replySend {
+  background: #394a75;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.replySend:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.replyCancel {
+  background: transparent;
+  color: #aaa;
+  border: 1px solid #3a3a55;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  cursor: pointer;
 }
 
 .text {

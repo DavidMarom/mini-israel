@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import styles from "./GameBoard.module.css";
 import useUserStore from "../../store/useUserStore";
 
-const ROWS = 30;
+const ROWS = 230;
 const COLS = 15;
 const TILE_SIZE = 64;
 
@@ -26,6 +26,11 @@ const AZRIELI_ROW = 4;
 const AZRIELI_COL = 12;
 const AZRIELI_W = 2;
 const AZRIELI_H = 2;
+
+const SYNAGOGUE_ROW = 50;
+const SYNAGOGUE_COL = 7;
+const SYNAGOGUE_W = 2;
+const SYNAGOGUE_H = 2;
 
 const AD_ROW = 7;
 const AD_COL = 6;
@@ -437,6 +442,19 @@ export default function GameBoard({ onOtherHouseClick }) {
           onClick={handleAzrieliClick}
         >
           <img src="/assets/azrieli.png" alt="בניין אזריאלי" className={styles.azrieliBuilding} />
+        </div>
+
+        {/* Synagogue */}
+        <div
+          className={styles.uniqueBuilding}
+          style={{
+            top: SYNAGOGUE_ROW * TILE_SIZE,
+            left: SYNAGOGUE_COL * TILE_SIZE,
+            width: SYNAGOGUE_W * TILE_SIZE,
+            height: SYNAGOGUE_H * TILE_SIZE,
+          }}
+        >
+          <img src="/assets/synagogue.png" alt="בית כנסת" className={styles.azrieliBuilding} />
         </div>
 
         {/* Advertisement Board */}

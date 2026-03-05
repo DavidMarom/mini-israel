@@ -2,12 +2,15 @@ import { NextResponse } from "next/server";
 import clientPromise from "../../../services/mongo";
 
 const BOARD_ID = "main-board";
-const ROWS = 30;
+const ROWS = 230;
 const COLS = 15;
 const APPLE_COUNT = 10;
 
 const AZRIELI_ROW = 4;
 const AZRIELI_COL = 12;
+
+const SYNAGOGUE_ROW = 50;
+const SYNAGOGUE_COL = 7;
 
 function seedApples(existingCells) {
   const occupied = new Set(existingCells.map((c) => `${c.row}-${c.col}`));
@@ -34,6 +37,7 @@ export async function GET() {
     let cells = existing?.cells || [];
 
     const hasApples = cells.some((c) => c.item === "apple");
+
     const azrieliTiles = [
       { row: AZRIELI_ROW,     col: AZRIELI_COL },
       { row: AZRIELI_ROW,     col: AZRIELI_COL + 1 },
@@ -44,7 +48,17 @@ export async function GET() {
       cells.some((c) => c.row === t.row && c.col === t.col && c.building === "azrieli")
     );
 
-    if (!hasApples || !hasAzrieli) {
+    const synagogueTiles = [
+      { row: SYNAGOGUE_ROW,     col: SYNAGOGUE_COL },
+      { row: SYNAGOGUE_ROW,     col: SYNAGOGUE_COL + 1 },
+      { row: SYNAGOGUE_ROW + 1, col: SYNAGOGUE_COL },
+      { row: SYNAGOGUE_ROW + 1, col: SYNAGOGUE_COL + 1 },
+    ];
+    const hasSynagogue = synagogueTiles.every((t) =>
+      cells.some((c) => c.row === t.row && c.col === t.col && c.building === "synagogue")
+    );
+
+    if (!hasApples || !hasAzrieli || !hasSynagogue) {
       if (!hasApples) {
         const apples = seedApples(cells);
         cells = [...cells, ...apples];
@@ -52,6 +66,10 @@ export async function GET() {
       if (!hasAzrieli) {
         cells = cells.filter((c) => !azrieliTiles.some((t) => t.row === c.row && t.col === c.col));
         azrieliTiles.forEach((t) => cells.push({ row: t.row, col: t.col, building: "azrieli" }));
+      }
+      if (!hasSynagogue) {
+        cells = cells.filter((c) => !synagogueTiles.some((t) => t.row === c.row && t.col === c.col));
+        synagogueTiles.forEach((t) => cells.push({ row: t.row, col: t.col, building: "synagogue" }));
       }
       await board.updateOne(
         { _id: BOARD_ID },

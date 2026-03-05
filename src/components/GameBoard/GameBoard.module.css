@@ -4,7 +4,7 @@
   overflow-y: auto;
   overflow-x: hidden;
   display: grid;
-  grid-template-rows: repeat(30, 64px);
+  grid-template-rows: repeat(230, 64px);
   grid-template-columns: repeat(15, 64px);
   background-color: #1f2937;
   position: relative;
@@ -27,6 +27,12 @@
   position: absolute;
   z-index: 10;
   cursor: pointer;
+}
+
+.uniqueBuilding {
+  position: absolute;
+  z-index: 10;
+  pointer-events: none;
 }
 
 .azrieliBuilding {

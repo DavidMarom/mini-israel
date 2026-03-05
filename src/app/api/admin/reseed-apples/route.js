@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import clientPromise from "../../../../services/mongo";
 
 const BOARD_ID = "main-board";
-const ROWS = 30;
+const ROWS = 230;
 const COLS = 15;
 const APPLE_COUNT = 10;
 
