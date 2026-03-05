@@ -85,6 +85,7 @@ export default function Home() {
           mongoId: data.user._id,
           money: typeof data.user.money === "number" ? data.user.money : 0,
           bio: data.user.bio ?? null,
+          inventory: data.user.inventory ?? [],
           createdAt: data.user.createdAt,
           updatedAt: data.user.updatedAt,
         };
@@ -231,6 +232,7 @@ export default function Home() {
             0
           }
           bio={(storedUser && storedUser.bio) || (backendUser && backendUser.bio) || ""}
+          inventory={(storedUser && storedUser.inventory) || []}
           photoURL={user ? user.photoURL : null}
           onGoogleSignIn={handleGoogleSignIn}
           onLogout={handleLogout}

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import styles from "./AuthCard.module.css";
 
-export default function AuthCard({ loading, user, displayName, bio, money, photoURL, onGoogleSignIn, onLogout, error, onUpdateName }) {
+export default function AuthCard({ loading, user, displayName, bio, money, inventory, photoURL, onGoogleSignIn, onLogout, error, onUpdateName }) {
 
   const [avatarBroken, setAvatarBroken] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
@@ -67,6 +67,25 @@ export default function AuthCard({ loading, user, displayName, bio, money, photo
           )}
 
           <p className={styles.balanceText}>מטבעות: <span className={styles.balanceValue}>{money ?? 0}</span> שקלים</p>
+
+          {inventory && inventory.length > 0 && (
+            <div className={styles.inventorySection}>
+              <p className={styles.inventoryTitle}>חפצים:</p>
+              <div className={styles.inventoryItems}>
+                {Object.entries(
+                  inventory.reduce((acc, item) => {
+                    acc[item.emoji] = (acc[item.emoji] || 0) + 1;
+                    return acc;
+                  }, {})
+                ).map(([emoji, count]) => (
+                  <span key={emoji} className={styles.inventoryItem}>
+                    {emoji}{count > 1 ? ` ×${count}` : ""}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
           <button onClick={onLogout} className={styles.secondaryButton}>התנתק</button>
         </>
       )}

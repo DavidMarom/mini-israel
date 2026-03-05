@@ -153,3 +153,29 @@
   color: var(--text-primary);
 }
 
+.inventorySection {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.inventoryTitle {
+  margin: 0;
+  font-size: 12px;
+  color: #555;
+  font-weight: 600;
+}
+
+.inventoryItems {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.inventoryItem {
+  background: #e5e5e5;
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 15px;
+}
+

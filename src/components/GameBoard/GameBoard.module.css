@@ -37,20 +37,100 @@
   pointer-events: none;
 }
 
-.azrieliToast {
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(20, 20, 30, 0.92);
-  color: #fff;
+.shopBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 40;
+}
+
+.shopModal {
+  background: #1e1e2e;
+  border-radius: 16px;
+  padding: 28px 24px;
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  direction: rtl;
+}
+
+.shopTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #e0e0e0;
+  text-align: center;
+}
+
+.shopBalance {
+  margin: 0;
   font-size: 13px;
+  color: #a08a55;
+  text-align: center;
+}
+
+.shopItems {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.shopItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #2a2a3e;
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+
+.shopEmoji {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.shopItemName {
+  flex: 1;
+  font-size: 14px;
   font-weight: 600;
-  padding: 8px 14px;
+  color: #e0e0e0;
+}
+
+.shopItemPrice {
+  font-size: 13px;
+  color: #a08a55;
+}
+
+.shopBuyBtn {
+  background: #e2b455;
+  color: #1a1a2e;
+  border: none;
   border-radius: 8px;
-  white-space: nowrap;
-  pointer-events: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.shopBuyBtn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.shopCloseBtn {
+  background: transparent;
+  color: #aaa;
+  border: 1px solid #3a3a55;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  align-self: center;
 }
 
 .houseWrapper {
