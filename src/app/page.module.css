@@ -56,6 +56,24 @@
   flex: 1;
 }
 
+.whatsappLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #25d366;
+  transition: color 0.15s;
+  flex-shrink: 0;
+}
+
+.whatsappLink:hover {
+  color: #1ebe5d;
+}
+
+.whatsappIcon {
+  width: 22px;
+  height: 22px;
+}
+
 .takanonLink {
   font-size: 12px;
   color: #888;
