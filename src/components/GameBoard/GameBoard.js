@@ -22,8 +22,8 @@ function renderWithLinks(text) {
   });
 }
 
-const AZRIELI_ROW = 4;
-const AZRIELI_COL = 12;
+const AZRIELI_ROW = 11;
+const AZRIELI_COL = 5;
 const AZRIELI_W = 2;
 const AZRIELI_H = 2;
 
@@ -38,7 +38,7 @@ const KNESSET_W = 3;
 const KNESSET_H = 2;
 
 const CAMERA_ROW = 69;
-const CAMERA_COL = 10;
+const CAMERA_COL = 7;
 const CAMERA_W = 2;
 const CAMERA_H = 2;
 
