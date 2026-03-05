@@ -6,8 +6,8 @@ const ROWS = 230;
 const COLS = 15;
 const APPLE_COUNT = 10;
 
-const AZRIELI_ROW = 4;
-const AZRIELI_COL = 12;
+const AZRIELI_ROW = 11;
+const AZRIELI_COL = 5;
 
 const SYNAGOGUE_ROW = 50;
 const SYNAGOGUE_COL = 7;

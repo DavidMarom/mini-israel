@@ -10,6 +10,13 @@
   position: relative;
 }
 
+@media (max-width: 1220px) {
+  .board {
+    /* grid-template-rows: repeat(230, 48px); */
+    grid-template-columns: repeat(15, minmax(32px, 1fr));
+  }
+}
+
 .tile {
   border: none;
   background-image: url('/assets/empty.png');
