@@ -122,5 +122,40 @@
   cursor: pointer;
 }
 
+.composeLabel {
+  margin: 0 0 6px 0;
+  font-size: 12px;
+  color: #888;
+}
+
+.inventoryGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.inventoryItem {
+  background: #2a2a3e;
+  border: 2px solid #3a3a55;
+  border-radius: 8px;
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s;
+}
+
+.inventoryItem:hover {
+  border-color: #6677aa;
+}
+
+.inventoryItemSelected {
+  border-color: #394a75;
+  background: #394a75;
+}
+
 
 

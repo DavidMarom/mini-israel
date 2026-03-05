@@ -27,6 +27,7 @@ export default function Home() {
   const [composeTarget, setComposeTarget] = useState(null); // { ownerUid, ownerName }
   const [composeText, setComposeText] = useState("");
   const [composeSending, setComposeSending] = useState(false);
+  const [composeItemIndex, setComposeItemIndex] = useState(null);
 
   const {
     user: storedUser,
@@ -179,22 +180,43 @@ export default function Home() {
   };
 
   const handleSendMessage = async () => {
-    if (!composeText.trim() || !composeTarget || !storedUser) return;
+    if (!composeTarget || !storedUser) return;
+    if (composeItemIndex === null && !composeText.trim()) return;
     setComposeSending(true);
     try {
-      await fetch("/api/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fromUid: storedUser.firebaseUid,
-          fromName: storedUser.name,
-          toUid: composeTarget.ownerUid,
-          toName: composeTarget.ownerName,
-          text: composeText,
-        }),
-      });
+      if (composeItemIndex !== null) {
+        const res = await fetch("/api/items/send", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            fromUid: storedUser.firebaseUid,
+            fromName: storedUser.name,
+            toUid: composeTarget.ownerUid,
+            toName: composeTarget.ownerName,
+            itemIndex: composeItemIndex,
+            text: composeText,
+          }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setUserStore((prev) => ({ ...prev, inventory: data.inventory }));
+        }
+      } else {
+        await fetch("/api/messages", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            fromUid: storedUser.firebaseUid,
+            fromName: storedUser.name,
+            toUid: composeTarget.ownerUid,
+            toName: composeTarget.ownerName,
+            text: composeText,
+          }),
+        });
+      }
       setComposeTarget(null);
       setComposeText("");
+      setComposeItemIndex(null);
     } catch (err) {
       console.error(err);
     } finally {
@@ -213,7 +235,7 @@ export default function Home() {
   return (
     <div className={styles.page}>
       <div className={styles.boardLayer}>
-        <GameBoard onOtherHouseClick={(target) => { setComposeTarget(target); setComposeText(""); }} />
+        <GameBoard onOtherHouseClick={(target) => { setComposeTarget(target); setComposeText(""); setComposeItemIndex(null); }} />
       </div>
 
       <div className={styles.overlay}>
@@ -248,18 +270,35 @@ export default function Home() {
         <div className={styles.composeBackdrop}>
           <div className={styles.composeModal}>
             <p className={styles.composeTitle}>הודעה ל{composeTarget.ownerName}</p>
+            {storedUser?.inventory?.length > 0 && (
+              <div>
+                <p className={styles.composeLabel}>שלח פריט (אופציונלי):</p>
+                <div className={styles.inventoryGrid}>
+                  {storedUser.inventory.map((item, i) => (
+                    <button
+                      key={i}
+                      className={`${styles.inventoryItem} ${composeItemIndex === i ? styles.inventoryItemSelected : ""}`}
+                      onClick={() => setComposeItemIndex(composeItemIndex === i ? null : i)}
+                      title={item.name}
+                    >
+                      {item.emoji}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
             <textarea
               className={styles.composeTextarea}
               value={composeText}
               onChange={(e) => setComposeText(e.target.value)}
-              placeholder="כתוב הודעה..."
-              rows={4}
+              placeholder={composeItemIndex !== null ? "הוסף הודעה (אופציונלי)..." : "כתוב הודעה..."}
+              rows={3}
             />
             <div className={styles.composeActions}>
-              <button className={styles.composeSend} onClick={handleSendMessage} disabled={composeSending || !composeText.trim()}>
+              <button className={styles.composeSend} onClick={handleSendMessage} disabled={composeSending || (composeItemIndex === null && !composeText.trim())}>
                 {composeSending ? "שולח..." : "שלח"}
               </button>
-              <button className={styles.composeCancel} onClick={() => setComposeTarget(null)}>ביטול</button>
+              <button className={styles.composeCancel} onClick={() => { setComposeTarget(null); setComposeItemIndex(null); }}>ביטול</button>
             </div>
           </div>
         </div>
