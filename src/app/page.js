@@ -239,6 +239,11 @@ export default function Home() {
       </div>
 
       <div className={styles.overlay}>
+        <div className={styles.siteHeader}>
+          <img src="/assets/main-house.png" alt="מיני ישראל" className={styles.siteLogo} />
+          <span className={styles.siteTitle}>מיני ישראל</span>
+          <a href="/takanon" className={styles.takanonLink} target="_blank" rel="noopener noreferrer">תקנון</a>
+        </div>
         <AuthCard
           loading={loading}
           user={user}
