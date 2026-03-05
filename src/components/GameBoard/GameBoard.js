@@ -32,6 +32,11 @@ const SYNAGOGUE_COL = 7;
 const SYNAGOGUE_W = 2;
 const SYNAGOGUE_H = 2;
 
+const KNESSET_ROW = 57;
+const KNESSET_COL = 9;
+const KNESSET_W = 3;
+const KNESSET_H = 2;
+
 const AD_ROW = 7;
 const AD_COL = 6;
 const AD_W = 3;
@@ -482,6 +487,19 @@ export default function GameBoard({ onOtherHouseClick }) {
           onClick={handleSynagogueClick}
         >
           <img src="/assets/synagogue.png" alt="בית כנסת" className={styles.azrieliBuilding} />
+        </div>
+
+        {/* Knesset */}
+        <div
+          className={styles.azrieliBoard}
+          style={{
+            top: KNESSET_ROW * TILE_SIZE,
+            left: KNESSET_COL * TILE_SIZE,
+            width: KNESSET_W * TILE_SIZE,
+            height: KNESSET_H * TILE_SIZE,
+          }}
+        >
+          <img src="/assets/knesset.png" alt="הכנסת" className={styles.azrieliBuilding} />
         </div>
 
         {/* Advertisement Board */}
