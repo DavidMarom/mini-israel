@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import styles from "./GameBoard.module.css";
 import useUserStore from "../../store/useUserStore";
 
-const ROWS = 30;
+const ROWS = 230;
 const COLS = 15;
 const TILE_SIZE = 64;
 
@@ -27,6 +27,11 @@ const AZRIELI_COL = 12;
 const AZRIELI_W = 2;
 const AZRIELI_H = 2;
 
+const SYNAGOGUE_ROW = 50;
+const SYNAGOGUE_COL = 7;
+const SYNAGOGUE_W = 2;
+const SYNAGOGUE_H = 2;
+
 const AD_ROW = 7;
 const AD_COL = 6;
 const AD_W = 3;
@@ -43,6 +48,25 @@ export default function GameBoard({ onOtherHouseClick }) {
   const { user, setUser, setMainHouse, needsHousePlacement } = useUserStore();
 
   const [showAzrieliShop, setShowAzrieliShop] = useState(false);
+
+  const [showSynagogue, setShowSynagogue] = useState(false);
+  const [parasha, setParasha] = useState(null);
+  const [parashaLoading, setParashaLoading] = useState(false);
+
+  const handleSynagogueClick = async () => {
+    setShowSynagogue(true);
+    if (parasha) return;
+    setParashaLoading(true);
+    try {
+      const res = await fetch("/api/parasha");
+      const data = await res.json();
+      setParasha(data);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setParashaLoading(false);
+    }
+  };
 
   const SHOP_ITEMS = [
     { id: "flower",  emoji: "🌸", name: "פרח",        price: 10 },
@@ -439,6 +463,20 @@ export default function GameBoard({ onOtherHouseClick }) {
           <img src="/assets/azrieli.png" alt="בניין אזריאלי" className={styles.azrieliBuilding} />
         </div>
 
+        {/* Synagogue */}
+        <div
+          className={styles.azrieliBoard}
+          style={{
+            top: SYNAGOGUE_ROW * TILE_SIZE,
+            left: SYNAGOGUE_COL * TILE_SIZE,
+            width: SYNAGOGUE_W * TILE_SIZE,
+            height: SYNAGOGUE_H * TILE_SIZE,
+          }}
+          onClick={handleSynagogueClick}
+        >
+          <img src="/assets/synagogue.png" alt="בית כנסת" className={styles.azrieliBuilding} />
+        </div>
+
         {/* Advertisement Board */}
         <div
           className={styles.adBoard}
@@ -525,6 +563,37 @@ export default function GameBoard({ onOtherHouseClick }) {
               ))}
             </div>
             <button className={styles.shopCloseBtn} onClick={() => setShowAzrieliShop(false)}>סגור</button>
+          </div>
+        </div>
+      )}
+
+      {/* Synagogue Parasha Popup */}
+      {showSynagogue && (
+        <div className={styles.shopBackdrop} onClick={() => setShowSynagogue(false)}>
+          <div className={styles.parashaModal} onClick={(e) => e.stopPropagation()}>
+            <p className={styles.parashaTitle}>🕍 פרשת השבוע</p>
+            {parashaLoading && <p className={styles.parashaLoading}>טוען...</p>}
+            {!parashaLoading && parasha && (
+              <>
+                <p className={styles.parashaName}>{parasha.name}</p>
+                <p className={styles.parashaNameEn}>{parasha.nameEn}</p>
+                {parasha.verses?.length > 0 && (
+                  <div className={styles.parashaText}>
+                    {parasha.verses.map((verse, i) => (
+                      <span key={i}>
+                        <span className={styles.parashaVerseNum}>{i + 1}. </span>
+                        <span dangerouslySetInnerHTML={{ __html: verse }} />
+                        {" "}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+            {!parashaLoading && !parasha && (
+              <p className={styles.parashaLoading}>לא נמצאה פרשה</p>
+            )}
+            <button className={styles.shopCloseBtn} onClick={() => setShowSynagogue(false)}>סגור</button>
           </div>
         </div>
       )}
