@@ -400,10 +400,15 @@ export default function GameBoard({ onOtherHouseClick }) {
               !userHasHouse &&
               isEmpty;
 
+            const isClickable =
+              hasApple ||
+              (hasMainHouse && cell.ownerUid !== ownerUid) ||
+              canPreview;
+
             return (
               <div
                 key={key}
-                className={styles.tile}
+                className={`${styles.tile}${!isClickable ? ` ${styles.tileDefault}` : ""}`}
                 onClick={() => handleClick(row, col)}
                 onMouseEnter={(e) => {
                   setHover({ row, col });
@@ -426,8 +431,10 @@ export default function GameBoard({ onOtherHouseClick }) {
                       alt="בית ראשי"
                       className={styles.mainHouse}
                     />
-                    {cell.ownerName && (
-                      <span className={styles.houseLabel}>{cell.ownerName}</span>
+                    {(cell.ownerUid === ownerUid ? (user?.name || cell.ownerName) : cell.ownerName) && (
+                      <span className={styles.houseLabel}>
+                        {cell.ownerUid === ownerUid ? (user?.name || cell.ownerName) : cell.ownerName}
+                      </span>
                     )}
                   </div>
                 )}
