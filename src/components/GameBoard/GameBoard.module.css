@@ -12,7 +12,9 @@
 
 .tile {
   border: none;
-  background-color: #044504;
+  background-image: url('/assets/empty.png');
+  background-size: cover;
+  background-repeat: no-repeat;
   cursor: pointer;
   position: relative;
 }
