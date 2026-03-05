@@ -42,13 +42,30 @@ export default function GameBoard({ onOtherHouseClick }) {
   const tooltipTimer = useRef(null);
   const { user, setUser, setMainHouse, needsHousePlacement } = useUserStore();
 
-  const [showAzrieliToast, setShowAzrieliToast] = useState(false);
-  const azrieliToastTimer = useRef(null);
+  const [showAzrieliShop, setShowAzrieliShop] = useState(false);
 
-  const handleAzrieliClick = () => {
-    setShowAzrieliToast(true);
-    clearTimeout(azrieliToastTimer.current);
-    azrieliToastTimer.current = setTimeout(() => setShowAzrieliToast(false), 3000);
+  const SHOP_ITEMS = [
+    { id: "flower",  emoji: "🌸", name: "פרח",        price: 10 },
+    { id: "falafel", emoji: "🧆", name: "פלאפל",      price: 25 },
+    { id: "flag",    emoji: "🇮🇱", name: "דגל ישראל", price: 10 },
+  ];
+
+  const handleAzrieliClick = () => setShowAzrieliShop(true);
+
+  const handleBuyItem = async (item) => {
+    if (!user) return;
+    const uid = user.firebaseUid || user.uid;
+    const res = await fetch("/api/shop/buy", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ uid, itemId: item.id }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      alert(data.error === "Insufficient funds" ? "אין מספיק כסף" : "שגיאה, נסה שוב");
+      return;
+    }
+    setUser((prev) => ({ ...prev, money: data.money, inventory: data.inventory }));
   };
 
   const [ads, setAds] = useState([]);
@@ -419,10 +436,7 @@ export default function GameBoard({ onOtherHouseClick }) {
           }}
           onClick={handleAzrieliClick}
         >
-          <img src="/assets/Azrieli-Building.png" alt="בניין אזריאלי" className={styles.azrieliBuilding} />
-          {showAzrieliToast && (
-            <div className={styles.azrieliToast}>הקניון יפתח בקרוב!</div>
-          )}
+          <img src="/assets/azrieli.png" alt="בניין אזריאלי" className={styles.azrieliBuilding} />
         </div>
 
         {/* Advertisement Board */}
@@ -484,6 +498,33 @@ export default function GameBoard({ onOtherHouseClick }) {
                 ביטול
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Azrieli Shop */}
+      {showAzrieliShop && (
+        <div className={styles.shopBackdrop} onClick={() => setShowAzrieliShop(false)}>
+          <div className={styles.shopModal} onClick={(e) => e.stopPropagation()}>
+            <p className={styles.shopTitle}>🏬 קניון אזריאלי</p>
+            <p className={styles.shopBalance}>יתרה: {user?.money ?? 0} שקלים</p>
+            <div className={styles.shopItems}>
+              {SHOP_ITEMS.map((item) => (
+                <div key={item.id} className={styles.shopItem}>
+                  <span className={styles.shopEmoji}>{item.emoji}</span>
+                  <span className={styles.shopItemName}>{item.name}</span>
+                  <span className={styles.shopItemPrice}>{item.price} ₪</span>
+                  <button
+                    className={styles.shopBuyBtn}
+                    onClick={() => handleBuyItem(item)}
+                    disabled={!user || (user.money ?? 0) < item.price}
+                  >
+                    קנה
+                  </button>
+                </div>
+              ))}
+            </div>
+            <button className={styles.shopCloseBtn} onClick={() => setShowAzrieliShop(false)}>סגור</button>
           </div>
         </div>
       )}
