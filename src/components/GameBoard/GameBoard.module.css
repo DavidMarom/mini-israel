@@ -105,7 +105,9 @@
   height: 100%;
   object-fit: contain;
   display: block;
-  pointer-events: none;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 .shopBackdrop {
@@ -190,7 +192,7 @@
 
 .shopBuyBtn:disabled {
   opacity: 0.4;
-  cursor: default;
+  /* cursor: default; */
 }
 
 .shopCloseBtn {
@@ -219,6 +221,7 @@
   font-size: 32px;
   line-height: 1;
   user-select: none;
+  cursor: pointer;
 }
 
 .houseTooltip {
@@ -399,7 +402,7 @@
 
 .adPopupSubmit:disabled {
   opacity: 0.45;
-  cursor: default;
+  /* cursor: default; */
 }
 
 .adPopupCancel {

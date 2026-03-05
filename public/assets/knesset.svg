@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 128">
+  <!-- Shadow -->
+  <ellipse cx="96" cy="120" rx="80" ry="6" fill="#00000022"/>
+
+  <!-- Steps (wide) -->
+  <rect x="16" y="100" width="160" height="6" rx="1" fill="#d4c9a8"/>
+  <rect x="22" y="94" width="148" height="6" rx="1" fill="#ddd3b0"/>
+  <rect x="28" y="88" width="136" height="6" rx="1" fill="#e8dfc0"/>
+
+  <!-- Left wing -->
+  <rect x="10" y="50" width="34" height="44" rx="2" fill="#f0e8cc"/>
+  <rect x="10" y="50" width="7" height="44" rx="1" fill="#d4c49a"/>
+  <!-- Left wing windows -->
+  <rect x="16" y="58" width="7" height="9" rx="1" fill="#aed0e8"/>
+  <rect x="27" y="58" width="7" height="9" rx="1" fill="#aed0e8"/>
+  <rect x="16" y="73" width="7" height="9" rx="1" fill="#aed0e8"/>
+  <rect x="27" y="73" width="7" height="9" rx="1" fill="#aed0e8"/>
+
+  <!-- Right wing -->
+  <rect x="148" y="50" width="34" height="44" rx="2" fill="#f0e8cc"/>
+  <rect x="175" y="50" width="7" height="44" rx="1" fill="#d4c49a"/>
+  <!-- Right wing windows -->
+  <rect x="150" y="58" width="7" height="9" rx="1" fill="#aed0e8"/>
+  <rect x="161" y="58" width="7" height="9" rx="1" fill="#aed0e8"/>
+  <rect x="150" y="73" width="7" height="9" rx="1" fill="#aed0e8"/>
+  <rect x="161" y="73" width="7" height="9" rx="1" fill="#aed0e8"/>
+
+  <!-- Main central building -->
+  <rect x="40" y="38" width="112" height="56" rx="2" fill="#f5edda"/>
+  <!-- Right side shadow -->
+  <rect x="144" y="38" width="8" height="56" rx="1" fill="#ddd3b0"/>
+  <!-- Blue top stripe -->
+  <rect x="40" y="38" width="112" height="7" rx="2" fill="#003d99"/>
+
+  <!-- Central raised portico -->
+  <rect x="68" y="28" width="56" height="16" rx="2" fill="#f5edda"/>
+  <rect x="116" y="28" width="8" height="16" rx="1" fill="#ddd3b0"/>
+  <rect x="68" y="28" width="56" height="6" rx="2" fill="#003d99"/>
+
+  <!-- Columns -->
+  <rect x="72" y="34" width="5" height="54" rx="1" fill="#e0d6b8"/>
+  <rect x="84" y="34" width="5" height="54" rx="1" fill="#e0d6b8"/>
+  <rect x="96" y="34" width="5" height="54" rx="1" fill="#e0d6b8"/>
+  <rect x="108" y="34" width="5" height="54" rx="1" fill="#e0d6b8"/>
+  <rect x="120" y="34" width="5" height="54" rx="1" fill="#e0d6b8"/>
+  <!-- Column capitals -->
+  <rect x="70" y="34" width="9" height="3" rx="1" fill="#c8bc96"/>
+  <rect x="82" y="34" width="9" height="3" rx="1" fill="#c8bc96"/>
+  <rect x="94" y="34" width="9" height="3" rx="1" fill="#c8bc96"/>
+  <rect x="106" y="34" width="9" height="3" rx="1" fill="#c8bc96"/>
+  <rect x="118" y="34" width="9" height="3" rx="1" fill="#c8bc96"/>
+
+  <!-- Entrance door -->
+  <rect x="89" y="72" width="14" height="16" rx="1" fill="#8b6914"/>
+  <rect x="91" y="74" width="5" height="11" rx="1" fill="#6b4f10"/>
+  <rect x="98" y="74" width="5" height="11" rx="1" fill="#6b4f10"/>
+
+  <!-- Main building windows (left side) -->
+  <rect x="46" y="48" width="10" height="12" rx="1" fill="#aed0e8"/>
+  <rect x="60" y="48" width="10" height="12" rx="1" fill="#aed0e8"/>
+  <rect x="46" y="66" width="10" height="12" rx="1" fill="#aed0e8"/>
+  <rect x="60" y="66" width="10" height="12" rx="1" fill="#aed0e8"/>
+  <!-- Main building windows (right side) -->
+  <rect x="122" y="48" width="10" height="12" rx="1" fill="#aed0e8"/>
+  <rect x="136" y="48" width="10" height="12" rx="1" fill="#aed0e8"/>
+  <rect x="122" y="66" width="10" height="12" rx="1" fill="#aed0e8"/>
+  <rect x="136" y="66" width="10" height="12" rx="1" fill="#aed0e8"/>
+
+  <!-- Israeli Flag on flagpole -->
+  <rect x="92" y="10" width="2" height="20" fill="#666"/>
+  <rect x="94" y="10" width="24" height="16" fill="white" stroke="#ccc" stroke-width="0.5"/>
+  <rect x="94" y="11.5" width="24" height="3" fill="#003d99"/>
+  <rect x="94" y="21" width="24" height="3" fill="#003d99"/>
+  <!-- Star of David -->
+  <polygon points="106,13.5 107.7,16.5 104.3,16.5" fill="#003d99"/>
+  <polygon points="106,20.5 107.7,17.5 104.3,17.5" fill="#003d99"/>
+
+  <!-- Menorah monument in front -->
+  <!-- Base plate -->
+  <rect x="82" y="109" width="28" height="3" rx="1" fill="#b8860b"/>
+  <rect x="88" y="107" width="16" height="3" rx="0.5" fill="#b8860b"/>
+  <!-- Stem -->
+  <rect x="95" y="96" width="2" height="11" fill="#c9a020"/>
+  <!-- Horizontal bar -->
+  <line x1="84" y1="105" x2="108" y2="105" stroke="#c9a020" stroke-width="2"/>
+  <!-- Arms (3 each side + center) -->
+  <line x1="87" y1="105" x2="87" y2="98" stroke="#c9a020" stroke-width="1.5"/>
+  <line x1="91" y1="105" x2="91" y2="97" stroke="#c9a020" stroke-width="1.5"/>
+  <line x1="96" y1="96" x2="96" y2="105" stroke="#c9a020" stroke-width="1.5"/>
+  <line x1="101" y1="105" x2="101" y2="97" stroke="#c9a020" stroke-width="1.5"/>
+  <line x1="105" y1="105" x2="105" y2="98" stroke="#c9a020" stroke-width="1.5"/>
+  <!-- Candle tips -->
+  <circle cx="87" cy="97" r="1.2" fill="#c9a020"/>
+  <circle cx="91" cy="96" r="1.2" fill="#c9a020"/>
+  <circle cx="96" cy="95" r="1.2" fill="#c9a020"/>
+  <circle cx="101" cy="96" r="1.2" fill="#c9a020"/>
+  <circle cx="105" cy="97" r="1.2" fill="#c9a020"/>
+</svg>

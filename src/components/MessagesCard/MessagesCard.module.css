@@ -175,7 +175,7 @@
 
 .replySend:disabled {
   opacity: 0.45;
-  cursor: default;
+  /* cursor: default; */
 }
 
 .replyCancel {

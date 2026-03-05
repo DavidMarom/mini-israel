@@ -38,7 +38,7 @@
   margin: 0;
   font-size: 12px;
   color: #333;
-  max-width: 280px;
+  max-width: 100%;
   line-height: 1.5;
   pointer-events: none;
   background-color: #fef08a;
@@ -109,7 +109,7 @@
 
 .composeSend:disabled {
   opacity: 0.45;
-  cursor: default;
+  /* cursor: default; */
 }
 
 .composeCancel {
