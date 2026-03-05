@@ -37,6 +37,11 @@ const KNESSET_COL = 9;
 const KNESSET_W = 3;
 const KNESSET_H = 2;
 
+const CAMERA_ROW = 69;
+const CAMERA_COL = 10;
+const CAMERA_W = 2;
+const CAMERA_H = 2;
+
 const AD_ROW = 7;
 const AD_COL = 6;
 const AD_W = 3;
@@ -53,6 +58,65 @@ export default function GameBoard({ onOtherHouseClick }) {
   const { user, setUser, setMainHouse, needsHousePlacement } = useUserStore();
 
   const [showAzrieliShop, setShowAzrieliShop] = useState(false);
+
+  const [cameraPhoto, setCameraPhoto] = useState(null);
+  const [showCameraPopup, setShowCameraPopup] = useState(false);
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
+
+  useEffect(() => {
+    fetch("/api/camera-photo")
+      .then((r) => r.json())
+      .then((data) => { if (data.photo) setCameraPhoto(data.photo); })
+      .catch(console.error);
+  }, []);
+
+  useEffect(() => {
+    if (!showCameraPopup) return;
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then((stream) => {
+        streamRef.current = stream;
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      })
+      .catch(console.error);
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((t) => t.stop());
+        streamRef.current = null;
+      }
+    };
+  }, [showCameraPopup]);
+
+  const handleCapture = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext("2d").drawImage(video, 0, 0);
+    const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+    setCameraPhoto(dataUrl);
+    fetch("/api/camera-photo", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ photo: dataUrl }),
+    }).catch(console.error);
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
+    }
+    setShowCameraPopup(false);
+  };
+
+  const handleCloseCameraPopup = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
+    }
+    setShowCameraPopup(false);
+  };
 
   const [showSynagogue, setShowSynagogue] = useState(false);
   const [parasha, setParasha] = useState(null);
@@ -502,6 +566,36 @@ export default function GameBoard({ onOtherHouseClick }) {
           <img src="/assets/knesset.png" alt="הכנסת" className={styles.azrieliBuilding} />
         </div>
 
+        {/* Camera Widget */}
+        <div
+          className={styles.cameraWidget}
+          style={{
+            top: CAMERA_ROW * TILE_SIZE,
+            left: CAMERA_COL * TILE_SIZE,
+            width: CAMERA_W * TILE_SIZE,
+            height: CAMERA_H * TILE_SIZE,
+          }}
+          onClick={() => setShowCameraPopup(true)}
+        >
+          {cameraPhoto && (
+            <img src={cameraPhoto} alt="תמונה שלי" className={styles.cameraPhoto} />
+          )}
+          <div className={`${styles.cameraPlaceholder} ${cameraPhoto ? styles.cameraPlaceholderOverlay : ""}`}>
+            <span className={styles.cameraIcon}>📷</span>
+            {!cameraPhoto && <span className={styles.cameraLabel}>צלם אותי</span>}
+          </div>
+        </div>
+        <div
+          className={styles.cameraCaption}
+          style={{
+            top: (CAMERA_ROW + CAMERA_H) * TILE_SIZE + 4,
+            left: CAMERA_COL * TILE_SIZE,
+            width: CAMERA_W * TILE_SIZE,
+          }}
+        >
+          צלמו את עצמכם!
+        </div>
+
         {/* Advertisement Board */}
         <div
           className={styles.adBoard}
@@ -588,6 +682,20 @@ export default function GameBoard({ onOtherHouseClick }) {
               ))}
             </div>
             <button className={styles.shopCloseBtn} onClick={() => setShowAzrieliShop(false)}>סגור</button>
+          </div>
+        </div>
+      )}
+
+      {/* Camera Popup */}
+      {showCameraPopup && (
+        <div className={styles.cameraBackdrop} onClick={handleCloseCameraPopup}>
+          <div className={styles.cameraModal} onClick={(e) => e.stopPropagation()}>
+            <p className={styles.cameraTitle}>צלם תמונה</p>
+            <video ref={videoRef} autoPlay playsInline className={styles.cameraVideo} />
+            <div className={styles.cameraActions}>
+              <button className={styles.cameraSnapBtn} onClick={handleCapture}>צלם</button>
+              <button className={styles.cameraCancelBtn} onClick={handleCloseCameraPopup}>ביטול</button>
+            </div>
           </div>
         </div>
       )}
