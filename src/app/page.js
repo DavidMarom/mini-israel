@@ -13,12 +13,24 @@ export default function Home() {
   const [isMobile, setIsMobile] = useState(false);
   const [user, setUser] = useState(null);
   const [taglines, setTaglines] = useState([]);
+  const [showMissile, setShowMissile] = useState(false);
+  const [missileBottom, setMissileBottom] = useState(30);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
     check();
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
+  }, []);
+
+  useEffect(() => {
+    const fireMissile = () => {
+      setMissileBottom(10 + Math.random() * 60);
+      setShowMissile(true);
+      setTimeout(() => setShowMissile(false), 4000);
+    };
+    const interval = setInterval(fireMissile, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -330,6 +342,15 @@ export default function Home() {
       )}
 
       {showNameModal && (<NameModal name={nameInput} onChangeName={setNameInput} onSave={handleSaveName} />)}
+
+      {showMissile && (
+        <img
+          src="/assets/missile.png"
+          alt=""
+          className={styles.missile}
+          style={{ bottom: `${missileBottom}vh` }}
+        />
+      )}
 
     </div>
   );
