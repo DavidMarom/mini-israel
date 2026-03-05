@@ -28,10 +28,10 @@
 
 @keyframes missilefly {
   from {
-    transform: translateX(-200px) translateY(0) rotate(-30deg);
+    transform: translateX(-200px) translateY(0);
   }
   to {
-    transform: translateX(calc(100vw + 200px)) translateY(-800px) rotate(-30deg);
+    transform: translateX(calc(100vw + 200px)) translateY(-400px);
   }
 }
 

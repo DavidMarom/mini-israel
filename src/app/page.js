@@ -25,7 +25,7 @@ export default function Home() {
 
   useEffect(() => {
     const fireMissile = () => {
-      setMissileBottom(10 + Math.random() * 60);
+      setMissileBottom(5 + Math.random() * 25);
       setShowMissile(true);
       setTimeout(() => setShowMissile(false), 4000);
     };
