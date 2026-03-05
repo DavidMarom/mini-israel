@@ -145,20 +145,27 @@ export default function GameBoard({ onOtherHouseClick }) {
 
   const handleAzrieliClick = () => setShowAzrieliShop(true);
 
+  const [buyingItem, setBuyingItem] = useState(null);
+
   const handleBuyItem = async (item) => {
-    if (!user) return;
+    if (!user || buyingItem) return;
     const uid = user.firebaseUid || user.uid;
-    const res = await fetch("/api/shop/buy", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ uid, itemId: item.id }),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      alert(data.error === "Insufficient funds" ? "אין מספיק כסף" : "שגיאה, נסה שוב");
-      return;
+    setBuyingItem(item.id);
+    try {
+      const res = await fetch("/api/shop/buy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid, itemId: item.id }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error === "Insufficient funds" ? "אין מספיק כסף" : "שגיאה, נסה שוב");
+        return;
+      }
+      setUser((prev) => ({ ...prev, money: data.money, inventory: data.inventory }));
+    } finally {
+      setBuyingItem(null);
     }
-    setUser((prev) => ({ ...prev, money: data.money, inventory: data.inventory }));
   };
 
   const [ads, setAds] = useState([]);
@@ -680,9 +687,9 @@ export default function GameBoard({ onOtherHouseClick }) {
                   <button
                     className={styles.shopBuyBtn}
                     onClick={() => handleBuyItem(item)}
-                    disabled={!user || (user.money ?? 0) < item.price}
+                    disabled={!user || (user.money ?? 0) < item.price || !!buyingItem}
                   >
-                    קנה
+                    {buyingItem === item.id ? <span className={styles.shopSpinner} /> : "קנה"}
                   </button>
                 </div>
               ))}
