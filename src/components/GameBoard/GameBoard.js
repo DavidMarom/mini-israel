@@ -230,7 +230,7 @@ export default function GameBoard({ onOtherHouseClick }) {
     if (ads.length <= 1) return;
     adTimerRef.current = setInterval(() => {
       setAdIndex((i) => (i + 1) % ads.length);
-    }, 7000);
+    }, 5000);
     return () => clearInterval(adTimerRef.current);
   }, [ads.length]);
 
@@ -638,7 +638,7 @@ export default function GameBoard({ onOtherHouseClick }) {
               rows={3}
               maxLength={120}
             />
-            <p className={styles.adPopupInfo}>עולה 100 מטבעות. הפרסום ישאר בלוח שבוע אחד.</p>
+            <p className={styles.adPopupInfo}>עולה 100 מטבעות. הפרסום ישאר בלוח 5 ימים.</p>
             <p className={styles.adPopupInfo}>מותר לפרסם הכל, גם קישורים. אנא שימרו על שפה נאותה.</p>
             <div className={styles.adPopupActions}>
               <button

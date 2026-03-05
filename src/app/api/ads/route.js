@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import clientPromise from "../../../services/mongo";
 
 const AD_COST = 100;
-const AD_DURATION_MS = 7 * 24 * 60 * 60 * 1000; // 1 week
+const AD_DURATION_MS = 5 * 24 * 60 * 60 * 1000; // 5 days
 
 export async function GET() {
   try {
