@@ -419,7 +419,7 @@ export default function GameBoard({ onOtherHouseClick }) {
           }}
           onClick={handleAzrieliClick}
         >
-          <img src="/assets/Azrieli-Building.png" alt="בניין אזריאלי" className={styles.azrieliBuilding} />
+          <img src="/assets/azrieli.png" alt="בניין אזריאלי" className={styles.azrieliBuilding} />
           {showAzrieliToast && (
             <div className={styles.azrieliToast}>הקניון יפתח בקרוב!</div>
           )}
