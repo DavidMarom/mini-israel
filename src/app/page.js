@@ -12,12 +12,32 @@ const provider = new GoogleAuthProvider();
 export default function Home() {
   const [isMobile, setIsMobile] = useState(false);
   const [user, setUser] = useState(null);
+  const [taglines, setTaglines] = useState([]);
+  const [showMissile, setShowMissile] = useState(false);
+  const [missileBottom, setMissileBottom] = useState(30);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
     check();
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
+  }, []);
+
+  useEffect(() => {
+    const fireMissile = () => {
+      setMissileBottom(5 + Math.random() * 25);
+      setShowMissile(true);
+      setTimeout(() => setShowMissile(false), 4000);
+    };
+    const interval = setInterval(fireMissile, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/admin/taglines")
+      .then((r) => r.json())
+      .then((data) => { if (Array.isArray(data.taglines)) setTaglines(data.taglines); })
+      .catch(console.error);
   }, []);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -227,7 +247,7 @@ export default function Home() {
   if (isMobile) {
     return (
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100dvh", textAlign: "center", padding: "2rem", fontSize: "1.5rem", direction: "rtl" }}>
-        האתר בנוי לשימוש בטאבלט או מחשב
+        סובב את המכשיר לאופק כדי לשחק במיני ישראל!
       </div>
     );
   }
@@ -278,8 +298,9 @@ export default function Home() {
           onUpdateName={saveName}
         />
         <MessagesCard user={storedUser} />
-        <p className={styles.tagline}>מיני ישראל מתחדשת כל הזמן! בכל יום פריטים חדשים ויכולות נוספות...</p>
-        <p className={styles.tagline}>אפשר לשלוח הודעות למשתמשים אחרים על ידי לחיצה על הבית שלהם</p>
+        {taglines.map((t, i) => (
+          <p key={i} className={styles.tagline}>{t}</p>
+        ))}
       </div>
 
       {composeTarget && (
@@ -321,6 +342,15 @@ export default function Home() {
       )}
 
       {showNameModal && (<NameModal name={nameInput} onChangeName={setNameInput} onSave={handleSaveName} />)}
+
+      {showMissile && (
+        <img
+          src="/assets/missile.png"
+          alt=""
+          className={styles.missile}
+          style={{ bottom: `${missileBottom}vh` }}
+        />
+      )}
 
     </div>
   );

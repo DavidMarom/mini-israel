@@ -16,6 +16,25 @@
   background-color: var(--background);
 }
 
+.missile {
+  position: fixed;
+  left: 0;
+  width: 140px;
+  z-index: 30;
+  pointer-events: none;
+  transform-origin: center center;
+  animation: missilefly 4s linear forwards;
+}
+
+@keyframes missilefly {
+  from {
+    transform: translateX(-200px) translateY(0);
+  }
+  to {
+    transform: translateX(calc(100vw + 200px)) translateY(-400px);
+  }
+}
+
 .boardLayer {
   flex: 1;
 }

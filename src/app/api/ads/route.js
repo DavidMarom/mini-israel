@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import clientPromise from "../../../services/mongo";
+import { ObjectId } from "mongodb";
 
 const AD_COST = 100;
 const AD_DURATION_MS = 5 * 24 * 60 * 60 * 1000; // 5 days
@@ -54,6 +55,20 @@ export async function POST(request) {
     return NextResponse.json({ ok: true, money: result.money }, { status: 200 });
   } catch (error) {
     console.error("Error in POST /api/ads", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
+
+export async function DELETE(request) {
+  try {
+    const { id } = await request.json();
+    if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
+    const client = await clientPromise;
+    const db = client.db("main");
+    await db.collection("ads").deleteOne({ _id: new ObjectId(id) });
+    return NextResponse.json({ ok: true }, { status: 200 });
+  } catch (error) {
+    console.error("Error in DELETE /api/ads", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
