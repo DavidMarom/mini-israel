@@ -309,8 +309,9 @@ export default function GameBoard({ onOtherHouseClick }) {
 
     const cell = grid[row][col];
 
-    // Collecting an apple
-    if (cell && cell.item === "apple") {
+    // Collecting an apple or orange
+    if (cell && (cell.item === "apple" || cell.item === "orange")) {
+      const amount = 5;
       const next = grid.map((r) => r.slice());
       next[row][col] = null;
       setGrid(next);
@@ -319,7 +320,7 @@ export default function GameBoard({ onOtherHouseClick }) {
       fetch("/api/user/money", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ uid: ownerUid, amount: 10 }),
+        body: JSON.stringify({ uid: ownerUid, amount }),
       })
         .then((r) => r.json())
         .then((data) => {
@@ -450,6 +451,7 @@ export default function GameBoard({ onOtherHouseClick }) {
             const cell = grid[row][col];
             const hasMainHouse = cell && cell.building === "main-house";
             const hasApple = cell && cell.item === "apple";
+            const hasOrange = cell && cell.item === "orange";
             const isEmpty = !cell;
             const ownerUid = user && (user.firebaseUid || user.uid);
             const userHasHouse =
@@ -471,6 +473,7 @@ export default function GameBoard({ onOtherHouseClick }) {
 
             const isClickable =
               hasApple ||
+              hasOrange ||
               (hasMainHouse && cell.ownerUid !== ownerUid) ||
               canPreview;
 
@@ -492,6 +495,9 @@ export default function GameBoard({ onOtherHouseClick }) {
               >
                 {hasApple && (
                   <span className={styles.apple}>🍎</span>
+                )}
+                {hasOrange && (
+                  <span className={styles.apple}>🍊</span>
                 )}
                 {hasMainHouse && (
                   <div className={styles.houseWrapper}>
