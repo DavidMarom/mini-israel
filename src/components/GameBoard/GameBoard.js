@@ -49,6 +49,25 @@ export default function GameBoard({ onOtherHouseClick }) {
 
   const [showAzrieliShop, setShowAzrieliShop] = useState(false);
 
+  const [showSynagogue, setShowSynagogue] = useState(false);
+  const [parasha, setParasha] = useState(null);
+  const [parashaLoading, setParashaLoading] = useState(false);
+
+  const handleSynagogueClick = async () => {
+    setShowSynagogue(true);
+    if (parasha) return;
+    setParashaLoading(true);
+    try {
+      const res = await fetch("/api/parasha");
+      const data = await res.json();
+      setParasha(data);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setParashaLoading(false);
+    }
+  };
+
   const SHOP_ITEMS = [
     { id: "flower",  emoji: "🌸", name: "פרח",        price: 10 },
     { id: "falafel", emoji: "🧆", name: "פלאפל",      price: 25 },
@@ -446,13 +465,14 @@ export default function GameBoard({ onOtherHouseClick }) {
 
         {/* Synagogue */}
         <div
-          className={styles.uniqueBuilding}
+          className={styles.azrieliBoard}
           style={{
             top: SYNAGOGUE_ROW * TILE_SIZE,
             left: SYNAGOGUE_COL * TILE_SIZE,
             width: SYNAGOGUE_W * TILE_SIZE,
             height: SYNAGOGUE_H * TILE_SIZE,
           }}
+          onClick={handleSynagogueClick}
         >
           <img src="/assets/synagogue.png" alt="בית כנסת" className={styles.azrieliBuilding} />
         </div>
@@ -543,6 +563,37 @@ export default function GameBoard({ onOtherHouseClick }) {
               ))}
             </div>
             <button className={styles.shopCloseBtn} onClick={() => setShowAzrieliShop(false)}>סגור</button>
+          </div>
+        </div>
+      )}
+
+      {/* Synagogue Parasha Popup */}
+      {showSynagogue && (
+        <div className={styles.shopBackdrop} onClick={() => setShowSynagogue(false)}>
+          <div className={styles.parashaModal} onClick={(e) => e.stopPropagation()}>
+            <p className={styles.parashaTitle}>🕍 פרשת השבוע</p>
+            {parashaLoading && <p className={styles.parashaLoading}>טוען...</p>}
+            {!parashaLoading && parasha && (
+              <>
+                <p className={styles.parashaName}>{parasha.name}</p>
+                <p className={styles.parashaNameEn}>{parasha.nameEn}</p>
+                {parasha.verses?.length > 0 && (
+                  <div className={styles.parashaText}>
+                    {parasha.verses.map((verse, i) => (
+                      <span key={i}>
+                        <span className={styles.parashaVerseNum}>{i + 1}. </span>
+                        <span dangerouslySetInnerHTML={{ __html: verse }} />
+                        {" "}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+            {!parashaLoading && !parasha && (
+              <p className={styles.parashaLoading}>לא נמצאה פרשה</p>
+            )}
+            <button className={styles.shopCloseBtn} onClick={() => setShowSynagogue(false)}>סגור</button>
           </div>
         </div>
       )}
