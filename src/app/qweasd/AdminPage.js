@@ -259,6 +259,44 @@ export default function AdminPage() {
     } catch (e) { console.error(e); } finally { setActionLoading(null); }
   };
 
+  // ── Cashout Requests ─────────────────────────────────
+  const [cashouts, setCashouts] = useState([]);
+  const [cashoutsLoading, setCashoutsLoading] = useState(true);
+  const [cashoutActionLoading, setCashoutActionLoading] = useState(null);
+
+  const loadCashouts = async () => {
+    setCashoutsLoading(true);
+    try {
+      const res = await fetch("/api/cashout");
+      const data = await res.json();
+      if (Array.isArray(data.requests)) setCashouts(data.requests);
+    } catch (e) { console.error(e); } finally { setCashoutsLoading(false); }
+  };
+
+  const handleCashoutStatus = async (id, status) => {
+    setCashoutActionLoading(id + status);
+    try {
+      await fetch("/api/cashout", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, status }),
+      });
+      setCashouts((prev) => prev.map((r) => String(r._id) === id ? { ...r, status } : r));
+    } catch (e) { console.error(e); } finally { setCashoutActionLoading(null); }
+  };
+
+  const handleCashoutDelete = async (id) => {
+    setCashoutActionLoading(id + "delete");
+    try {
+      await fetch("/api/cashout", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      setCashouts((prev) => prev.filter((r) => String(r._id) !== id));
+    } catch (e) { console.error(e); } finally { setCashoutActionLoading(null); }
+  };
+
   useEffect(() => {
     loadUsers();
     loadTaglines();
@@ -266,6 +304,7 @@ export default function AdminPage() {
     loadAdvRequests();
     loadDonations();
     loadYadSaraVisible();
+    loadCashouts();
   }, []);
 
   return (
@@ -615,6 +654,65 @@ export default function AdminPage() {
                     )}
                     <button onClick={() => handleAdvDelete(id)} disabled={!!advActionLoading} style={{ ...actionBtn, background: "#dc2626" }}>
                       {advActionLoading === id + "delete" ? "..." : "מחק"}
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      )}
+
+      <hr style={{ margin: "32px 0" }} />
+
+      {/* ── Cashout Requests ── */}
+      <h2>💵 בקשות המרה לכסף אמיתי</h2>
+      <button onClick={loadCashouts} disabled={cashoutsLoading} style={{ marginBottom: 16, padding: "6px 16px", cursor: "pointer" }}>
+        {cashoutsLoading ? "טוען..." : "רענן"}
+      </button>
+      {cashoutsLoading ? <p>טוען...</p> : cashouts.length === 0 ? <p style={{ color: "#888" }}>אין בקשות עדיין.</p> : (
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+          <thead>
+            <tr style={{ background: "#f0f0f0", textAlign: "right" }}>
+              <th style={th}>שם</th>
+              <th style={th}>טלפון</th>
+              <th style={th}>מטבעות</th>
+              <th style={th}>שקלים</th>
+              <th style={th}>תאריך</th>
+              <th style={th}>סטטוס</th>
+              <th style={th}>פעולות</th>
+            </tr>
+          </thead>
+          <tbody>
+            {cashouts.map((r) => {
+              const id = String(r._id);
+              const statusColors = { new: "#2563eb", paid: "#16a34a", cancelled: "#dc2626" };
+              const statusLabels = { new: "חדש", paid: "שולם", cancelled: "בוטל" };
+              return (
+                <tr key={id} style={{ borderBottom: "1px solid #ddd", background: r.status === "new" ? "#f0fdf4" : "white" }}>
+                  <td style={td}>{r.name || "—"}</td>
+                  <td style={{ ...td, fontWeight: 600 }}>{r.phone}</td>
+                  <td style={td}>{r.coins?.toLocaleString()}</td>
+                  <td style={{ ...td, color: "#15803d", fontWeight: 700 }}>₪{r.ils}</td>
+                  <td style={{ ...td, whiteSpace: "nowrap" }}>{r.createdAt ? new Date(r.createdAt).toLocaleDateString("he-IL") : "—"}</td>
+                  <td style={td}>
+                    <span style={{ color: statusColors[r.status] || "#333", fontWeight: 600 }}>
+                      {statusLabels[r.status] || r.status}
+                    </span>
+                  </td>
+                  <td style={{ ...td, display: "flex", gap: 6, flexWrap: "wrap" }}>
+                    {r.status !== "paid" && (
+                      <button onClick={() => handleCashoutStatus(id, "paid")} disabled={!!cashoutActionLoading} style={{ ...actionBtn, background: "#16a34a" }}>
+                        {cashoutActionLoading === id + "paid" ? "..." : "✅ שולם"}
+                      </button>
+                    )}
+                    {r.status !== "cancelled" && (
+                      <button onClick={() => handleCashoutStatus(id, "cancelled")} disabled={!!cashoutActionLoading} style={{ ...actionBtn, background: "#d97706" }}>
+                        {cashoutActionLoading === id + "cancelled" ? "..." : "בטל"}
+                      </button>
+                    )}
+                    <button onClick={() => handleCashoutDelete(id)} disabled={!!cashoutActionLoading} style={{ ...actionBtn, background: "#dc2626" }}>
+                      {cashoutActionLoading === id + "delete" ? "..." : "מחק"}
                     </button>
                   </td>
                 </tr>
