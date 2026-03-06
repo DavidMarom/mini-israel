@@ -201,6 +201,53 @@
   border-color: #555;
 }
 
+.starHouseBanner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #78350f 0%, #92400e 80%);
+  border: 1px solid #f59e0b;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.25);
+  direction: rtl;
+}
+
+.starHouseIcon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.starHouseText {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.starHouseTitle {
+  font-size: 10px;
+  font-weight: 700;
+  color: #fcd34d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.starHouseName {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fef3c7;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.starHouseSponsor {
+  font-size: 10px;
+  color: #d97706;
+}
+
 .tagline {
   margin: 0;
   font-size: 12px;

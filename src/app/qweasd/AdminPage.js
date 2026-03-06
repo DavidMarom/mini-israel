@@ -88,6 +88,70 @@ export default function AdminPage() {
   };
 
   // ── Users ─────────────────────────────────────────────
+  // ── Treasure Drop ────────────────────────────────────
+  const [treasureRow, setTreasureRow] = useState("");
+  const [treasureCol, setTreasureCol] = useState("");
+  const [treasureSponsor, setTreasureSponsor] = useState("");
+  const [treasureLoading, setTreasureLoading] = useState(false);
+
+  const handleDropTreasure = async () => {
+    setTreasureLoading(true);
+    setStatus(null);
+    try {
+      const body = { sponsor: treasureSponsor || undefined };
+      if (treasureRow !== "") body.row = Number(treasureRow);
+      if (treasureCol !== "") body.col = Number(treasureCol);
+      const res = await fetch("/api/admin/treasure", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      setStatus(data.ok ? `✅ אוצר הוטל בשורה ${data.row}, עמודה ${data.col}` : "❌ שגיאה");
+    } catch (e) {
+      setStatus("❌ Request failed");
+    } finally {
+      setTreasureLoading(false);
+    }
+  };
+
+  // ── Star House ───────────────────────────────────────
+  const [starUid, setStarUid] = useState("");
+  const [starSponsor, setStarSponsor] = useState("");
+  const [starLoading, setStarLoading] = useState(false);
+
+  const handleSetStarHouse = async () => {
+    if (!starUid.trim()) return;
+    setStarLoading(true);
+    setStatus(null);
+    try {
+      const res = await fetch("/api/admin/star-house", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid: starUid.trim(), sponsor: starSponsor || undefined }),
+      });
+      const data = await res.json();
+      setStatus(data.ok ? `✅ בית השבוע: ${data.name}` : `❌ ${data.error || "שגיאה"}`);
+    } catch (e) {
+      setStatus("❌ Request failed");
+    } finally {
+      setStarLoading(false);
+    }
+  };
+
+  const handleClearStarHouse = async () => {
+    setStarLoading(true);
+    try {
+      await fetch("/api/admin/star-house", { method: "DELETE" });
+      setStatus("✅ בית השבוע נמחק");
+    } catch (e) {
+      setStatus("❌ Request failed");
+    } finally {
+      setStarLoading(false);
+    }
+  };
+
+  // ── Users ─────────────────────────────────────────────
   const [users, setUsers] = useState([]);
   const [usersLoading, setUsersLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(null);
@@ -139,6 +203,96 @@ export default function AdminPage() {
         </button>
       </div>
       {status && <p style={{ marginTop: 12 }}>{status}</p>}
+
+      <hr style={{ margin: "32px 0" }} />
+
+      {/* ── Treasure Drop ── */}
+      <h2>💎 הטלת אוצר</h2>
+      <p style={{ fontSize: 13, color: "#555", marginTop: 0 }}>הטל אוצר על הלוח. המשתמש הראשון שימצא אותו יקבל 200 מטבעות.</p>
+      <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "flex-end" }}>
+        <div>
+          <label style={{ display: "block", fontSize: 12, marginBottom: 4 }}>שורה (ריק = אקראי)</label>
+          <input
+            type="number"
+            value={treasureRow}
+            onChange={(e) => setTreasureRow(e.target.value)}
+            style={{ padding: "6px 10px", borderRadius: 6, border: "1px solid #ccc", width: 90 }}
+            placeholder="אקראי"
+          />
+        </div>
+        <div>
+          <label style={{ display: "block", fontSize: 12, marginBottom: 4 }}>עמודה (ריק = אקראי)</label>
+          <input
+            type="number"
+            value={treasureCol}
+            onChange={(e) => setTreasureCol(e.target.value)}
+            style={{ padding: "6px 10px", borderRadius: 6, border: "1px solid #ccc", width: 90 }}
+            placeholder="אקראי"
+          />
+        </div>
+        <div style={{ flex: 1, minWidth: 160 }}>
+          <label style={{ display: "block", fontSize: 12, marginBottom: 4 }}>שם מפרסם (אופציונלי)</label>
+          <input
+            type="text"
+            value={treasureSponsor}
+            onChange={(e) => setTreasureSponsor(e.target.value)}
+            style={{ padding: "6px 10px", borderRadius: 6, border: "1px solid #ccc", width: "100%" }}
+            placeholder="למשל: פיצה גבריאל"
+          />
+        </div>
+        <button
+          onClick={handleDropTreasure}
+          disabled={treasureLoading}
+          style={{ padding: "8px 20px", cursor: "pointer", background: "#7c3aed", color: "#fff", border: "none", borderRadius: 6, fontWeight: 700 }}
+        >
+          {treasureLoading ? "מטיל..." : "💎 הטל אוצר"}
+        </button>
+      </div>
+
+      <hr style={{ margin: "32px 0" }} />
+
+      {/* ── Star House ── */}
+      <h2>⭐ בית השבוע</h2>
+      <p style={{ fontSize: 13, color: "#555", marginTop: 0 }}>בחר משתמש שיקבל כתר ⭐ על הבית שלו ויופיע בבאנר.</p>
+      <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "flex-end" }}>
+        <div style={{ flex: 1, minWidth: 200 }}>
+          <label style={{ display: "block", fontSize: 12, marginBottom: 4 }}>UID של המשתמש</label>
+          <select
+            value={starUid}
+            onChange={(e) => setStarUid(e.target.value)}
+            style={{ padding: "6px 10px", borderRadius: 6, border: "1px solid #ccc", width: "100%" }}
+          >
+            <option value="">-- בחר משתמש --</option>
+            {users.map((u) => (
+              <option key={u.uid} value={u.uid}>{u.name || u.email} ({u.uid.slice(0, 8)}...)</option>
+            ))}
+          </select>
+        </div>
+        <div style={{ flex: 1, minWidth: 160 }}>
+          <label style={{ display: "block", fontSize: 12, marginBottom: 4 }}>שם מפרסם (אופציונלי)</label>
+          <input
+            type="text"
+            value={starSponsor}
+            onChange={(e) => setStarSponsor(e.target.value)}
+            style={{ padding: "6px 10px", borderRadius: 6, border: "1px solid #ccc", width: "100%" }}
+            placeholder="למשל: בנק הפועלים"
+          />
+        </div>
+        <button
+          onClick={handleSetStarHouse}
+          disabled={starLoading || !starUid}
+          style={{ padding: "8px 20px", cursor: "pointer", background: "#92400e", color: "#fff", border: "none", borderRadius: 6, fontWeight: 700 }}
+        >
+          {starLoading ? "שומר..." : "⭐ קבע בית השבוע"}
+        </button>
+        <button
+          onClick={handleClearStarHouse}
+          disabled={starLoading}
+          style={{ padding: "8px 20px", cursor: "pointer", background: "#dc2626", color: "#fff", border: "none", borderRadius: 6 }}
+        >
+          נקה
+        </button>
+      </div>
 
       <hr style={{ margin: "32px 0" }} />
 

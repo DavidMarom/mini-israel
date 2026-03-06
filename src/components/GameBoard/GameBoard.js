@@ -42,6 +42,11 @@ const CAMERA_COL = 7;
 const CAMERA_W = 2;
 const CAMERA_H = 2;
 
+const LEADERBOARD_ROW = 3;
+const LEADERBOARD_COL = 11;
+const LEADERBOARD_W = 2;
+const LEADERBOARD_H = 2;
+
 const AD_ROW = 7;
 const AD_COL = 6;
 const AD_W = 3;
@@ -58,6 +63,17 @@ export default function GameBoard({ onOtherHouseClick }) {
   const { user, setUser, setMainHouse, needsHousePlacement } = useUserStore();
 
   const [showAzrieliShop, setShowAzrieliShop] = useState(false);
+
+  // Config: star house + treasure winner
+  const [starHouseUid, setStarHouseUid] = useState(null);
+  const [starHouseName, setStarHouseName] = useState(null);
+  const [starHouseSponsor, setStarHouseSponsor] = useState(null);
+  const [treasureWinnerToast, setTreasureWinnerToast] = useState(null); // { name, sponsor }
+
+  // Leaderboard
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [leaderboardLoading, setLeaderboardLoading] = useState(false);
 
   const [cameraPhoto, setCameraPhoto] = useState(null);
   const [showCameraPopup, setShowCameraPopup] = useState(false);
@@ -108,6 +124,44 @@ export default function GameBoard({ onOtherHouseClick }) {
       streamRef.current = null;
     }
     setShowCameraPopup(false);
+  };
+
+  useEffect(() => {
+    const fetchConfig = () => {
+      fetch("/api/config")
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.starHouse) {
+            setStarHouseUid(data.starHouse.uid);
+            setStarHouseName(data.starHouse.name);
+            setStarHouseSponsor(data.starHouse.sponsor);
+          }
+          if (data.treasureWinner) {
+            const claimedAt = new Date(data.treasureWinner.claimedAt);
+            const age = Date.now() - claimedAt.getTime();
+            if (age < 24 * 60 * 60 * 1000) {
+              setTreasureWinnerToast({ name: data.treasureWinner.name, sponsor: data.treasureWinner.sponsor });
+              setTimeout(() => setTreasureWinnerToast(null), 8000);
+            }
+          }
+        })
+        .catch(console.error);
+    };
+    fetchConfig();
+    const interval = setInterval(fetchConfig, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleLeaderboardClick = async () => {
+    setShowLeaderboard(true);
+    if (leaderboard.length > 0) return;
+    setLeaderboardLoading(true);
+    try {
+      const res = await fetch("/api/leaderboard");
+      const data = await res.json();
+      if (Array.isArray(data.users)) setLeaderboard(data.users);
+    } catch (e) { console.error(e); }
+    finally { setLeaderboardLoading(false); }
   };
 
   const handleCloseCameraPopup = () => {
@@ -317,6 +371,32 @@ export default function GameBoard({ onOtherHouseClick }) {
     const cell = grid[row][col];
 
     // Collecting an apple or orange
+    if (cell && cell.item === "treasure") {
+      fetch("/api/treasure/collect", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid: ownerUid, name: user.name, row, col }),
+      })
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.error === "Treasure already claimed") {
+            alert("מישהו אחר כבר מצא את האוצר!");
+            return;
+          }
+          if (data.ok) {
+            const next = grid.map((r) => r.slice());
+            next[row][col] = null;
+            setGrid(next);
+            setUser((prev) => ({ ...prev, money: data.money }));
+            const toast = { name: user.name, sponsor: data.sponsor };
+            setTreasureWinnerToast(toast);
+            setTimeout(() => setTreasureWinnerToast(null), 8000);
+          }
+        })
+        .catch(console.error);
+      return;
+    }
+
     if (cell && (cell.item === "apple" || cell.item === "orange")) {
       const amount = 5;
       const next = grid.map((r) => r.slice());
@@ -459,6 +539,8 @@ export default function GameBoard({ onOtherHouseClick }) {
             const hasMainHouse = cell && cell.building === "main-house";
             const hasApple = cell && cell.item === "apple";
             const hasOrange = cell && cell.item === "orange";
+            const hasTreasure = cell && cell.item === "treasure";
+            const isStarHouse = hasMainHouse && starHouseUid && cell.ownerUid === starHouseUid;
             const isEmpty = !cell;
             const ownerUid = user && (user.firebaseUid || user.uid);
             const userHasHouse =
@@ -481,6 +563,7 @@ export default function GameBoard({ onOtherHouseClick }) {
             const isClickable =
               hasApple ||
               hasOrange ||
+              hasTreasure ||
               (hasMainHouse && cell.ownerUid !== ownerUid) ||
               canPreview;
 
@@ -506,6 +589,9 @@ export default function GameBoard({ onOtherHouseClick }) {
                 {hasOrange && (
                   <span className={styles.apple}>🍊</span>
                 )}
+                {hasTreasure && (
+                  <span className={styles.treasure}>💎</span>
+                )}
                 {hasMainHouse && (
                   <div className={styles.houseWrapper}>
                     <img
@@ -518,6 +604,7 @@ export default function GameBoard({ onOtherHouseClick }) {
                         {cell.ownerUid === ownerUid ? (user?.name || cell.ownerName) : cell.ownerName}
                       </span>
                     )}
+                    {isStarHouse && <span className={styles.starBadge}>⭐</span>}
                   </div>
                 )}
                 {!hasMainHouse &&
@@ -577,6 +664,21 @@ export default function GameBoard({ onOtherHouseClick }) {
           }}
         >
           <img src="/assets/knesset.png" alt="הכנסת" className={styles.azrieliBuilding} />
+        </div>
+
+        {/* Leaderboard Building */}
+        <div
+          className={styles.leaderboardBuilding}
+          style={{
+            top: LEADERBOARD_ROW * TILE_SIZE,
+            left: LEADERBOARD_COL * TILE_SIZE,
+            width: LEADERBOARD_W * TILE_SIZE,
+            height: LEADERBOARD_H * TILE_SIZE,
+          }}
+          onClick={handleLeaderboardClick}
+        >
+          <span className={styles.leaderboardBuildingIcon}>🏆</span>
+          <span className={styles.leaderboardBuildingLabel}>מצעד העשירים</span>
         </div>
 
         {/* Camera Widget */}
@@ -709,6 +811,47 @@ export default function GameBoard({ onOtherHouseClick }) {
               <button className={styles.cameraSnapBtn} onClick={handleCapture}>צלם</button>
               <button className={styles.cameraCancelBtn} onClick={handleCloseCameraPopup}>ביטול</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Treasure Winner Toast */}
+      {treasureWinnerToast && (
+        <div className={styles.treasureToast}>
+          <span className={styles.treasureToastGem}>💎</span>
+          <div className={styles.treasureToastText}>
+            <span className={styles.treasureToastName}>{treasureWinnerToast.name} מצא את האוצר!</span>
+            {treasureWinnerToast.sponsor && (
+              <span className={styles.treasureToastSponsor}>בחסות {treasureWinnerToast.sponsor}</span>
+            )}
+          </div>
+          <button className={styles.treasureToastClose} onClick={() => setTreasureWinnerToast(null)}>✕</button>
+        </div>
+      )}
+
+      {/* Leaderboard Modal */}
+      {showLeaderboard && (
+        <div className={styles.shopBackdrop} onClick={() => setShowLeaderboard(false)}>
+          <div className={styles.shopModal} onClick={(e) => e.stopPropagation()}>
+            <p className={styles.shopTitle}>🏆 מצעד העשירים</p>
+            {leaderboardLoading ? (
+              <p className={styles.shopBalance}>טוען...</p>
+            ) : (
+              <div className={styles.leaderboardList}>
+                {leaderboard.map((u, i) => {
+                  const medals = ["🥇", "🥈", "🥉"];
+                  const isMe = user && (user.firebaseUid || user.uid) === u.uid;
+                  return (
+                    <div key={u.uid || i} className={`${styles.leaderboardRow} ${isMe ? styles.leaderboardRowMe : ""}`}>
+                      <span className={styles.leaderboardRank}>{medals[i] || `#${i + 1}`}</span>
+                      <span className={styles.leaderboardName}>{u.name || "אנונימי"}</span>
+                      <span className={styles.leaderboardMoney}>{u.money ?? 0} ₪</span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+            <button className={styles.shopCloseBtn} onClick={() => setShowLeaderboard(false)}>סגור</button>
           </div>
         </div>
       )}
