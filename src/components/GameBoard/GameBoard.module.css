@@ -797,6 +797,117 @@
   direction: rtl;
 }
 
+/* ── Yad Sara Building ── */
+
+.yadSaraBuilding {
+  position: absolute;
+  z-index: 10;
+  cursor: pointer;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 2px solid #e11d48;
+  box-shadow: 0 0 16px rgba(225, 29, 72, 0.4);
+  transition: box-shadow 0.15s;
+}
+
+.yadSaraBuilding:hover {
+  box-shadow: 0 0 26px rgba(225, 29, 72, 0.65);
+}
+
+.yadSaraImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ── Yad Sara Modal ── */
+
+.yadSaraModal {
+  background: #fff;
+  border-radius: 16px;
+  padding: 0 0 24px;
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  direction: rtl;
+  overflow: hidden;
+}
+
+.yadSaraModalImg {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  display: block;
+}
+
+.yadSaraTitle {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: #be123c;
+  padding: 0 20px;
+  text-align: center;
+}
+
+.yadSaraMsg {
+  margin: 0;
+  font-size: 13px;
+  color: #374151;
+  line-height: 1.65;
+  text-align: center;
+  padding: 0 20px;
+}
+
+.yadSaraBalance {
+  margin: 0;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.yadSaraActions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 0 20px;
+}
+
+.yadSaraDonateBtn {
+  background: #e11d48;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 11px 28px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
+  transition: background 0.15s;
+  font-family: inherit;
+}
+
+.yadSaraDonateBtn:hover {
+  background: #be123c;
+}
+
+.yadSaraDonateBtn:disabled {
+  opacity: 0.45;
+}
+
+.yadSaraThanks {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #16a34a;
+  text-align: center;
+  padding: 0 20px;
+}
+
 /* ──────────────────────── */
 
 .houseLabel {

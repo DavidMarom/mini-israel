@@ -151,6 +151,21 @@ export default function AdminPage() {
     }
   };
 
+  // ── Donations ────────────────────────────────────────
+  const [donations, setDonations] = useState([]);
+  const [donationsLoading, setDonationsLoading] = useState(true);
+  const [donationsMeta, setDonationsMeta] = useState({ totalCoins: 0, totalIls: 0 });
+
+  const loadDonations = async () => {
+    setDonationsLoading(true);
+    try {
+      const res = await fetch("/api/donate");
+      const data = await res.json();
+      if (Array.isArray(data.donations)) setDonations(data.donations);
+      setDonationsMeta({ totalCoins: data.totalCoins || 0, totalIls: data.totalIls || 0 });
+    } catch (e) { console.error(e); } finally { setDonationsLoading(false); }
+  };
+
   // ── Advertise Requests ───────────────────────────────
   const [advRequests, setAdvRequests] = useState([]);
   const [advLoading, setAdvLoading] = useState(true);
@@ -224,6 +239,7 @@ export default function AdminPage() {
     loadTaglines();
     loadAds();
     loadAdvRequests();
+    loadDonations();
   }, []);
 
   return (
@@ -454,6 +470,50 @@ export default function AdminPage() {
                     </button>
                   )}
                 </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+
+      <hr style={{ margin: "32px 0" }} />
+
+      {/* ── Donations ── */}
+      <h2>❤️ תרומות יד שרה</h2>
+      <button onClick={loadDonations} disabled={donationsLoading} style={{ marginBottom: 16, padding: "6px 16px", cursor: "pointer" }}>
+        {donationsLoading ? "טוען..." : "רענן"}
+      </button>
+      <div style={{ display: "flex", gap: 24, marginBottom: 16, flexWrap: "wrap" }}>
+        <div style={{ background: "#fef2f2", border: "1px solid #fca5a5", borderRadius: 8, padding: "10px 20px", textAlign: "center" }}>
+          <div style={{ fontSize: 22, fontWeight: 700, color: "#be123c" }}>{donationsMeta.totalCoins.toLocaleString()}</div>
+          <div style={{ fontSize: 12, color: "#9f1239" }}>מטבעות שנתרמו</div>
+        </div>
+        <div style={{ background: "#f0fdf4", border: "1px solid #86efac", borderRadius: 8, padding: "10px 20px", textAlign: "center" }}>
+          <div style={{ fontSize: 22, fontWeight: 700, color: "#15803d" }}>₪{donationsMeta.totalIls.toLocaleString()}</div>
+          <div style={{ fontSize: 12, color: "#166534" }}>לתרומה ליד שרה</div>
+        </div>
+        <div style={{ background: "#f0fdf4", border: "1px solid #86efac", borderRadius: 8, padding: "10px 20px", textAlign: "center" }}>
+          <div style={{ fontSize: 22, fontWeight: 700, color: "#15803d" }}>{donations.length}</div>
+          <div style={{ fontSize: 12, color: "#166534" }}>תורמים</div>
+        </div>
+      </div>
+      {!donationsLoading && donations.length > 0 && (
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14, marginBottom: 8 }}>
+          <thead>
+            <tr style={{ background: "#f0f0f0", textAlign: "right" }}>
+              <th style={th}>שם</th>
+              <th style={th}>מטבעות</th>
+              <th style={th}>שקלים</th>
+              <th style={th}>תאריך</th>
+            </tr>
+          </thead>
+          <tbody>
+            {donations.map((d) => (
+              <tr key={String(d._id)} style={{ borderBottom: "1px solid #ddd" }}>
+                <td style={td}>{d.name || "—"}</td>
+                <td style={td}>{d.coins}</td>
+                <td style={{ ...td, color: "#15803d", fontWeight: 600 }}>₪{d.ils}</td>
+                <td style={td}>{d.createdAt ? new Date(d.createdAt).toLocaleDateString("he-IL") : "—"}</td>
               </tr>
             ))}
           </tbody>
