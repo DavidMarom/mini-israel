@@ -69,12 +69,13 @@ export default function GameBoard({ onOtherHouseClick }) {
 
   const [showAzrieliShop, setShowAzrieliShop] = useState(false);
 
-  // Config: star house + treasure winner
+  // Config: star house + treasure winner + yad sara visibility
   const dismissedTreasureRef = useRef(null); // claimedAt string of dismissed toast
   const [starHouseUid, setStarHouseUid] = useState(null);
   const [starHouseName, setStarHouseName] = useState(null);
   const [starHouseSponsor, setStarHouseSponsor] = useState(null);
   const [treasureWinnerToast, setTreasureWinnerToast] = useState(null); // { name, sponsor }
+  const [yadSaraVisible, setYadSaraVisible] = useState(true);
 
   // Leaderboard
   const [showLeaderboard, setShowLeaderboard] = useState(false);
@@ -150,6 +151,7 @@ export default function GameBoard({ onOtherHouseClick }) {
               setTimeout(() => setTreasureWinnerToast(null), 8000);
             }
           }
+          setYadSaraVisible(data.yadSaraVisible !== false);
         })
         .catch(console.error);
     };
@@ -744,18 +746,20 @@ export default function GameBoard({ onOtherHouseClick }) {
         </div>
 
         {/* Yad Sara Building */}
-        <div
-          className={styles.yadSaraBuilding}
-          style={{
-            top: YAD_SARA_ROW * TILE_SIZE,
-            left: YAD_SARA_COL * TILE_SIZE,
-            width: YAD_SARA_W * TILE_SIZE,
-            height: YAD_SARA_H * TILE_SIZE,
-          }}
-          onClick={() => { setShowYadSara(true); setDonationDone(false); }}
-        >
-          <img src="/assets/yad-sara.jpg" alt="יד שרה" className={styles.yadSaraImg} />
-        </div>
+        {yadSaraVisible && (
+          <div
+            className={styles.yadSaraBuilding}
+            style={{
+              top: YAD_SARA_ROW * TILE_SIZE,
+              left: YAD_SARA_COL * TILE_SIZE,
+              width: YAD_SARA_W * TILE_SIZE,
+              height: YAD_SARA_H * TILE_SIZE,
+            }}
+            onClick={() => { setShowYadSara(true); setDonationDone(false); }}
+          >
+            <img src="/assets/yad-sara.jpg" alt="יד שרה" className={styles.yadSaraImg} />
+          </div>
+        )}
 
         {/* Camera Widget */}
         <div

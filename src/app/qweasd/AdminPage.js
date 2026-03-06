@@ -151,6 +151,31 @@ export default function AdminPage() {
     }
   };
 
+  // ── Yad Sara Visibility ──────────────────────────────
+  const [yadSaraVisible, setYadSaraVisible] = useState(true);
+  const [yadSaraToggleLoading, setYadSaraToggleLoading] = useState(false);
+
+  const loadYadSaraVisible = async () => {
+    try {
+      const res = await fetch("/api/admin/yad-sara");
+      const data = await res.json();
+      setYadSaraVisible(data.visible !== false);
+    } catch (e) { console.error(e); }
+  };
+
+  const handleToggleYadSara = async () => {
+    setYadSaraToggleLoading(true);
+    try {
+      const res = await fetch("/api/admin/yad-sara", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ visible: !yadSaraVisible }),
+      });
+      const data = await res.json();
+      if (data.ok) setYadSaraVisible(data.visible);
+    } catch (e) { console.error(e); } finally { setYadSaraToggleLoading(false); }
+  };
+
   // ── Donations ────────────────────────────────────────
   const [donations, setDonations] = useState([]);
   const [donationsLoading, setDonationsLoading] = useState(true);
@@ -240,6 +265,7 @@ export default function AdminPage() {
     loadAds();
     loadAdvRequests();
     loadDonations();
+    loadYadSaraVisible();
   }, []);
 
   return (
@@ -475,6 +501,23 @@ export default function AdminPage() {
           </tbody>
         </table>
       )}
+
+      <hr style={{ margin: "32px 0" }} />
+
+      {/* ── Yad Sara Visibility ── */}
+      <h2>🏠 בניין יד שרה</h2>
+      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+        <span style={{ fontSize: 14 }}>
+          הבניין כרגע: <strong style={{ color: yadSaraVisible ? "#16a34a" : "#dc2626" }}>{yadSaraVisible ? "מוצג" : "מוסתר"}</strong>
+        </span>
+        <button
+          onClick={handleToggleYadSara}
+          disabled={yadSaraToggleLoading}
+          style={{ padding: "8px 20px", cursor: "pointer", background: yadSaraVisible ? "#dc2626" : "#16a34a", color: "#fff", border: "none", borderRadius: 6, fontWeight: 700 }}
+        >
+          {yadSaraToggleLoading ? "..." : yadSaraVisible ? "הסתר בניין" : "הצג בניין"}
+        </button>
+      </div>
 
       <hr style={{ margin: "32px 0" }} />
 
