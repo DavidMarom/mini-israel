@@ -756,6 +756,47 @@
   white-space: nowrap;
 }
 
+/* ── Knesset Sell Modal ── */
+
+.knessetSellPrice {
+  font-size: 13px;
+  font-weight: 700;
+  color: #16a34a;
+}
+
+.knessetSellBtn {
+  background: #16a34a;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+  min-width: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.knessetSellBtn:hover {
+  background: #15803d;
+}
+
+.knessetSellBtn:disabled {
+  opacity: 0.4;
+}
+
+.knessetEmpty {
+  margin: 0;
+  font-size: 13px;
+  color: #666;
+  text-align: center;
+  line-height: 1.6;
+  direction: rtl;
+}
+
 /* ──────────────────────── */
 
 .houseLabel {
