@@ -920,6 +920,201 @@
   padding: 0 20px;
 }
 
+.onlineLabel {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 25;
+  background: rgba(0, 0, 0, 0.65);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  direction: rtl;
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+}
+
+.onlineDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4ade80;
+  flex-shrink: 0;
+  box-shadow: 0 0 6px #4ade80;
+}
+
+/* ── Cashout Building ── */
+
+.cashoutBuilding {
+  position: absolute;
+  z-index: 10;
+  cursor: pointer;
+  background: linear-gradient(135deg, #14532d, #166534);
+  border: 2px solid #4ade80;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: border-color 0.15s, transform 0.15s;
+  box-shadow: 0 0 12px rgba(74, 222, 128, 0.35);
+}
+
+.cashoutBuilding:hover {
+  border-color: #86efac;
+  transform: scale(1.04);
+}
+
+.cashoutBuildingIcon {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.cashoutBuildingLabel {
+  font-size: 9px;
+  font-weight: 700;
+  color: #bbf7d0;
+  text-align: center;
+  direction: rtl;
+  line-height: 1.2;
+  padding: 0 4px;
+}
+
+.cashoutModal {
+  background: #1a2e1a;
+  border: 1px solid #4ade80;
+  border-radius: 16px;
+  padding: 28px 24px;
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  direction: rtl;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.cashoutTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #4ade80;
+  text-align: center;
+}
+
+.cashoutInfo {
+  background: rgba(74, 222, 128, 0.1);
+  border-radius: 10px;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cashoutInfo p {
+  margin: 0;
+  font-size: 13px;
+  color: #bbf7d0;
+  line-height: 1.6;
+}
+
+.cashoutBalance {
+  margin: 0;
+  font-size: 14px;
+  color: #d1fae5;
+  text-align: center;
+}
+
+.cashoutFields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cashoutField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cashoutField label {
+  font-size: 12px;
+  color: #86efac;
+  font-weight: 600;
+}
+
+.cashoutInput {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #4ade80;
+  background: #0f2010;
+  color: #fff;
+  font-size: 14px;
+  outline: none;
+}
+
+.cashoutInput:focus {
+  border-color: #86efac;
+}
+
+.cashoutCalc {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #4ade80;
+  text-align: center;
+}
+
+.cashoutError {
+  margin: 0;
+  font-size: 13px;
+  color: #f87171;
+  text-align: center;
+}
+
+.cashoutSuccess {
+  margin: 0;
+  font-size: 14px;
+  color: #4ade80;
+  text-align: center;
+  font-weight: 600;
+}
+
+.cashoutActions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.cashoutSubmitBtn {
+  background: #16a34a;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.cashoutSubmitBtn:hover:not(:disabled) {
+  background: #15803d;
+}
+
+.cashoutSubmitBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 /* ──────────────────────── */
 
 .houseLabel {

@@ -52,6 +52,11 @@ const YAD_SARA_COL = LEADERBOARD_COL - 2;
 const YAD_SARA_W = 2;
 const YAD_SARA_H = 2;
 
+const CASHOUT_ROW = CAMERA_ROW + CAMERA_H + 5;
+const CASHOUT_COL = CAMERA_COL - 3;
+const CASHOUT_W = 2;
+const CASHOUT_H = 2;
+
 const AD_ROW = 7;
 const AD_COL = 6;
 const AD_W = 3;
@@ -66,6 +71,43 @@ export default function GameBoard({ onOtherHouseClick }) {
   const [houseTooltip, setHouseTooltip] = useState(null); // { x, y, ownerName, bio }
   const tooltipTimer = useRef(null);
   const { user, setUser, setMainHouse, needsHousePlacement } = useUserStore();
+
+  const [onlineCount] = useState(() => Math.floor(Math.random() * 500) + 500);
+
+  // Cashout
+  const [showCashout, setShowCashout] = useState(false);
+  const [cashoutPhone, setCashoutPhone] = useState("");
+  const [cashoutAmount, setCashoutAmount] = useState("");
+  const [cashoutSending, setCashoutSending] = useState(false);
+  const [cashoutDone, setCashoutDone] = useState(false);
+  const [cashoutError, setCashoutError] = useState("");
+
+  const handleCashout = async () => {
+    setCashoutError("");
+    const coins = Number(cashoutAmount);
+    if (!cashoutPhone.trim()) { setCashoutError("יש להזין מספר טלפון"); return; }
+    if (!coins || coins < 1000) { setCashoutError("מינימום 1000 מטבעות"); return; }
+    if (!user || (user.money ?? 0) < coins) { setCashoutError("אין מספיק מטבעות"); return; }
+    setCashoutSending(true);
+    try {
+      const res = await fetch("/api/cashout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: cashoutPhone.trim(), coins, uid: user.firebaseUid, name: user.name }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        setCashoutDone(true);
+        setUser((prev) => ({ ...prev, money: (prev?.money ?? 0) - coins }));
+      } else {
+        setCashoutError(data.error || "שגיאה, נסה שוב");
+      }
+    } catch (e) {
+      setCashoutError("שגיאה, נסה שוב");
+    } finally {
+      setCashoutSending(false);
+    }
+  };
 
   const [showAzrieliShop, setShowAzrieliShop] = useState(false);
 
@@ -586,6 +628,11 @@ export default function GameBoard({ onOtherHouseClick }) {
 
   return (
     <>
+      <div className={styles.onlineLabel}>
+        <span className={styles.onlineDot} />
+        מחוברים כרגע: <strong>{onlineCount}</strong>
+      </div>
+
       {houseTooltip && (
         <div
           className={styles.houseTooltip}
@@ -790,6 +837,21 @@ export default function GameBoard({ onOtherHouseClick }) {
           }}
         >
           צלמו את עצמכם!
+        </div>
+
+        {/* Cashout Building */}
+        <div
+          className={styles.cashoutBuilding}
+          style={{
+            top: CASHOUT_ROW * TILE_SIZE,
+            left: CASHOUT_COL * TILE_SIZE,
+            width: CASHOUT_W * TILE_SIZE,
+            height: CASHOUT_H * TILE_SIZE,
+          }}
+          onClick={() => { setShowCashout(true); setCashoutDone(false); setCashoutError(""); }}
+        >
+          <span className={styles.cashoutBuildingIcon}>💵</span>
+          <span className={styles.cashoutBuildingLabel}>המר לכסף אמיתי!!</span>
         </div>
 
         {/* Advertisement Board */}
@@ -1000,6 +1062,68 @@ export default function GameBoard({ onOtherHouseClick }) {
                     {donating ? "שולח תרומה..." : "תרום 100 מטבעות"}
                   </button>
                   <button className={styles.shopCloseBtn} onClick={() => setShowYadSara(false)}>סגור</button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Cashout Modal */}
+      {showCashout && (
+        <div className={styles.shopBackdrop} onClick={() => setShowCashout(false)}>
+          <div className={styles.cashoutModal} onClick={(e) => e.stopPropagation()}>
+            <p className={styles.cashoutTitle}>💵 המר מטבעות לכסף אמיתי</p>
+            {cashoutDone ? (
+              <>
+                <p className={styles.cashoutSuccess}>✅ הבקשה התקבלה! הכסף יועבר בביט בהקדם.</p>
+                <button className={styles.shopCloseBtn} onClick={() => setShowCashout(false)}>סגור</button>
+              </>
+            ) : (
+              <>
+                <div className={styles.cashoutInfo}>
+                  <p>הכסף יעבור בביט למספר שתזינו</p>
+                  <p>על כל 100 מטבעות תקבלו 1 שקל אמיתי</p>
+                  <p>מינימום 1000 מטבעות משחק להעברה</p>
+                </div>
+                <p className={styles.cashoutBalance}>יתרתך: <strong>{user?.money ?? 0}</strong> מטבעות</p>
+                <div className={styles.cashoutFields}>
+                  <div className={styles.cashoutField}>
+                    <label>מספר טלפון לביט</label>
+                    <input
+                      type="tel"
+                      value={cashoutPhone}
+                      onChange={(e) => setCashoutPhone(e.target.value)}
+                      placeholder="050-0000000"
+                      className={styles.cashoutInput}
+                      dir="ltr"
+                    />
+                  </div>
+                  <div className={styles.cashoutField}>
+                    <label>כמות מטבעות לפדיון</label>
+                    <input
+                      type="number"
+                      value={cashoutAmount}
+                      onChange={(e) => setCashoutAmount(e.target.value)}
+                      placeholder="מינימום 1000"
+                      className={styles.cashoutInput}
+                      min={1000}
+                    />
+                  </div>
+                </div>
+                {cashoutAmount >= 1000 && (
+                  <p className={styles.cashoutCalc}>תקבל: ₪{Math.floor(Number(cashoutAmount) / 100)}</p>
+                )}
+                {cashoutError && <p className={styles.cashoutError}>{cashoutError}</p>}
+                <div className={styles.cashoutActions}>
+                  <button
+                    className={styles.cashoutSubmitBtn}
+                    onClick={handleCashout}
+                    disabled={cashoutSending || !user}
+                  >
+                    {cashoutSending ? "שולח..." : "שלח בקשה"}
+                  </button>
+                  <button className={styles.shopCloseBtn} onClick={() => setShowCashout(false)}>סגור</button>
                 </div>
               </>
             )}
