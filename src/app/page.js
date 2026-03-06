@@ -14,6 +14,7 @@ export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [taglines, setTaglines] = useState([]);
+  const [starHouse, setStarHouse] = useState(null); // { name, sponsor }
   const [showMissile, setShowMissile] = useState(false);
   const [missileBottom, setMissileBottom] = useState(30);
 
@@ -38,6 +39,13 @@ export default function Home() {
     fetch("/api/admin/taglines")
       .then((r) => r.json())
       .then((data) => { if (Array.isArray(data.taglines)) setTaglines(data.taglines); })
+      .catch(console.error);
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/config")
+      .then((r) => r.json())
+      .then((data) => { if (data.starHouse) setStarHouse(data.starHouse); })
       .catch(console.error);
   }, []);
   const [loading, setLoading] = useState(true);
@@ -311,6 +319,16 @@ export default function Home() {
           onUpdateName={saveName}
         />
         <MessagesCard user={storedUser} />
+        {starHouse && (
+          <div className={styles.starHouseBanner}>
+            <span className={styles.starHouseIcon}>⭐</span>
+            <div className={styles.starHouseText}>
+              <span className={styles.starHouseTitle}>בית השבוע</span>
+              <span className={styles.starHouseName}>{starHouse.name}</span>
+              {starHouse.sponsor && <span className={styles.starHouseSponsor}>בחסות {starHouse.sponsor}</span>}
+            </div>
+          </div>
+        )}
         {taglines.map((t, i) => (
           <p key={i} className={styles.tagline}>{t}</p>
         ))}

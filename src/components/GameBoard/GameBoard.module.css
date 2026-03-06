@@ -572,6 +572,192 @@
 
 /* ──────────────────── */
 
+/* ── Treasure ── */
+
+.treasure {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  line-height: 1;
+  user-select: none;
+  cursor: pointer;
+  animation: treasurePulse 1.2s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px #a855f7) drop-shadow(0 0 16px #7c3aed);
+}
+
+@keyframes treasurePulse {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 8px #a855f7) drop-shadow(0 0 16px #7c3aed); }
+  50% { transform: scale(1.18); filter: drop-shadow(0 0 14px #c084fc) drop-shadow(0 0 28px #a855f7); }
+}
+
+/* ── Star House Badge ── */
+
+.starBadge {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 18px;
+  line-height: 1;
+  z-index: 2;
+  filter: drop-shadow(0 0 4px #fbbf24);
+  animation: starFloat 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes starFloat {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-3px); }
+}
+
+/* ── Treasure Winner Toast ── */
+
+.treasureToast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 60%, #4c1d95 100%);
+  border: 2px solid #a855f7;
+  border-radius: 16px;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  z-index: 60;
+  box-shadow: 0 0 32px rgba(168, 85, 247, 0.5), 0 8px 24px rgba(0,0,0,0.5);
+  direction: rtl;
+  animation: toastIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  min-width: 280px;
+  max-width: 460px;
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(24px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.treasureToastGem {
+  font-size: 32px;
+  flex-shrink: 0;
+  animation: treasurePulse 1.2s ease-in-out infinite;
+}
+
+.treasureToastText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.treasureToastName {
+  font-size: 15px;
+  font-weight: 700;
+  color: #e9d5ff;
+}
+
+.treasureToastSponsor {
+  font-size: 11px;
+  color: #a78bfa;
+}
+
+.treasureToastClose {
+  background: transparent;
+  border: none;
+  color: #7c3aed;
+  font-size: 16px;
+  cursor: pointer;
+  flex-shrink: 0;
+  line-height: 1;
+  padding: 2px 6px;
+}
+
+/* ── Leaderboard Building ── */
+
+.leaderboardBuilding {
+  position: absolute;
+  z-index: 10;
+  cursor: pointer;
+  background: linear-gradient(160deg, #78350f 0%, #92400e 60%, #b45309 100%);
+  border: 2px solid #f59e0b;
+  border-radius: 10px;
+  box-shadow: 0 0 18px rgba(245, 158, 11, 0.4), inset 0 0 10px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: box-shadow 0.15s;
+}
+
+.leaderboardBuilding:hover {
+  box-shadow: 0 0 28px rgba(245, 158, 11, 0.65), inset 0 0 10px rgba(0,0,0,0.3);
+}
+
+.leaderboardBuildingIcon {
+  font-size: 30px;
+  line-height: 1;
+}
+
+.leaderboardBuildingLabel {
+  font-size: 9px;
+  font-weight: 700;
+  color: #fef3c7;
+  direction: rtl;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* ── Leaderboard Modal ── */
+
+.leaderboardList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.leaderboardRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: #e8e8e8;
+  border-radius: 8px;
+}
+
+.leaderboardRowMe {
+  background: #fef9c3;
+  border: 1px solid #f59e0b;
+}
+
+.leaderboardRank {
+  font-size: 18px;
+  flex-shrink: 0;
+  width: 28px;
+  text-align: center;
+}
+
+.leaderboardName {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a2e;
+  direction: rtl;
+}
+
+.leaderboardMoney {
+  font-size: 13px;
+  font-weight: 700;
+  color: #92400e;
+  white-space: nowrap;
+}
+
+/* ──────────────────────── */
+
 .houseLabel {
   position: absolute;
   left: 4px;
