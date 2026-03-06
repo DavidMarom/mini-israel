@@ -259,6 +259,35 @@ export default function AdminPage() {
     } catch (e) { console.error(e); } finally { setActionLoading(null); }
   };
 
+  // ── Edit User ─────────────────────────────────────────
+  const [editUser, setEditUser] = useState(null); // { uid, name, email, money, bio }
+  const [editSaving, setEditSaving] = useState(false);
+  const [editError, setEditError] = useState("");
+
+  const openEditUser = (u) => {
+    setEditUser({ uid: u.uid, name: u.name || "", email: u.email || "", money: u.money ?? 0, bio: u.bio || "" });
+    setEditError("");
+  };
+
+  const handleEditSave = async () => {
+    setEditSaving(true);
+    setEditError("");
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editUser),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        setUsers((prev) => prev.map((u) => u.uid === editUser.uid ? { ...u, ...editUser, money: Number(editUser.money) } : u));
+        setEditUser(null);
+      } else {
+        setEditError(data.error || "שגיאה בשמירה");
+      }
+    } catch (e) { setEditError("שגיאה, נסה שוב"); } finally { setEditSaving(false); }
+  };
+
   // ── Cashout Requests ─────────────────────────────────
   const [cashouts, setCashouts] = useState([]);
   const [cashoutsLoading, setCashoutsLoading] = useState(true);
@@ -614,9 +643,12 @@ export default function AdminPage() {
                     ? <span style={{ color: "#c00", fontWeight: 600 }}>מושעה</span>
                     : <span style={{ color: "#080" }}>פעיל</span>}
                 </td>
-                <td style={td}>
+                <td style={{ ...td, display: "flex", gap: 6 }}>
+                  <button onClick={() => openEditUser(u)} style={{ ...actionBtn, background: "#2563eb" }}>
+                    ✏️ ערוך
+                  </button>
                   {u.suspended ? (
-                    <button onClick={() => handleUserAction(u.uid, "unsuspend")} disabled={actionLoading === u.uid} style={{ ...actionBtn, background: "#2563eb" }}>
+                    <button onClick={() => handleUserAction(u.uid, "unsuspend")} disabled={actionLoading === u.uid} style={{ ...actionBtn, background: "#6b7280" }}>
                       {actionLoading === u.uid ? "..." : "בטל השעיה"}
                     </button>
                   ) : (
@@ -758,6 +790,47 @@ export default function AdminPage() {
       )}
 
       </> /* end advertisers tab */}
+
+      {/* ── Edit User Modal ── */}
+      {editUser && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100 }}
+          onClick={() => setEditUser(null)}>
+          <div style={{ background: "#fff", borderRadius: 16, padding: "32px 28px", width: "100%", maxWidth: 420, direction: "rtl", display: "flex", flexDirection: "column", gap: 14 }}
+            onClick={(e) => e.stopPropagation()}>
+            <h2 style={{ margin: 0, fontSize: 18 }}>✏️ עריכת משתמש</h2>
+
+            {[
+              { label: "שם", key: "name", type: "text" },
+              { label: "אימייל", key: "email", type: "email" },
+              { label: "מטבעות", key: "money", type: "number" },
+              { label: "ביו", key: "bio", type: "text" },
+            ].map(({ label, key, type }) => (
+              <div key={key} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                <label style={{ fontSize: 12, fontWeight: 600, color: "#555" }}>{label}</label>
+                <input
+                  type={type}
+                  value={editUser[key]}
+                  onChange={(e) => setEditUser((prev) => ({ ...prev, [key]: e.target.value }))}
+                  style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #ccc", fontSize: 14, direction: key === "email" ? "ltr" : "rtl" }}
+                />
+              </div>
+            ))}
+
+            {editError && <p style={{ margin: 0, color: "#dc2626", fontSize: 13 }}>{editError}</p>}
+
+            <div style={{ display: "flex", gap: 10, justifyContent: "flex-start" }}>
+              <button onClick={handleEditSave} disabled={editSaving}
+                style={{ ...actionBtn, background: "#16a34a", padding: "10px 24px", fontSize: 14, borderRadius: 8 }}>
+                {editSaving ? "שומר..." : "שמור"}
+              </button>
+              <button onClick={() => setEditUser(null)}
+                style={{ ...actionBtn, background: "#6b7280", padding: "10px 20px", fontSize: 14, borderRadius: 8 }}>
+                ביטול
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

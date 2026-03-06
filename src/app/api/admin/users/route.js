@@ -42,3 +42,24 @@ export async function POST(request) {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
+
+export async function PATCH(request) {
+  try {
+    const { uid, name, email, money, bio } = await request.json();
+    if (!uid) return NextResponse.json({ error: "Missing uid" }, { status: 400 });
+
+    const update = { updatedAt: new Date() };
+    if (name !== undefined) update.name = name;
+    if (email !== undefined) update.email = email;
+    if (money !== undefined) update.money = Number(money);
+    if (bio !== undefined) update.bio = bio;
+
+    const client = await clientPromise;
+    const db = client.db("main");
+    await db.collection("users").updateOne({ uid }, { $set: update });
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    console.error("Error in PATCH /api/admin/users", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
