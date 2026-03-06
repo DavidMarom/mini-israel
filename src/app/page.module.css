@@ -391,5 +391,52 @@
   background: #394a75;
 }
 
+.sidebarFooter {
+  margin-top: auto;
+  padding-top: 16px;
+  font-size: 11px;
+  color: #888;
+  text-align: center;
+  width: 100%;
+  line-height: 1.8;
+  direction: rtl;
+}
+
+.sidebarFooterLink {
+  color: #60a5fa;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.sidebarFooterLink:hover {
+  text-decoration: underline;
+}
+
+.sidebarFooterPhone {
+  color: #4ade80;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.sidebarFooterPhone:hover {
+  text-decoration: underline;
+}
+
+@keyframes scrollBounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.7; }
+  50% { transform: translateX(-50%) translateY(8px); opacity: 1; }
+}
+
+.scrollHint {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  z-index: 30;
+  color: #ffffff;
+  animation: scrollBounce 1.4s ease-in-out infinite;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+
 
 
