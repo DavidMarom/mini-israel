@@ -153,6 +153,7 @@
   width: 100%;
   padding-bottom: 12px;
   border-bottom: 1px solid #2e2e2e;
+  position: relative;
 }
 
 .siteLogo {
@@ -174,7 +175,9 @@
   justify-content: center;
   color: #25d366;
   transition: color 0.15s;
-  flex-shrink: 0;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .whatsappLink:hover {
