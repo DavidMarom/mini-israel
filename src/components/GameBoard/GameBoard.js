@@ -42,8 +42,8 @@ const CAMERA_COL = 7;
 const CAMERA_W = 2;
 const CAMERA_H = 2;
 
-const LEADERBOARD_ROW = 3;
-const LEADERBOARD_COL = 11;
+const LEADERBOARD_ROW = 22;
+const LEADERBOARD_COL = 6;
 const LEADERBOARD_W = 2;
 const LEADERBOARD_H = 2;
 
@@ -65,6 +65,7 @@ export default function GameBoard({ onOtherHouseClick }) {
   const [showAzrieliShop, setShowAzrieliShop] = useState(false);
 
   // Config: star house + treasure winner
+  const dismissedTreasureRef = useRef(null); // claimedAt string of dismissed toast
   const [starHouseUid, setStarHouseUid] = useState(null);
   const [starHouseName, setStarHouseName] = useState(null);
   const [starHouseSponsor, setStarHouseSponsor] = useState(null);
@@ -137,10 +138,10 @@ export default function GameBoard({ onOtherHouseClick }) {
             setStarHouseSponsor(data.starHouse.sponsor);
           }
           if (data.treasureWinner) {
-            const claimedAt = new Date(data.treasureWinner.claimedAt);
-            const age = Date.now() - claimedAt.getTime();
-            if (age < 24 * 60 * 60 * 1000) {
-              setTreasureWinnerToast({ name: data.treasureWinner.name, sponsor: data.treasureWinner.sponsor });
+            const claimedAt = data.treasureWinner.claimedAt;
+            const age = Date.now() - new Date(claimedAt).getTime();
+            if (age < 24 * 60 * 60 * 1000 && dismissedTreasureRef.current !== claimedAt) {
+              setTreasureWinnerToast({ name: data.treasureWinner.name, sponsor: data.treasureWinner.sponsor, claimedAt });
               setTimeout(() => setTreasureWinnerToast(null), 8000);
             }
           }
@@ -853,7 +854,7 @@ export default function GameBoard({ onOtherHouseClick }) {
               <span className={styles.treasureToastSponsor}>בחסות {treasureWinnerToast.sponsor}</span>
             )}
           </div>
-          <button className={styles.treasureToastClose} onClick={() => setTreasureWinnerToast(null)}>✕</button>
+          <button className={styles.treasureToastClose} onClick={() => { dismissedTreasureRef.current = treasureWinnerToast.claimedAt; setTreasureWinnerToast(null); }}>✕</button>
         </div>
       )}
 

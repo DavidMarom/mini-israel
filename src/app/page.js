@@ -283,6 +283,7 @@ export default function Home() {
         <div className={styles.siteHeader}>
           <img src="/assets/main-house.png" alt="מיני ישראל" className={styles.siteLogo} />
           <span className={styles.siteTitle}>מיני ישראל</span>
+          <a href="/advertisers" className={styles.advertisersLink} target="_blank" rel="noopener noreferrer">למפרסמים</a>
           <a
             href="https://wa.me/?text=%D7%91%D7%95%D7%90%D7%95%20%D7%9C%D7%A9%D7%97%D7%A7%20%D7%91%D7%9E%D7%99%D7%A0%D7%99%20%D7%99%D7%A9%D7%A8%D7%90%D7%9C%21%20https%3A%2F%2Fwww.mini-israel.com%2F"
             className={styles.whatsappLink}

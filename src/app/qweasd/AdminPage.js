@@ -151,6 +151,44 @@ export default function AdminPage() {
     }
   };
 
+  // ── Advertise Requests ───────────────────────────────
+  const [advRequests, setAdvRequests] = useState([]);
+  const [advLoading, setAdvLoading] = useState(true);
+  const [advActionLoading, setAdvActionLoading] = useState(null);
+
+  const loadAdvRequests = async () => {
+    setAdvLoading(true);
+    try {
+      const res = await fetch("/api/advertise");
+      const data = await res.json();
+      if (Array.isArray(data.requests)) setAdvRequests(data.requests);
+    } catch (e) { console.error(e); } finally { setAdvLoading(false); }
+  };
+
+  const handleAdvStatus = async (id, status) => {
+    setAdvActionLoading(id + status);
+    try {
+      await fetch("/api/advertise", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, status }),
+      });
+      setAdvRequests((prev) => prev.map((r) => String(r._id) === id ? { ...r, status } : r));
+    } catch (e) { console.error(e); } finally { setAdvActionLoading(null); }
+  };
+
+  const handleAdvDelete = async (id) => {
+    setAdvActionLoading(id + "delete");
+    try {
+      await fetch("/api/advertise", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      setAdvRequests((prev) => prev.filter((r) => String(r._id) !== id));
+    } catch (e) { console.error(e); } finally { setAdvActionLoading(null); }
+  };
+
   // ── Users ─────────────────────────────────────────────
   const [users, setUsers] = useState([]);
   const [usersLoading, setUsersLoading] = useState(true);
@@ -185,6 +223,7 @@ export default function AdminPage() {
     loadUsers();
     loadTaglines();
     loadAds();
+    loadAdvRequests();
   }, []);
 
   return (
@@ -417,6 +456,67 @@ export default function AdminPage() {
                 </td>
               </tr>
             ))}
+          </tbody>
+        </table>
+      )}
+
+      <hr style={{ margin: "32px 0" }} />
+
+      {/* ── Advertise Requests ── */}
+      <h2>📬 פניות מפרסמים</h2>
+      <button onClick={loadAdvRequests} disabled={advLoading} style={{ marginBottom: 16, padding: "6px 16px", cursor: "pointer" }}>
+        {advLoading ? "טוען..." : "רענן"}
+      </button>
+      {advLoading ? <p>טוען...</p> : advRequests.length === 0 ? <p style={{ color: "#888" }}>אין פניות עדיין.</p> : (
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+          <thead>
+            <tr style={{ background: "#f0f0f0", textAlign: "right" }}>
+              <th style={th}>שם</th>
+              <th style={th}>חברה</th>
+              <th style={th}>טלפון</th>
+              <th style={th}>אימייל</th>
+              <th style={th}>הודעה</th>
+              <th style={th}>תאריך</th>
+              <th style={th}>סטטוס</th>
+              <th style={th}>פעולות</th>
+            </tr>
+          </thead>
+          <tbody>
+            {advRequests.map((r) => {
+              const id = String(r._id);
+              const statusColors = { new: "#2563eb", read: "#d97706", done: "#16a34a" };
+              const statusLabels = { new: "חדש", read: "נקרא", done: "טופל" };
+              return (
+                <tr key={id} style={{ borderBottom: "1px solid #ddd", background: r.status === "new" ? "#eff6ff" : "white" }}>
+                  <td style={td}>{r.name}</td>
+                  <td style={{ ...td, color: "#666" }}>{r.company || "—"}</td>
+                  <td style={td}>{r.phone}</td>
+                  <td style={{ ...td, fontSize: 12, color: "#555" }}>{r.email || "—"}</td>
+                  <td style={{ ...td, maxWidth: 240, wordBreak: "break-word" }}>{r.message}</td>
+                  <td style={{ ...td, whiteSpace: "nowrap" }}>{r.createdAt ? new Date(r.createdAt).toLocaleDateString("he-IL") : "—"}</td>
+                  <td style={td}>
+                    <span style={{ color: statusColors[r.status] || "#333", fontWeight: 600 }}>
+                      {statusLabels[r.status] || r.status}
+                    </span>
+                  </td>
+                  <td style={{ ...td, display: "flex", gap: 6, flexWrap: "wrap" }}>
+                    {r.status !== "read" && (
+                      <button onClick={() => handleAdvStatus(id, "read")} disabled={!!advActionLoading} style={{ ...actionBtn, background: "#d97706" }}>
+                        {advActionLoading === id + "read" ? "..." : "סמן נקרא"}
+                      </button>
+                    )}
+                    {r.status !== "done" && (
+                      <button onClick={() => handleAdvStatus(id, "done")} disabled={!!advActionLoading} style={{ ...actionBtn, background: "#16a34a" }}>
+                        {advActionLoading === id + "done" ? "..." : "טופל"}
+                      </button>
+                    )}
+                    <button onClick={() => handleAdvDelete(id)} disabled={!!advActionLoading} style={{ ...actionBtn, background: "#dc2626" }}>
+                      {advActionLoading === id + "delete" ? "..." : "מחק"}
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       )}
