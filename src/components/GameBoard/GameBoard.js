@@ -47,6 +47,11 @@ const LEADERBOARD_COL = 6;
 const LEADERBOARD_W = 2;
 const LEADERBOARD_H = 2;
 
+const YAD_SARA_ROW = LEADERBOARD_ROW + LEADERBOARD_H + 3;
+const YAD_SARA_COL = LEADERBOARD_COL - 2;
+const YAD_SARA_W = 2;
+const YAD_SARA_H = 2;
+
 const AD_ROW = 7;
 const AD_COL = 6;
 const AD_W = 3;
@@ -201,6 +206,34 @@ export default function GameBoard({ onOtherHouseClick }) {
 
   const [showKnesset, setShowKnesset] = useState(false);
   const [sellingItem, setSellingItem] = useState(null); // index being sold
+
+  const [showYadSara, setShowYadSara] = useState(false);
+  const [donating, setDonating] = useState(false);
+  const [donationDone, setDonationDone] = useState(false);
+
+  const handleDonate = async () => {
+    if (!user || donating) return;
+    const uid = user.firebaseUid || user.uid;
+    setDonating(true);
+    try {
+      const res = await fetch("/api/donate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid, name: user.name }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error === "Insufficient funds" ? "אין מספיק מטבעות לתרומה" : "שגיאה, נסה שוב");
+        return;
+      }
+      setUser((prev) => ({ ...prev, money: data.money }));
+      setDonationDone(true);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setDonating(false);
+    }
+  };
 
   const handleSellItem = async (itemIndex) => {
     if (!user || sellingItem !== null) return;
@@ -710,6 +743,20 @@ export default function GameBoard({ onOtherHouseClick }) {
           <span className={styles.leaderboardBuildingLabel}>מצעד העשירים</span>
         </div>
 
+        {/* Yad Sara Building */}
+        <div
+          className={styles.yadSaraBuilding}
+          style={{
+            top: YAD_SARA_ROW * TILE_SIZE,
+            left: YAD_SARA_COL * TILE_SIZE,
+            width: YAD_SARA_W * TILE_SIZE,
+            height: YAD_SARA_H * TILE_SIZE,
+          }}
+          onClick={() => { setShowYadSara(true); setDonationDone(false); }}
+        >
+          <img src="/assets/yad-sara.jpg" alt="יד שרה" className={styles.yadSaraImg} />
+        </div>
+
         {/* Camera Widget */}
         <div
           className={styles.cameraWidget}
@@ -918,6 +965,37 @@ export default function GameBoard({ onOtherHouseClick }) {
               </div>
             )}
             <button className={styles.shopCloseBtn} onClick={() => setShowKnesset(false)}>סגור</button>
+          </div>
+        </div>
+      )}
+
+      {/* Yad Sara Donation Popup */}
+      {showYadSara && (
+        <div className={styles.shopBackdrop} onClick={() => setShowYadSara(false)}>
+          <div className={styles.yadSaraModal} onClick={(e) => e.stopPropagation()}>
+            <img src="/assets/yad-sara.jpg" alt="יד שרה" className={styles.yadSaraModalImg} />
+            <p className={styles.yadSaraTitle}>❤️ תרומה לעמותת יד שרה</p>
+            {donationDone ? (
+              <>
+                <p className={styles.yadSaraThanks}>תודה רבה על תרומתך! 🙏</p>
+                <button className={styles.shopCloseBtn} onClick={() => setShowYadSara(false)}>סגור</button>
+              </>
+            ) : (
+              <>
+                <p className={styles.yadSaraMsg}>בכל תרומה של 100 מטבעות משחק, אנחנו נתרום 2 שקלים לעמותת יד שרה!</p>
+                <p className={styles.yadSaraBalance}>יתרתך: {user?.money ?? 0} מטבעות</p>
+                <div className={styles.yadSaraActions}>
+                  <button
+                    className={styles.yadSaraDonateBtn}
+                    onClick={handleDonate}
+                    disabled={donating || !user || (user?.money ?? 0) < 100}
+                  >
+                    {donating ? "שולח תרומה..." : "תרום 100 מטבעות"}
+                  </button>
+                  <button className={styles.shopCloseBtn} onClick={() => setShowYadSara(false)}>סגור</button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
