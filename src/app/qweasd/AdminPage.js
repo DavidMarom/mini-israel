@@ -259,6 +259,35 @@ export default function AdminPage() {
     } catch (e) { console.error(e); } finally { setActionLoading(null); }
   };
 
+  // ── Edit User ─────────────────────────────────────────
+  const [editUser, setEditUser] = useState(null); // { uid, name, email, money, bio }
+  const [editSaving, setEditSaving] = useState(false);
+  const [editError, setEditError] = useState("");
+
+  const openEditUser = (u) => {
+    setEditUser({ uid: u.uid, name: u.name || "", email: u.email || "", money: u.money ?? 0, bio: u.bio || "" });
+    setEditError("");
+  };
+
+  const handleEditSave = async () => {
+    setEditSaving(true);
+    setEditError("");
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editUser),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        setUsers((prev) => prev.map((u) => u.uid === editUser.uid ? { ...u, ...editUser, money: Number(editUser.money) } : u));
+        setEditUser(null);
+      } else {
+        setEditError(data.error || "שגיאה בשמירה");
+      }
+    } catch (e) { setEditError("שגיאה, נסה שוב"); } finally { setEditSaving(false); }
+  };
+
   // ── Cashout Requests ─────────────────────────────────
   const [cashouts, setCashouts] = useState([]);
   const [cashoutsLoading, setCashoutsLoading] = useState(true);
@@ -307,10 +336,39 @@ export default function AdminPage() {
     loadCashouts();
   }, []);
 
+  const [tab, setTab] = useState("general");
+
+  const TABS = [
+    { id: "general", label: "כללי" },
+    { id: "users", label: "משתמשים" },
+    { id: "yadsara", label: "יד שרה" },
+    { id: "advertisers", label: "פניות מפרסמים" },
+  ];
+
   return (
     <div style={{ padding: 40, fontFamily: "sans-serif", direction: "rtl" }}>
-      <h1>Admin</h1>
-      <hr />
+      <h1 style={{ marginBottom: 24 }}>Admin</h1>
+
+      {/* ── Tabs ── */}
+      <div style={{ display: "flex", gap: 4, marginBottom: 32, borderBottom: "2px solid #ddd" }}>
+        {TABS.map((t) => (
+          <button
+            key={t.id}
+            onClick={() => setTab(t.id)}
+            style={{
+              padding: "10px 22px", border: "none", background: "none", cursor: "pointer",
+              fontSize: 15, fontWeight: tab === t.id ? 700 : 400,
+              color: tab === t.id ? "#2563eb" : "#555",
+              borderBottom: tab === t.id ? "2px solid #2563eb" : "2px solid transparent",
+              marginBottom: -2, transition: "all 0.15s",
+            }}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {tab === "general" && <>
 
       {/* ── Board ── */}
       <h2>לוח</h2>
@@ -495,6 +553,67 @@ export default function AdminPage() {
 
       <hr style={{ margin: "32px 0" }} />
 
+      {/* ── Cashout Requests ── */}
+      <h2>💵 בקשות המרה לכסף אמיתי</h2>
+      <button onClick={loadCashouts} disabled={cashoutsLoading} style={{ marginBottom: 16, padding: "6px 16px", cursor: "pointer" }}>
+        {cashoutsLoading ? "טוען..." : "רענן"}
+      </button>
+      {cashoutsLoading ? <p>טוען...</p> : cashouts.length === 0 ? <p style={{ color: "#888" }}>אין בקשות עדיין.</p> : (
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+          <thead>
+            <tr style={{ background: "#f0f0f0", textAlign: "right" }}>
+              <th style={th}>שם</th>
+              <th style={th}>טלפון</th>
+              <th style={th}>מטבעות</th>
+              <th style={th}>שקלים</th>
+              <th style={th}>תאריך</th>
+              <th style={th}>סטטוס</th>
+              <th style={th}>פעולות</th>
+            </tr>
+          </thead>
+          <tbody>
+            {cashouts.map((r) => {
+              const id = String(r._id);
+              const statusColors = { new: "#2563eb", paid: "#16a34a", cancelled: "#dc2626" };
+              const statusLabels = { new: "חדש", paid: "שולם", cancelled: "בוטל" };
+              return (
+                <tr key={id} style={{ borderBottom: "1px solid #ddd", background: r.status === "new" ? "#f0fdf4" : "white" }}>
+                  <td style={td}>{r.name || "—"}</td>
+                  <td style={{ ...td, fontWeight: 600 }}>{r.phone}</td>
+                  <td style={td}>{r.coins?.toLocaleString()}</td>
+                  <td style={{ ...td, color: "#15803d", fontWeight: 700 }}>₪{r.ils}</td>
+                  <td style={{ ...td, whiteSpace: "nowrap" }}>{r.createdAt ? new Date(r.createdAt).toLocaleDateString("he-IL") : "—"}</td>
+                  <td style={td}>
+                    <span style={{ color: statusColors[r.status] || "#333", fontWeight: 600 }}>
+                      {statusLabels[r.status] || r.status}
+                    </span>
+                  </td>
+                  <td style={{ ...td, display: "flex", gap: 6, flexWrap: "wrap" }}>
+                    {r.status !== "paid" && (
+                      <button onClick={() => handleCashoutStatus(id, "paid")} disabled={!!cashoutActionLoading} style={{ ...actionBtn, background: "#16a34a" }}>
+                        {cashoutActionLoading === id + "paid" ? "..." : "✅ שולם"}
+                      </button>
+                    )}
+                    {r.status !== "cancelled" && (
+                      <button onClick={() => handleCashoutStatus(id, "cancelled")} disabled={!!cashoutActionLoading} style={{ ...actionBtn, background: "#d97706" }}>
+                        {cashoutActionLoading === id + "cancelled" ? "..." : "בטל"}
+                      </button>
+                    )}
+                    <button onClick={() => handleCashoutDelete(id)} disabled={!!cashoutActionLoading} style={{ ...actionBtn, background: "#dc2626" }}>
+                      {cashoutActionLoading === id + "delete" ? "..." : "מחק"}
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      )}
+
+      </> /* end general tab */}
+
+      {tab === "users" && <>
+
       {/* ── Users ── */}
       <h2>משתמשים</h2>
       <button onClick={loadUsers} disabled={usersLoading} style={{ marginBottom: 16, padding: "6px 16px", cursor: "pointer" }}>
@@ -524,9 +643,12 @@ export default function AdminPage() {
                     ? <span style={{ color: "#c00", fontWeight: 600 }}>מושעה</span>
                     : <span style={{ color: "#080" }}>פעיל</span>}
                 </td>
-                <td style={td}>
+                <td style={{ ...td, display: "flex", gap: 6 }}>
+                  <button onClick={() => openEditUser(u)} style={{ ...actionBtn, background: "#2563eb" }}>
+                    ✏️ ערוך
+                  </button>
                   {u.suspended ? (
-                    <button onClick={() => handleUserAction(u.uid, "unsuspend")} disabled={actionLoading === u.uid} style={{ ...actionBtn, background: "#2563eb" }}>
+                    <button onClick={() => handleUserAction(u.uid, "unsuspend")} disabled={actionLoading === u.uid} style={{ ...actionBtn, background: "#6b7280" }}>
                       {actionLoading === u.uid ? "..." : "בטל השעיה"}
                     </button>
                   ) : (
@@ -541,7 +663,9 @@ export default function AdminPage() {
         </table>
       )}
 
-      <hr style={{ margin: "32px 0" }} />
+      </> /* end users tab */}
+
+      {tab === "yadsara" && <>
 
       {/* ── Yad Sara Visibility ── */}
       <h2>🏠 בניין יד שרה</h2>
@@ -602,7 +726,9 @@ export default function AdminPage() {
         </table>
       )}
 
-      <hr style={{ margin: "32px 0" }} />
+      </> /* end yadsara tab */}
+
+      {tab === "advertisers" && <>
 
       {/* ── Advertise Requests ── */}
       <h2>📬 פניות מפרסמים</h2>
@@ -663,63 +789,47 @@ export default function AdminPage() {
         </table>
       )}
 
-      <hr style={{ margin: "32px 0" }} />
+      </> /* end advertisers tab */}
 
-      {/* ── Cashout Requests ── */}
-      <h2>💵 בקשות המרה לכסף אמיתי</h2>
-      <button onClick={loadCashouts} disabled={cashoutsLoading} style={{ marginBottom: 16, padding: "6px 16px", cursor: "pointer" }}>
-        {cashoutsLoading ? "טוען..." : "רענן"}
-      </button>
-      {cashoutsLoading ? <p>טוען...</p> : cashouts.length === 0 ? <p style={{ color: "#888" }}>אין בקשות עדיין.</p> : (
-        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
-          <thead>
-            <tr style={{ background: "#f0f0f0", textAlign: "right" }}>
-              <th style={th}>שם</th>
-              <th style={th}>טלפון</th>
-              <th style={th}>מטבעות</th>
-              <th style={th}>שקלים</th>
-              <th style={th}>תאריך</th>
-              <th style={th}>סטטוס</th>
-              <th style={th}>פעולות</th>
-            </tr>
-          </thead>
-          <tbody>
-            {cashouts.map((r) => {
-              const id = String(r._id);
-              const statusColors = { new: "#2563eb", paid: "#16a34a", cancelled: "#dc2626" };
-              const statusLabels = { new: "חדש", paid: "שולם", cancelled: "בוטל" };
-              return (
-                <tr key={id} style={{ borderBottom: "1px solid #ddd", background: r.status === "new" ? "#f0fdf4" : "white" }}>
-                  <td style={td}>{r.name || "—"}</td>
-                  <td style={{ ...td, fontWeight: 600 }}>{r.phone}</td>
-                  <td style={td}>{r.coins?.toLocaleString()}</td>
-                  <td style={{ ...td, color: "#15803d", fontWeight: 700 }}>₪{r.ils}</td>
-                  <td style={{ ...td, whiteSpace: "nowrap" }}>{r.createdAt ? new Date(r.createdAt).toLocaleDateString("he-IL") : "—"}</td>
-                  <td style={td}>
-                    <span style={{ color: statusColors[r.status] || "#333", fontWeight: 600 }}>
-                      {statusLabels[r.status] || r.status}
-                    </span>
-                  </td>
-                  <td style={{ ...td, display: "flex", gap: 6, flexWrap: "wrap" }}>
-                    {r.status !== "paid" && (
-                      <button onClick={() => handleCashoutStatus(id, "paid")} disabled={!!cashoutActionLoading} style={{ ...actionBtn, background: "#16a34a" }}>
-                        {cashoutActionLoading === id + "paid" ? "..." : "✅ שולם"}
-                      </button>
-                    )}
-                    {r.status !== "cancelled" && (
-                      <button onClick={() => handleCashoutStatus(id, "cancelled")} disabled={!!cashoutActionLoading} style={{ ...actionBtn, background: "#d97706" }}>
-                        {cashoutActionLoading === id + "cancelled" ? "..." : "בטל"}
-                      </button>
-                    )}
-                    <button onClick={() => handleCashoutDelete(id)} disabled={!!cashoutActionLoading} style={{ ...actionBtn, background: "#dc2626" }}>
-                      {cashoutActionLoading === id + "delete" ? "..." : "מחק"}
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+      {/* ── Edit User Modal ── */}
+      {editUser && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100 }}
+          onClick={() => setEditUser(null)}>
+          <div style={{ background: "#fff", borderRadius: 16, padding: "32px 28px", width: "100%", maxWidth: 420, direction: "rtl", display: "flex", flexDirection: "column", gap: 14 }}
+            onClick={(e) => e.stopPropagation()}>
+            <h2 style={{ margin: 0, fontSize: 18 }}>✏️ עריכת משתמש</h2>
+
+            {[
+              { label: "שם", key: "name", type: "text" },
+              { label: "אימייל", key: "email", type: "email" },
+              { label: "מטבעות", key: "money", type: "number" },
+              { label: "ביו", key: "bio", type: "text" },
+            ].map(({ label, key, type }) => (
+              <div key={key} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                <label style={{ fontSize: 12, fontWeight: 600, color: "#555" }}>{label}</label>
+                <input
+                  type={type}
+                  value={editUser[key]}
+                  onChange={(e) => setEditUser((prev) => ({ ...prev, [key]: e.target.value }))}
+                  style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #ccc", fontSize: 14, direction: key === "email" ? "ltr" : "rtl" }}
+                />
+              </div>
+            ))}
+
+            {editError && <p style={{ margin: 0, color: "#dc2626", fontSize: 13 }}>{editError}</p>}
+
+            <div style={{ display: "flex", gap: 10, justifyContent: "flex-start" }}>
+              <button onClick={handleEditSave} disabled={editSaving}
+                style={{ ...actionBtn, background: "#16a34a", padding: "10px 24px", fontSize: 14, borderRadius: 8 }}>
+                {editSaving ? "שומר..." : "שמור"}
+              </button>
+              <button onClick={() => setEditUser(null)}
+                style={{ ...actionBtn, background: "#6b7280", padding: "10px 20px", fontSize: 14, borderRadius: 8 }}>
+                ביטול
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

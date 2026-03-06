@@ -2,4 +2,4 @@ export const metadata = {
   robots: { index: false, follow: false },
 };
 
-export { default } from "./AdminPage";
+export { default } from "./AdminGate";
