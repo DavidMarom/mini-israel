@@ -192,10 +192,37 @@ export default function GameBoard({ onOtherHouseClick }) {
   };
 
   const SHOP_ITEMS = [
-    { id: "flower",  emoji: "🌸", name: "פרח",        price: 10 },
-    { id: "falafel", emoji: "🧆", name: "פלאפל",      price: 25 },
-    { id: "flag",    emoji: "🇮🇱", name: "דגל ישראל", price: 10 },
+    { id: "flower",  emoji: "🌸", name: "פרח",        price: 10, sellPrice: 7  },
+    { id: "falafel", emoji: "🧆", name: "פלאפל",      price: 25, sellPrice: 17 },
+    { id: "flag",    emoji: "🇮🇱", name: "דגל ישראל", price: 10, sellPrice: 7  },
   ];
+  const DEFAULT_SELL_PRICE = 5;
+
+  const [showKnesset, setShowKnesset] = useState(false);
+  const [sellingItem, setSellingItem] = useState(null); // index being sold
+
+  const handleSellItem = async (itemIndex) => {
+    if (!user || sellingItem !== null) return;
+    const uid = user.firebaseUid || user.uid;
+    setSellingItem(itemIndex);
+    try {
+      const res = await fetch("/api/items/sell", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid, itemIndex }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setUser((prev) => ({ ...prev, money: data.money, inventory: data.inventory }));
+      } else {
+        alert(data.error || "שגיאה, נסה שוב");
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setSellingItem(null);
+    }
+  };
 
   const handleAzrieliClick = () => setShowAzrieliShop(true);
 
@@ -662,6 +689,7 @@ export default function GameBoard({ onOtherHouseClick }) {
             width: KNESSET_W * TILE_SIZE,
             height: KNESSET_H * TILE_SIZE,
           }}
+          onClick={() => setShowKnesset(true)}
         >
           <img src="/assets/knesset.png" alt="הכנסת" className={styles.azrieliBuilding} />
         </div>
@@ -852,6 +880,43 @@ export default function GameBoard({ onOtherHouseClick }) {
               </div>
             )}
             <button className={styles.shopCloseBtn} onClick={() => setShowLeaderboard(false)}>סגור</button>
+          </div>
+        </div>
+      )}
+
+      {/* Knesset — Sell Items */}
+      {showKnesset && (
+        <div className={styles.shopBackdrop} onClick={() => setShowKnesset(false)}>
+          <div className={styles.shopModal} onClick={(e) => e.stopPropagation()}>
+            <p className={styles.shopTitle}>🏛️ הכנסת</p>
+            <p className={styles.shopBalance}>יתרה שלך: {user?.money ?? 0} שקלים</p>
+            {!user ? (
+              <p className={styles.knessetEmpty}>התחבר כדי למכור פריטים</p>
+            ) : !user.inventory?.length ? (
+              <p className={styles.knessetEmpty}>אין לך פריטים למכירה.<br />קנה פריטים בקניון אזריאלי!</p>
+            ) : (
+              <div className={styles.shopItems}>
+                {user.inventory.map((item, i) => {
+                  const shopItem = SHOP_ITEMS.find((s) => s.id === item.id);
+                  const price = shopItem?.sellPrice ?? DEFAULT_SELL_PRICE;
+                  return (
+                    <div key={i} className={styles.shopItem}>
+                      <span className={styles.shopEmoji}>{item.emoji}</span>
+                      <span className={styles.shopItemName}>{item.name}</span>
+                      <span className={styles.knessetSellPrice}>+{price} ₪</span>
+                      <button
+                        className={styles.knessetSellBtn}
+                        onClick={() => handleSellItem(i)}
+                        disabled={sellingItem !== null}
+                      >
+                        {sellingItem === i ? <span className={styles.shopSpinner} /> : "מכור"}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+            <button className={styles.shopCloseBtn} onClick={() => setShowKnesset(false)}>סגור</button>
           </div>
         </div>
       )}
