@@ -38,9 +38,9 @@ const KNESSET_W = 3;
 const KNESSET_H = 2;
 
 const CAMERA_ROW = 69;
-const CAMERA_COL = 7;
-const CAMERA_W = 2;
-const CAMERA_H = 2;
+const CAMERA_COL = 5;
+const CAMERA_W = 3;
+const CAMERA_H = 3;
 
 const LEADERBOARD_ROW = 22;
 const LEADERBOARD_COL = 6;
@@ -147,6 +147,7 @@ export default function GameBoard({ onOtherHouseClick }) {
             const claimedAt = data.treasureWinner.claimedAt;
             const age = Date.now() - new Date(claimedAt).getTime();
             if (age < 24 * 60 * 60 * 1000 && dismissedTreasureRef.current !== claimedAt) {
+              dismissedTreasureRef.current = claimedAt;
               setTreasureWinnerToast({ name: data.treasureWinner.name, sponsor: data.treasureWinner.sponsor, claimedAt });
               setTimeout(() => setTreasureWinnerToast(null), 8000);
             }
@@ -886,10 +887,12 @@ export default function GameBoard({ onOtherHouseClick }) {
         <div className={styles.cameraBackdrop} onClick={handleCloseCameraPopup}>
           <div className={styles.cameraModal} onClick={(e) => e.stopPropagation()}>
             <p className={styles.cameraTitle}>צלם תמונה</p>
-            <video ref={videoRef} autoPlay playsInline className={styles.cameraVideo} />
-            <div className={styles.cameraActions}>
-              <button className={styles.cameraSnapBtn} onClick={handleCapture}>צלם</button>
-              <button className={styles.cameraCancelBtn} onClick={handleCloseCameraPopup}>ביטול</button>
+            <div className={styles.cameraBody}>
+              <div className={styles.cameraActions}>
+                <button className={styles.cameraSnapBtn} onClick={handleCapture}>צלם</button>
+                <button className={styles.cameraCancelBtn} onClick={handleCloseCameraPopup}>ביטול</button>
+              </div>
+              <video ref={videoRef} autoPlay playsInline className={styles.cameraVideo} />
             </div>
           </div>
         </div>
