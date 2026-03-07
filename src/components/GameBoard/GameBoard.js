@@ -72,7 +72,8 @@ export default function GameBoard({ onOtherHouseClick }) {
   const tooltipTimer = useRef(null);
   const { user, setUser, setMainHouse, needsHousePlacement } = useUserStore();
 
-  const [onlineCount] = useState(() => Math.floor(Math.random() * 500) + 500);
+  const [onlineCount, setOnlineCount] = useState(null);
+  useEffect(() => { setOnlineCount(Math.floor(Math.random() * 500) + 500); }, []);
 
   // Cashout
   const [showCashout, setShowCashout] = useState(false);
@@ -628,10 +629,12 @@ export default function GameBoard({ onOtherHouseClick }) {
 
   return (
     <>
-      <div className={styles.onlineLabel}>
-        <span className={styles.onlineDot} />
-        מחוברים כרגע: <strong>{onlineCount}</strong>
-      </div>
+      {onlineCount !== null && (
+        <div className={styles.onlineLabel}>
+          <span className={styles.onlineDot} />
+          מחוברים כרגע: <strong>{onlineCount}</strong>
+        </div>
+      )}
 
       {houseTooltip && (
         <div
