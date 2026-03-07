@@ -57,6 +57,8 @@ export default function Home() {
   const [composeText, setComposeText] = useState("");
   const [composeSending, setComposeSending] = useState(false);
   const [composeItemIndex, setComposeItemIndex] = useState(null);
+  const [poopThrowing, setPoopThrowing] = useState(false);
+  const [justPoopedUid, setJustPoopedUid] = useState(null);
 
   const {
     user: storedUser,
@@ -253,6 +255,32 @@ export default function Home() {
     }
   };
 
+  const handleThrowPoop = async () => {
+    if (!composeTarget || !storedUser || poopThrowing) return;
+    const uid = storedUser.firebaseUid || storedUser.uid;
+    setPoopThrowing(true);
+    try {
+      const res = await fetch("/api/poop/throw", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid, targetUid: composeTarget.ownerUid }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setUserStore((prev) => ({ ...prev, inventory: data.inventory }));
+        setJustPoopedUid(composeTarget.ownerUid);
+        setComposeTarget(null);
+        setComposeItemIndex(null);
+      } else {
+        alert(data.error || "שגיאה, נסה שוב");
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setPoopThrowing(false);
+    }
+  };
+
   if (isMobile) {
     return (
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100dvh", textAlign: "center", padding: "2rem", fontSize: "1.5rem", direction: "rtl" }}>
@@ -264,7 +292,7 @@ export default function Home() {
   return (
     <div className={styles.page}>
       <div className={styles.boardLayer}>
-        <GameBoard onOtherHouseClick={(target) => { setComposeTarget(target); setComposeText(""); setComposeItemIndex(null); }} />
+        <GameBoard onOtherHouseClick={(target) => { setComposeTarget(target); setComposeText(""); setComposeItemIndex(null); }} justPoopedUid={justPoopedUid} />
       </div>
 
       <div className={styles.scrollHint} aria-hidden="true">
@@ -376,6 +404,14 @@ export default function Home() {
               placeholder={composeItemIndex !== null ? "הוסף הודעה (אופציונלי)..." : "כתוב הודעה..."}
               rows={3}
             />
+            {(() => {
+              const poopCount = (storedUser?.inventory || []).filter((i) => i.id === "poop").length;
+              return poopCount > 0 ? (
+                <button className={styles.poopThrowBtn} onClick={handleThrowPoop} disabled={poopThrowing}>
+                  {poopThrowing ? "זורק..." : `💩 זרוק קקי על הבית של ${composeTarget.ownerName}`}
+                </button>
+              ) : null;
+            })()}
             <div className={styles.composeActions}>
               <button className={styles.composeSend} onClick={handleSendMessage} disabled={composeSending || (composeItemIndex === null && !composeText.trim())}>
                 {composeSending ? "שולח..." : "שלח"}

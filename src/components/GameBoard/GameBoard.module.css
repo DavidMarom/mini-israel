@@ -1304,6 +1304,149 @@
   background: #4338ca;
 }
 
+/* ── Poop Popup ── */
+
+.poopPopup {
+  background: #1a1a1a;
+  border: 2px solid #8B4513;
+  border-radius: 14px;
+  padding: 24px 20px 18px;
+  width: 320px;
+  max-width: 95vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  direction: rtl;
+}
+
+.poopPopupName {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.poopThrowBtn {
+  width: 100%;
+  background: #8B4513;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+  direction: rtl;
+}
+
+.poopThrowBtn:hover:not(:disabled) {
+  background: #a0522d;
+}
+
+.poopThrowBtn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.poopMessageBtn {
+  width: 100%;
+  background: #2a2a2a;
+  color: #ccc;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.poopMessageBtn:hover {
+  background: #333;
+}
+
+.cleanHouseHint {
+  font-size: 9px;
+  color: #fbbf24;
+  background: rgba(0,0,0,0.6);
+  border-radius: 4px;
+  padding: 1px 4px;
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+/* ── Neighborhood Labels ── */
+
+.neighborhoodLabel {
+  position: absolute;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 4px 10px 5px;
+  pointer-events: none;
+  min-width: 120px;
+  backdrop-filter: blur(4px);
+}
+
+.neighborhoodLabelMine {
+  border-color: #facc15;
+  box-shadow: 0 0 10px rgba(250, 204, 21, 0.5);
+  pointer-events: auto;
+}
+
+.neighborhoodName {
+  font-size: 11px;
+  font-weight: 800;
+  color: #fff;
+  white-space: nowrap;
+  direction: rtl;
+}
+
+.neighborhoodCount {
+  font-size: 10px;
+  color: #aaa;
+  direction: rtl;
+}
+
+.neighborhoodClaimBtn {
+  margin-top: 3px;
+  background: #facc15;
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.neighborhoodClaimBtn:hover:not(:disabled) {
+  background: #fde047;
+  transform: scale(1.05);
+}
+
+.neighborhoodClaimBtn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.neighborhoodClaimed {
+  margin-top: 3px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #4ade80;
+}
+
 /* ── Poll Widget (on board) ── */
 
 .pollWidget {
