@@ -63,6 +63,11 @@ const TRIVIA_COL = YAD_SARA_COL;
 const TRIVIA_W = 3;
 const TRIVIA_H = 3;
 
+const POLL_W = 3;
+const POLL_H = 3;
+const POLL_COL = 6;
+const POLL_ROW = 215;
+
 const EILAT_ROW = 222;
 const EILAT_COL = 6;
 const EILAT_W = 3;
@@ -316,6 +321,42 @@ export default function GameBoard({ onOtherHouseClick }) {
         setTriviaAwarding(false);
       }
     }
+  };
+
+  // Poll
+  const [pollMessi, setPollMessi] = useState(0);
+  const [pollRonaldo, setPollRonaldo] = useState(0);
+  const [pollUserVote, setPollUserVote] = useState(null);
+  const [pollVoting, setPollVoting] = useState(false);
+
+  useEffect(() => {
+    const uid = user ? (user.firebaseUid || user.uid) : null;
+    fetch(`/api/poll${uid ? `?uid=${uid}` : ""}`)
+      .then((r) => r.json())
+      .then((data) => {
+        setPollMessi(data.messi ?? 0);
+        setPollRonaldo(data.ronaldo ?? 0);
+        setPollUserVote(data.userVote ?? null);
+      })
+      .catch(console.error);
+  }, [user]);
+
+  const handlePollVote = async (vote) => {
+    if (!user || pollVoting) return;
+    const uid = user.firebaseUid || user.uid;
+    setPollVoting(true);
+    try {
+      const res = await fetch("/api/poll", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid, vote }),
+      });
+      const data = await res.json();
+      setPollMessi(data.messi ?? 0);
+      setPollRonaldo(data.ronaldo ?? 0);
+      setPollUserVote(data.userVote ?? vote);
+    } catch (e) { console.error(e); }
+    finally { setPollVoting(false); }
   };
 
   const handleDonate = async () => {
@@ -957,6 +998,51 @@ export default function GameBoard({ onOtherHouseClick }) {
           <span className={styles.cashoutBuildingIcon}>💵</span>
           <span className={styles.cashoutBuildingLabel}>המר לכסף אמיתי!!</span>
         </div>
+
+        {/* Poll Widget */}
+        {(() => {
+          const total = pollMessi + pollRonaldo;
+          const messiPct = total ? Math.round((pollMessi / total) * 100) : 50;
+          const ronaldoPct = total ? 100 - messiPct : 50;
+          return (
+            <div
+              className={styles.pollWidget}
+              style={{
+                top: POLL_ROW * TILE_SIZE,
+                left: POLL_COL * TILE_SIZE,
+                width: POLL_W * TILE_SIZE,
+                height: POLL_H * TILE_SIZE,
+              }}
+            >
+              <div className={styles.pollWidgetPlayers}>
+                <div
+                  className={`${styles.pollWidgetPlayer} ${pollUserVote === "messi" ? styles.pollWidgetVoted : ""}`}
+                  onClick={() => handlePollVote("messi")}
+                  title="הצבע למסי"
+                >
+                  <img src="/assets/messi.png" alt="מסי" className={styles.pollWidgetImg} />
+                  {pollUserVote === "messi" && <span className={styles.pollWidgetCheck}>✓</span>}
+                </div>
+                <span className={styles.pollWidgetVs}>VS</span>
+                <div
+                  className={`${styles.pollWidgetPlayer} ${pollUserVote === "ronaldo" ? styles.pollWidgetVoted : ""}`}
+                  onClick={() => handlePollVote("ronaldo")}
+                  title="הצבע לרונאלדו"
+                >
+                  <img src="/assets/ronaldo.png" alt="רונאלדו" className={styles.pollWidgetImg} />
+                  {pollUserVote === "ronaldo" && <span className={styles.pollWidgetCheck}>✓</span>}
+                </div>
+              </div>
+              <div className={styles.pollBar}>
+                <span className={styles.pollBarMessi} style={{ width: `${messiPct}%` }} />
+              </div>
+              <div className={styles.pollNames}>
+                <span className={styles.pollNameMessi}>{messiPct}%</span>
+                <span className={styles.pollNameRonaldo}>{ronaldoPct}%</span>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Eilat Building */}
         <div
