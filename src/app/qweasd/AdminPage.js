@@ -7,6 +7,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
   const [orangeLoading, setOrangeLoading] = useState(false);
   const [shirtLoading, setShirtLoading] = useState(false);
+  const [poopLoading, setPoopLoading] = useState(false);
 
   // ── Board ────────────────────────────────────────────
   const handleReseed = async () => {
@@ -48,6 +49,20 @@ export default function AdminPage() {
       setStatus("❌ Request failed");
     } finally {
       setShirtLoading(false);
+    }
+  };
+
+  const handleReseedPoop = async () => {
+    setPoopLoading(true);
+    setStatus(null);
+    try {
+      const res = await fetch("/api/admin/reseed-poop", { method: "POST" });
+      const data = await res.json();
+      setStatus(data.ok ? `✅ Seeded ${data.count} poops.` : "❌ Error: " + (data.error || "Unknown error"));
+    } catch (e) {
+      setStatus("❌ Request failed");
+    } finally {
+      setPoopLoading(false);
     }
   };
 
@@ -434,6 +449,9 @@ export default function AdminPage() {
         </button>
         <button onClick={handleReseedShirts} disabled={shirtLoading} style={{ padding: "8px 20px", cursor: "pointer" }}>
           {shirtLoading ? "Seeding…" : "👕 Reseed Shirts"}
+        </button>
+        <button onClick={handleReseedPoop} disabled={poopLoading} style={{ padding: "8px 20px", cursor: "pointer" }}>
+          {poopLoading ? "Seeding…" : "💩 Reseed Poop"}
         </button>
       </div>
       {status && <p style={{ marginTop: 12 }}>{status}</p>}

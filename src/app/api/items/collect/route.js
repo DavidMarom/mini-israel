@@ -3,6 +3,7 @@ import clientPromise from "../../../../services/mongo";
 
 const COLLECTIBLE_ITEMS = {
   shirt: { id: "shirt", img: "/assets/items/shirt.png", name: "חולצה" },
+  poop: { id: "poop", emoji: "💩", name: "קקי" },
 };
 
 export async function POST(req) {
@@ -16,7 +17,7 @@ export async function POST(req) {
 
     const result = await db.collection("users").findOneAndUpdate(
       { uid },
-      { $push: { inventory: { id: item.id, img: item.img, name: item.name } }, $set: { updatedAt: new Date() } },
+      { $push: { inventory: { id: item.id, ...(item.img ? { img: item.img } : { emoji: item.emoji }), name: item.name } }, $set: { updatedAt: new Date() } },
       { returnDocument: "after" }
     );
 

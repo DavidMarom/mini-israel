@@ -330,6 +330,28 @@
   justify-content: flex-end;
 }
 
+.poopThrowBtn {
+  width: 100%;
+  background: #8B4513;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+.poopThrowBtn:hover:not(:disabled) {
+  background: #a0522d;
+}
+
+.poopThrowBtn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 .composeSend {
   background: #394a75;
   color: #fff;

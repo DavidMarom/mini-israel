@@ -81,7 +81,7 @@ const AD_H = 2;
 const createEmptyGrid = () =>
   Array.from({ length: ROWS }, () => Array(COLS).fill(null));
 
-export default function GameBoard({ onOtherHouseClick }) {
+export default function GameBoard({ onOtherHouseClick, justPoopedUid }) {
   const [grid, setGrid] = useState(createEmptyGrid);
   const [hover, setHover] = useState(null);
   const [houseTooltip, setHouseTooltip] = useState(null); // { x, y, ownerName, bio }
@@ -323,6 +323,46 @@ export default function GameBoard({ onOtherHouseClick }) {
     }
   };
 
+  // Neighborhoods
+  const [neighborhoods, setNeighborhoods] = useState([]);
+  const [nbhdClaimedTodayId, setNbhdClaimedTodayId] = useState(null);
+  const [nbhdClaiming, setNbhdClaiming] = useState(false);
+  const NBHD_DAILY_BONUS = 50;
+
+  const fetchNeighborhoods = () => {
+    const uid = user ? (user.firebaseUid || user.uid) : null;
+    fetch(`/api/neighborhoods${uid ? `?uid=${uid}` : ""}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data.neighborhoods)) setNeighborhoods(data.neighborhoods);
+        setNbhdClaimedTodayId(data.claimedTodayId ?? null);
+      })
+      .catch(console.error);
+  };
+
+  useEffect(() => {
+    fetchNeighborhoods();
+  }, [user]);
+
+  const handleClaimNeighborhoodBonus = async (neighborhoodId) => {
+    if (!user || nbhdClaiming) return;
+    const uid = user.firebaseUid || user.uid;
+    setNbhdClaiming(true);
+    try {
+      const res = await fetch("/api/neighborhoods/claim", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid, neighborhoodId }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        setUser((prev) => ({ ...prev, money: data.money }));
+        setNbhdClaimedTodayId(neighborhoodId);
+      }
+    } catch (e) { console.error(e); }
+    finally { setNbhdClaiming(false); }
+  };
+
   // Poll
   const [pollMessi, setPollMessi] = useState(0);
   const [pollRonaldo, setPollRonaldo] = useState(0);
@@ -539,6 +579,20 @@ export default function GameBoard({ onOtherHouseClick }) {
     }
   };
 
+  // Mark house as pooped when thrown from parent
+  useEffect(() => {
+    if (!justPoopedUid) return;
+    setGrid((prev) =>
+      prev.map((row) =>
+        row.map((cell) =>
+          cell && cell.building === "main-house" && cell.ownerUid === justPoopedUid
+            ? { ...cell, pooped: true }
+            : cell
+        )
+      )
+    );
+  }, [justPoopedUid]);
+
   // Keep house labels in sync when the user's name changes
   useEffect(() => {
     if (!user) return;
@@ -649,6 +703,32 @@ export default function GameBoard({ onOtherHouseClick }) {
       return;
     }
 
+    if (cell && cell.item === "poop") {
+      const next = grid.map((r) => r.slice());
+      next[row][col] = null;
+      setGrid(next);
+      void persistBoard(next);
+
+      fetch("/api/items/collect", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid: ownerUid, itemId: "poop" }),
+      })
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.inventory) setUser((prev) => ({ ...prev, inventory: data.inventory }));
+        })
+        .catch(console.error);
+
+      return;
+    }
+
+    // Clicking own poophouse → clean it
+    if (cell && cell.building === "main-house" && cell.ownerUid === ownerUid && cell.pooped) {
+      handleCleanHouse();
+      return;
+    }
+
     // Clicking another user's house → open message compose
     if (cell && cell.building === "main-house" && cell.ownerUid !== ownerUid) {
       onOtherHouseClick && onOtherHouseClick({ ownerUid: cell.ownerUid, ownerName: cell.ownerName });
@@ -720,6 +800,28 @@ export default function GameBoard({ onOtherHouseClick }) {
     setHouseTooltip(null);
   };
 
+
+  const handleCleanHouse = async () => {
+    if (!user) return;
+    const uid = user.firebaseUid || user.uid;
+    try {
+      const res = await fetch("/api/poop/clean", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid }),
+      });
+      if (res.ok) {
+        setGrid((prev) => prev.map((row) =>
+          row.map((cell) =>
+            cell && cell.building === "main-house" && cell.ownerUid === uid && cell.pooped
+              ? { ...cell, pooped: false }
+              : cell
+          )
+        ));
+      }
+    } catch (e) { console.error(e); }
+  };
+
   const handleSubmitAd = async () => {
     if (!adText.trim() || !user) return;
     const ownerUid = user.firebaseUid || user.uid;
@@ -776,8 +878,10 @@ export default function GameBoard({ onOtherHouseClick }) {
             const hasApple = cell && cell.item === "apple";
             const hasOrange = cell && cell.item === "orange";
             const hasShirt = cell && cell.item === "shirt";
+            const hasPoop = cell && cell.item === "poop";
             const hasTreasure = cell && cell.item === "treasure";
-            const isStarHouse = hasMainHouse && starHouseUid && cell.ownerUid === starHouseUid;
+            const isPoopHouse = hasMainHouse && cell.pooped;
+            const isStarHouse = hasMainHouse && !isPoopHouse && starHouseUid && cell.ownerUid === starHouseUid;
             const isEmpty = !cell;
             const ownerUid = user && (user.firebaseUid || user.uid);
             const userHasHouse =
@@ -801,8 +905,10 @@ export default function GameBoard({ onOtherHouseClick }) {
               hasApple ||
               hasOrange ||
               hasShirt ||
+              hasPoop ||
               hasTreasure ||
               (hasMainHouse && cell.ownerUid !== ownerUid) ||
+              (hasMainHouse && cell.ownerUid === ownerUid && isPoopHouse) ||
               canPreview;
 
             return (
@@ -830,20 +936,26 @@ export default function GameBoard({ onOtherHouseClick }) {
                 {hasShirt && (
                   <img src="/assets/items/shirt.png" alt="חולצה" className={styles.tileItemImg} />
                 )}
+                {hasPoop && (
+                  <span className={styles.apple}>💩</span>
+                )}
                 {hasTreasure && (
                   <span className={styles.treasure}>💎</span>
                 )}
                 {hasMainHouse && (
                   <div className={styles.houseWrapper}>
                     <img
-                      src="/assets/main-house.png"
-                      alt="בית ראשי"
+                      src={isPoopHouse ? "/assets/poophouse.png" : "/assets/main-house.png"}
+                      alt={isPoopHouse ? "בית מלוכלך" : "בית ראשי"}
                       className={styles.mainHouse}
                     />
                     {(cell.ownerUid === ownerUid ? (user?.name || cell.ownerName) : cell.ownerName) && (
                       <span className={styles.houseLabel}>
                         {cell.ownerUid === ownerUid ? (user?.name || cell.ownerName) : cell.ownerName}
                       </span>
+                    )}
+                    {isPoopHouse && cell.ownerUid === ownerUid && (
+                      <span className={styles.cleanHouseHint}>לחץ לניקוי 🧹</span>
                     )}
                     {isStarHouse && <span className={styles.starBadge}>⭐</span>}
                   </div>
@@ -1043,6 +1155,38 @@ export default function GameBoard({ onOtherHouseClick }) {
             </div>
           );
         })()}
+
+        {/* Neighborhood Labels */}
+        {neighborhoods.map((nbhd) => {
+          const ownerUid = user && (user.firebaseUid || user.uid);
+          const isMyNbhd = ownerUid && nbhd.members.includes(ownerUid);
+          const claimedToday = nbhdClaimedTodayId === nbhd.id;
+          return (
+            <div
+              key={nbhd.id}
+              className={`${styles.neighborhoodLabel} ${isMyNbhd ? styles.neighborhoodLabelMine : ""}`}
+              style={{
+                top: nbhd.centerRow * TILE_SIZE - 28,
+                left: nbhd.centerCol * TILE_SIZE - 60,
+              }}
+            >
+              <span className={styles.neighborhoodName}>{nbhd.name}</span>
+              <span className={styles.neighborhoodCount}>{nbhd.memberCount} שכנים</span>
+              {isMyNbhd && !claimedToday && (
+                <button
+                  className={styles.neighborhoodClaimBtn}
+                  onClick={() => handleClaimNeighborhoodBonus(nbhd.id)}
+                  disabled={nbhdClaiming}
+                >
+                  {nbhdClaiming ? "..." : `+${NBHD_DAILY_BONUS} 🎁`}
+                </button>
+              )}
+              {isMyNbhd && claimedToday && (
+                <span className={styles.neighborhoodClaimed}>✓ נאסף היום</span>
+              )}
+            </div>
+          );
+        })}
 
         {/* Eilat Building */}
         <div
@@ -1339,6 +1483,7 @@ export default function GameBoard({ onOtherHouseClick }) {
           </div>
         </div>
       )}
+
 
       {/* Trivia Modal */}
       {showTrivia && triviaQuestion && (
