@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import styles from "./GameBoard.module.css";
 import useUserStore from "../../store/useUserStore";
+import TRIVIA_QUESTIONS from "../../data/triviaQuestions";
 
 const ROWS = 230;
 const COLS = 15;
@@ -56,6 +57,11 @@ const CASHOUT_ROW = CAMERA_ROW + CAMERA_H + 5;
 const CASHOUT_COL = CAMERA_COL - 3;
 const CASHOUT_W = 2;
 const CASHOUT_H = 2;
+
+const TRIVIA_ROW = YAD_SARA_ROW + YAD_SARA_H + 3;
+const TRIVIA_COL = YAD_SARA_COL;
+const TRIVIA_W = 3;
+const TRIVIA_H = 3;
 
 const AD_ROW = 7;
 const AD_COL = 6;
@@ -260,6 +266,52 @@ export default function GameBoard({ onOtherHouseClick }) {
   const [showYadSara, setShowYadSara] = useState(false);
   const [donating, setDonating] = useState(false);
   const [donationDone, setDonationDone] = useState(false);
+
+  // Trivia
+  const [showTrivia, setShowTrivia] = useState(false);
+  const [triviaQuestion, setTriviaQuestion] = useState(null);
+  const [triviaAnswered, setTriviaAnswered] = useState(false);
+  const [triviaCorrect, setTriviaCorrect] = useState(false);
+  const [triviaAwarding, setTriviaAwarding] = useState(false);
+  const triviaCountRef = useRef(0);
+
+  const openTrivia = () => {
+    triviaCountRef.current += 1;
+    const isHard = triviaCountRef.current % 5 === 0;
+    const pool = TRIVIA_QUESTIONS.filter((q) => q.hard === isHard);
+    const q = pool[Math.floor(Math.random() * pool.length)];
+    setTriviaQuestion(q);
+    setTriviaAnswered(false);
+    setTriviaCorrect(false);
+    setShowTrivia(true);
+  };
+
+  const handleTriviaAnswer = async (optionIndex) => {
+    if (triviaAnswered || !triviaQuestion) return;
+    const correct = optionIndex === triviaQuestion.answer;
+    setTriviaAnswered(true);
+    setTriviaCorrect(correct);
+    if (correct && user) {
+      const uid = user.firebaseUid || user.uid;
+      const amount = triviaQuestion.hard ? 20 : 10;
+      setTriviaAwarding(true);
+      try {
+        const res = await fetch("/api/user/money", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ uid, amount }),
+        });
+        const data = await res.json();
+        if (typeof data.money === "number") {
+          setUser((prev) => ({ ...prev, money: data.money }));
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setTriviaAwarding(false);
+      }
+    }
+  };
 
   const handleDonate = async () => {
     if (!user || donating) return;
@@ -841,6 +893,21 @@ export default function GameBoard({ onOtherHouseClick }) {
           </div>
         )}
 
+        {/* Trivia Building */}
+        <div
+          className={styles.triviaBuilding}
+          style={{
+            top: TRIVIA_ROW * TILE_SIZE,
+            left: TRIVIA_COL * TILE_SIZE,
+            width: TRIVIA_W * TILE_SIZE,
+            height: TRIVIA_H * TILE_SIZE,
+          }}
+          onClick={openTrivia}
+        >
+          <span className={styles.triviaBuildingIcon}>🧠</span>
+          <span className={styles.triviaBuildingLabel}>טריוויה</span>
+        </div>
+
         {/* Camera Widget */}
         <div
           className={styles.cameraWidget}
@@ -1165,6 +1232,49 @@ export default function GameBoard({ onOtherHouseClick }) {
                 </div>
               </>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Trivia Modal */}
+      {showTrivia && triviaQuestion && (
+        <div className={styles.shopBackdrop} onClick={() => setShowTrivia(false)}>
+          <div className={styles.triviaModal} onClick={(e) => e.stopPropagation()}>
+            <p className={styles.triviaTitle}>🧠 טריוויה</p>
+            <p className={styles.triviaLevel}>{triviaQuestion.hard ? "שאלה קשה — 20 מטבעות" : "שאלה קלה — 10 מטבעות"}</p>
+            <p className={styles.triviaQuestion}>{triviaQuestion.q}</p>
+            <div className={styles.triviaOptions}>
+              {triviaQuestion.options.map((opt, i) => {
+                let cls = styles.triviaOption;
+                if (triviaAnswered) {
+                  if (i === triviaQuestion.answer) cls = `${styles.triviaOption} ${styles.triviaOptionCorrect}`;
+                  else if (i !== triviaQuestion.answer) cls = `${styles.triviaOption} ${styles.triviaOptionWrong}`;
+                }
+                return (
+                  <button
+                    key={i}
+                    className={cls}
+                    onClick={() => handleTriviaAnswer(i)}
+                    disabled={triviaAnswered}
+                  >
+                    {opt}
+                  </button>
+                );
+              })}
+            </div>
+            {triviaAnswered && (
+              <div className={styles.triviaResult}>
+                {triviaCorrect ? (
+                  <p className={styles.triviaResultCorrect}>
+                    ✅ נכון! +{triviaQuestion.hard ? 20 : 10} מטבעות{triviaAwarding ? " (מעדכן...)" : ""}
+                  </p>
+                ) : (
+                  <p className={styles.triviaResultWrong}>❌ לא נכון. התשובה הנכונה: {triviaQuestion.options[triviaQuestion.answer]}</p>
+                )}
+                <button className={styles.triviaNextBtn} onClick={openTrivia}>שאלה הבאה</button>
+              </div>
+            )}
+            <button className={styles.shopCloseBtn} onClick={() => setShowTrivia(false)}>סגור</button>
           </div>
         </div>
       )}
