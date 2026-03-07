@@ -1304,4 +1304,223 @@
   background: #4338ca;
 }
 
+/* ── Poll Widget (on board) ── */
 
+.pollWidget {
+  position: absolute;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  padding-bottom: 6px;
+}
+
+.pollWidgetPlayers {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  flex: 1;
+}
+
+.pollWidgetPlayer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  cursor: pointer;
+  position: relative;
+  width: 35%;
+  transition: transform 0.15s;
+}
+
+.pollWidgetPlayer:hover {
+  transform: scale(1.08);
+}
+
+.pollWidgetPlayer:first-child {
+  width: 45%;
+}
+
+.pollWidgetVoted .pollWidgetImg {
+  filter: drop-shadow(0 0 8px #4ade80) drop-shadow(0 2px 6px rgba(0,0,0,0.6));
+}
+
+.pollWidgetCheck {
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 14px;
+  font-weight: 900;
+  color: #4ade80;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.9);
+}
+
+.pollWidgetImg {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  object-position: bottom;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.6));
+}
+
+.pollWidgetPlayer:first-child .pollWidgetImg {
+  transform: scale(1.1);
+  transform-origin: bottom center;
+}
+
+.pollWidgetVs {
+  font-size: 13px;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+  padding-bottom: 12px;
+}
+
+.pollBar {
+  width: 88%;
+  height: 7px;
+  background: #3a7bd5;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.pollBarMessi {
+  display: block;
+  height: 100%;
+  background: #e2b714;
+  border-radius: 4px;
+  transition: width 0.4s;
+}
+
+.pollNames {
+  width: 88%;
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.pollNameMessi { color: #e2b714; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+.pollNameRonaldo { color: #5b9cf6; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+
+/* ── Poll Modal ── */
+
+.pollModal {
+  background: #1a1a2e;
+  border: 2px solid #e2b714;
+  border-radius: 14px;
+  padding: 28px 24px 20px;
+  width: 400px;
+  max-width: 95vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  direction: rtl;
+  box-shadow: 0 8px 32px rgba(226, 183, 20, 0.3);
+}
+
+.pollModalTitle {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  color: #e2b714;
+}
+
+.pollModalSub {
+  margin: 0;
+  font-size: 13px;
+  color: #888;
+}
+
+.pollModalBar {
+  width: 100%;
+  height: 12px;
+  background: #3a7bd5;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.pollModalBarMessi {
+  display: block;
+  height: 100%;
+  background: #e2b714;
+  border-radius: 6px;
+  transition: width 0.4s;
+}
+
+.pollModalCandidates {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+}
+
+.pollCandidate {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 8px;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s, background 0.15s;
+  background: #16213e;
+}
+
+.pollCandidate:hover:not(:disabled) {
+  transform: scale(1.04);
+}
+
+.pollCandidate:disabled {
+  cursor: default;
+}
+
+.pollCandidateMessi { border-color: #e2b714; }
+.pollCandidateRonaldo { border-color: #3a7bd5; }
+
+.pollCandidateActive.pollCandidateMessi { background: rgba(226, 183, 20, 0.15); }
+.pollCandidateActive.pollCandidateRonaldo { background: rgba(58, 123, 213, 0.15); }
+
+.pollCandidateMessi .pollCandidateImg {
+  transform: scale(1.1);
+  transform-origin: bottom center;
+}
+
+.pollCandidateImg {
+  width: 100%;
+  max-height: 140px;
+  object-fit: contain;
+  object-position: bottom;
+  border-radius: 8px;
+}
+
+.pollCandidatePct {
+  font-size: 20px;
+  font-weight: 800;
+  color: #ccc;
+}
+
+.pollCheck {
+  font-size: 11px;
+  font-weight: 700;
+  color: #4ade80;
+}
+
+.pollLoginMsg {
+  margin: 0;
+  font-size: 13px;
+  color: #888;
+}
+
+.pollChangeMsg {
+  margin: 0;
+  font-size: 12px;
+  color: #666;
+}
