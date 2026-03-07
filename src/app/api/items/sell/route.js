@@ -5,6 +5,10 @@ const SELL_PRICES = {
   flower: 7,
   falafel: 17,
   flag: 7,
+  bike: 55,
+  headphones: 35,
+  pc: 85,
+  shirt: 20,
 };
 const DEFAULT_SELL_PRICE = 5;
 

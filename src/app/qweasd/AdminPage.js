@@ -6,6 +6,7 @@ export default function AdminPage() {
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
   const [orangeLoading, setOrangeLoading] = useState(false);
+  const [shirtLoading, setShirtLoading] = useState(false);
 
   // ── Board ────────────────────────────────────────────
   const handleReseed = async () => {
@@ -33,6 +34,20 @@ export default function AdminPage() {
       setStatus("❌ Request failed");
     } finally {
       setOrangeLoading(false);
+    }
+  };
+
+  const handleReseedShirts = async () => {
+    setShirtLoading(true);
+    setStatus(null);
+    try {
+      const res = await fetch("/api/admin/reseed-shirts", { method: "POST" });
+      const data = await res.json();
+      setStatus(data.ok ? `✅ Seeded ${data.shirts} shirts.` : "❌ Error: " + (data.error || "Unknown error"));
+    } catch (e) {
+      setStatus("❌ Request failed");
+    } finally {
+      setShirtLoading(false);
     }
   };
 
@@ -326,6 +341,42 @@ export default function AdminPage() {
     } catch (e) { console.error(e); } finally { setCashoutActionLoading(null); }
   };
 
+  // ── Fictive Users ─────────────────────────────────────
+  const [fictiveUsers, setFictiveUsers] = useState([]);
+  const [fictiveLoading, setFictiveLoading] = useState(true);
+  const [fictiveCreating, setFictiveCreating] = useState(false);
+  const [fictiveDeleteLoading, setFictiveDeleteLoading] = useState(null);
+
+  const loadFictiveUsers = async () => {
+    setFictiveLoading(true);
+    try {
+      const res = await fetch("/api/admin/fictive-users");
+      const data = await res.json();
+      if (Array.isArray(data.users)) setFictiveUsers(data.users);
+    } catch (e) { console.error(e); } finally { setFictiveLoading(false); }
+  };
+
+  const handleCreateFictive = async () => {
+    setFictiveCreating(true);
+    try {
+      const res = await fetch("/api/admin/fictive-users", { method: "POST" });
+      const data = await res.json();
+      if (data.ok) setFictiveUsers((prev) => [data.user, ...prev]);
+    } catch (e) { console.error(e); } finally { setFictiveCreating(false); }
+  };
+
+  const handleDeleteFictive = async (uid) => {
+    setFictiveDeleteLoading(uid);
+    try {
+      await fetch("/api/admin/fictive-users", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid }),
+      });
+      setFictiveUsers((prev) => prev.filter((u) => u.uid !== uid));
+    } catch (e) { console.error(e); } finally { setFictiveDeleteLoading(null); }
+  };
+
   useEffect(() => {
     loadUsers();
     loadTaglines();
@@ -334,6 +385,7 @@ export default function AdminPage() {
     loadDonations();
     loadYadSaraVisible();
     loadCashouts();
+    loadFictiveUsers();
   }, []);
 
   const [tab, setTab] = useState("general");
@@ -343,6 +395,7 @@ export default function AdminPage() {
     { id: "users", label: "משתמשים" },
     { id: "yadsara", label: "יד שרה" },
     { id: "advertisers", label: "פניות מפרסמים" },
+    { id: "fictive", label: "משתמשים פיקטיביים" },
   ];
 
   return (
@@ -378,6 +431,9 @@ export default function AdminPage() {
         </button>
         <button onClick={handleReseedOranges} disabled={orangeLoading} style={{ padding: "8px 20px", cursor: "pointer" }}>
           {orangeLoading ? "Seeding…" : "🍊 Reseed Oranges"}
+        </button>
+        <button onClick={handleReseedShirts} disabled={shirtLoading} style={{ padding: "8px 20px", cursor: "pointer" }}>
+          {shirtLoading ? "Seeding…" : "👕 Reseed Shirts"}
         </button>
       </div>
       {status && <p style={{ marginTop: 12 }}>{status}</p>}
@@ -790,6 +846,62 @@ export default function AdminPage() {
       )}
 
       </> /* end advertisers tab */}
+
+      {tab === "fictive" && <>
+        <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24, flexWrap: "wrap" }}>
+          <button
+            onClick={handleCreateFictive}
+            disabled={fictiveCreating}
+            style={{ padding: "10px 24px", background: "#7c3aed", color: "#fff", border: "none", borderRadius: 8, fontWeight: 700, fontSize: 15, cursor: "pointer" }}
+          >
+            {fictiveCreating ? "יוצר..." : "➕ צור משתמש פיקטיבי"}
+          </button>
+          <button onClick={loadFictiveUsers} disabled={fictiveLoading} style={{ padding: "8px 16px", cursor: "pointer" }}>
+            {fictiveLoading ? "טוען..." : "רענן"}
+          </button>
+        </div>
+
+        {fictiveLoading ? <p>טוען...</p> : fictiveUsers.length === 0 ? (
+          <p style={{ color: "#888" }}>אין משתמשים פיקטיביים עדיין.</p>
+        ) : (
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+            <thead>
+              <tr style={{ background: "#f0f0f0", textAlign: "right" }}>
+                <th style={th}>שם</th>
+                <th style={th}>UID</th>
+                <th style={th}>מטבעות</th>
+                <th style={th}>מיקום בית</th>
+                <th style={th}>נוצר</th>
+                <th style={th}>פעולות</th>
+              </tr>
+            </thead>
+            <tbody>
+              {fictiveUsers.map((u) => (
+                <tr key={u.uid} style={{ borderBottom: "1px solid #ddd", background: "#faf5ff" }}>
+                  <td style={{ ...td, fontWeight: 600 }}>{u.name}</td>
+                  <td style={{ ...td, fontSize: 11, color: "#666" }}>{u.uid}</td>
+                  <td style={td}>{u.money?.toLocaleString()}</td>
+                  <td style={{ ...td, fontSize: 12, color: "#555" }}>
+                    {u.houseRow !== undefined ? `שורה ${u.houseRow}, עמודה ${u.houseCol}` : "—"}
+                  </td>
+                  <td style={{ ...td, whiteSpace: "nowrap" }}>
+                    {u.createdAt ? new Date(u.createdAt).toLocaleDateString("he-IL") : "—"}
+                  </td>
+                  <td style={td}>
+                    <button
+                      onClick={() => handleDeleteFictive(u.uid)}
+                      disabled={fictiveDeleteLoading === u.uid}
+                      style={{ ...actionBtn, background: "#dc2626" }}
+                    >
+                      {fictiveDeleteLoading === u.uid ? "..." : "מחק"}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </> /* end fictive tab */}
 
       {/* ── Edit User Modal ── */}
       {editUser && (

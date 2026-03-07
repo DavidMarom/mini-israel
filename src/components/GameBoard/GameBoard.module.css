@@ -176,6 +176,14 @@
   line-height: 1;
 }
 
+.shopItemImg {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
 .shopItemName {
   flex: 1;
   font-size: 14px;
@@ -234,6 +242,17 @@
   position: relative;
   width: 100%;
   height: 100%;
+}
+
+.tileItemImg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 8px;
+  cursor: pointer;
+  user-select: none;
 }
 
 .apple {

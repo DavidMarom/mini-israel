@@ -72,14 +72,20 @@ export default function AuthCard({ loading, user, displayName, bio, money, inven
             <div className={styles.inventorySection}>
               <p className={styles.inventoryTitle}>חפצים:</p>
               <div className={styles.inventoryItems}>
-                {Object.entries(
+                {Object.values(
                   inventory.reduce((acc, item) => {
-                    acc[item.emoji] = (acc[item.emoji] || 0) + 1;
+                    const key = item.id;
+                    if (!acc[key]) acc[key] = { ...item, count: 0 };
+                    acc[key].count += 1;
                     return acc;
                   }, {})
-                ).map(([emoji, count]) => (
-                  <span key={emoji} className={styles.inventoryItem}>
-                    {emoji}{count > 1 ? ` ×${count}` : ""}
+                ).map((item) => (
+                  <span key={item.id} className={styles.inventoryItem}>
+                    {item.img
+                      ? <img src={item.img} alt={item.name} style={{ width: 18, height: 18, objectFit: "contain", verticalAlign: "middle" }} />
+                      : item.emoji
+                    }
+                    {item.count > 1 ? ` ×${item.count}` : ""}
                   </span>
                 ))}
               </div>
