@@ -63,6 +63,11 @@ const TRIVIA_COL = YAD_SARA_COL;
 const TRIVIA_W = 3;
 const TRIVIA_H = 3;
 
+const EILAT_ROW = 222;
+const EILAT_COL = 6;
+const EILAT_W = 3;
+const EILAT_H = 3;
+
 const AD_ROW = 7;
 const AD_COL = 6;
 const AD_W = 3;
@@ -951,6 +956,19 @@ export default function GameBoard({ onOtherHouseClick }) {
         >
           <span className={styles.cashoutBuildingIcon}>💵</span>
           <span className={styles.cashoutBuildingLabel}>המר לכסף אמיתי!!</span>
+        </div>
+
+        {/* Eilat Building */}
+        <div
+          className={styles.azrieliBoard}
+          style={{
+            top: EILAT_ROW * TILE_SIZE,
+            left: EILAT_COL * TILE_SIZE,
+            width: EILAT_W * TILE_SIZE,
+            height: EILAT_H * TILE_SIZE,
+          }}
+        >
+          <img src="/assets/eilat.png" alt="אילת" className={styles.azrieliBuilding} />
         </div>
 
         {/* Advertisement Board */}
