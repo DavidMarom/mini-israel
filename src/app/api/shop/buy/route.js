@@ -2,9 +2,13 @@ import { NextResponse } from "next/server";
 import clientPromise from "../../../../services/mongo";
 
 const SHOP_ITEMS = {
-  flower:  { id: "flower",  emoji: "🌸", name: "פרח",        price: 10 },
-  falafel: { id: "falafel", emoji: "🧆", name: "פלאפל",      price: 25 },
-  flag:    { id: "flag",    emoji: "🇮🇱", name: "דגל ישראל", price: 10 },
+  flower:     { id: "flower",     emoji: "🌸", name: "פרח",         price: 10  },
+  falafel:    { id: "falafel",    emoji: "🧆", name: "פלאפל",       price: 25  },
+  flag:       { id: "flag",       emoji: "🇮🇱", name: "דגל ישראל",  price: 10  },
+  bike:       { id: "bike",       img: "/assets/items/bike.png",        name: "אופניים", price: 80  },
+  headphones: { id: "headphones", img: "/assets/items/headphones.png",  name: "אוזניות", price: 50  },
+  pc:         { id: "pc",         img: "/assets/items/pc.png",          name: "מחשב",    price: 120 },
+  shirt:      { id: "shirt",      img: "/assets/items/shirt.png",       name: "חולצה",   price: 30  },
 };
 
 export async function POST(request) {
@@ -23,7 +27,7 @@ export async function POST(request) {
       { uid, money: { $gte: item.price } },
       {
         $inc: { money: -item.price },
-        $push: { inventory: { id: item.id, emoji: item.emoji, name: item.name } },
+        $push: { inventory: { id: item.id, ...(item.emoji ? { emoji: item.emoji } : { img: item.img }), name: item.name } },
         $set: { updatedAt: new Date() },
       },
       { returnDocument: "after" }

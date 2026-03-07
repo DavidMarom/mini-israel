@@ -362,7 +362,7 @@ export default function Home() {
                       onClick={() => setComposeItemIndex(composeItemIndex === i ? null : i)}
                       title={item.name}
                     >
-                      {item.emoji}
+                      {item.img ? <img src={item.img} alt={item.name} style={{ width: 24, height: 24, objectFit: "contain" }} /> : item.emoji}
                     </button>
                   ))}
                 </div>

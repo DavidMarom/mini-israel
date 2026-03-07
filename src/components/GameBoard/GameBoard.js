@@ -244,9 +244,13 @@ export default function GameBoard({ onOtherHouseClick }) {
   };
 
   const SHOP_ITEMS = [
-    { id: "flower",  emoji: "🌸", name: "פרח",        price: 10, sellPrice: 7  },
-    { id: "falafel", emoji: "🧆", name: "פלאפל",      price: 25, sellPrice: 17 },
-    { id: "flag",    emoji: "🇮🇱", name: "דגל ישראל", price: 10, sellPrice: 7  },
+    { id: "flower",      emoji: "🌸", name: "פרח",         price: 10,  sellPrice: 7   },
+    { id: "falafel",     emoji: "🧆", name: "פלאפל",       price: 25,  sellPrice: 17  },
+    { id: "flag",        emoji: "🇮🇱", name: "דגל ישראל",  price: 10,  sellPrice: 7   },
+    { id: "bike",        img: "/assets/items/bike.png",        name: "אופניים",    price: 80,  sellPrice: 55  },
+    { id: "headphones",  img: "/assets/items/headphones.png",  name: "אוזניות",    price: 50,  sellPrice: 35  },
+    { id: "pc",          img: "/assets/items/pc.png",          name: "מחשב",       price: 120, sellPrice: 85  },
+    { id: "shirt",       img: "/assets/items/shirt.png",       name: "חולצה",      price: 30,  sellPrice: 20  },
   ];
   const DEFAULT_SELL_PRICE = 5;
 
@@ -527,6 +531,26 @@ export default function GameBoard({ onOtherHouseClick }) {
       return;
     }
 
+    if (cell && cell.item === "shirt") {
+      const next = grid.map((r) => r.slice());
+      next[row][col] = null;
+      setGrid(next);
+      void persistBoard(next);
+
+      fetch("/api/items/collect", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid: ownerUid, itemId: "shirt" }),
+      })
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.inventory) setUser((prev) => ({ ...prev, inventory: data.inventory }));
+        })
+        .catch(console.error);
+
+      return;
+    }
+
     // Clicking another user's house → open message compose
     if (cell && cell.building === "main-house" && cell.ownerUid !== ownerUid) {
       onOtherHouseClick && onOtherHouseClick({ ownerUid: cell.ownerUid, ownerName: cell.ownerName });
@@ -653,6 +677,7 @@ export default function GameBoard({ onOtherHouseClick }) {
             const hasMainHouse = cell && cell.building === "main-house";
             const hasApple = cell && cell.item === "apple";
             const hasOrange = cell && cell.item === "orange";
+            const hasShirt = cell && cell.item === "shirt";
             const hasTreasure = cell && cell.item === "treasure";
             const isStarHouse = hasMainHouse && starHouseUid && cell.ownerUid === starHouseUid;
             const isEmpty = !cell;
@@ -677,6 +702,7 @@ export default function GameBoard({ onOtherHouseClick }) {
             const isClickable =
               hasApple ||
               hasOrange ||
+              hasShirt ||
               hasTreasure ||
               (hasMainHouse && cell.ownerUid !== ownerUid) ||
               canPreview;
@@ -702,6 +728,9 @@ export default function GameBoard({ onOtherHouseClick }) {
                 )}
                 {hasOrange && (
                   <span className={styles.apple}>🍊</span>
+                )}
+                {hasShirt && (
+                  <img src="/assets/items/shirt.png" alt="חולצה" className={styles.tileItemImg} />
                 )}
                 {hasTreasure && (
                   <span className={styles.treasure}>💎</span>
@@ -929,7 +958,10 @@ export default function GameBoard({ onOtherHouseClick }) {
             <div className={styles.shopItems}>
               {SHOP_ITEMS.map((item) => (
                 <div key={item.id} className={styles.shopItem}>
-                  <span className={styles.shopEmoji}>{item.emoji}</span>
+                  {item.img
+                    ? <img src={item.img} alt={item.name} className={styles.shopItemImg} />
+                    : <span className={styles.shopEmoji}>{item.emoji}</span>
+                  }
                   <span className={styles.shopItemName}>{item.name}</span>
                   <span className={styles.shopItemPrice}>{item.price} ₪</span>
                   <button
@@ -1021,7 +1053,10 @@ export default function GameBoard({ onOtherHouseClick }) {
                   const price = shopItem?.sellPrice ?? DEFAULT_SELL_PRICE;
                   return (
                     <div key={i} className={styles.shopItem}>
-                      <span className={styles.shopEmoji}>{item.emoji}</span>
+                      {shopItem?.img
+                        ? <img src={shopItem.img} alt={item.name} className={styles.shopItemImg} />
+                        : <span className={styles.shopEmoji}>{item.emoji}</span>
+                      }
                       <span className={styles.shopItemName}>{item.name}</span>
                       <span className={styles.knessetSellPrice}>+{price} ₪</span>
                       <button
