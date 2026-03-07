@@ -506,6 +506,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid }) {
                 ownerUid: cell.ownerUid || null,
                 ownerName: cell.ownerName || null,
                 item: cell.item || null,
+                pooped: cell.pooped || false,
               };
             }
           });
@@ -518,8 +519,11 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid }) {
 
     loadBoard();
 
+    const interval = setInterval(loadBoard, 15000);
+
     return () => {
       cancelled = true;
+      clearInterval(interval);
     };
   }, []);
 
