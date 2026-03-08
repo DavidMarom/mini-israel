@@ -281,16 +281,13 @@ export default function Home() {
     }
   };
 
-  if (isMobile) {
-    return (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100dvh", textAlign: "center", padding: "2rem", fontSize: "1.5rem", direction: "rtl" }}>
-        סובב את המכשיר לאופק כדי לשחק במיני ישראל!
-      </div>
-    );
-  }
-
   return (
     <div className={styles.page}>
+      {isMobile && (
+        <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", fontSize: "1.1rem", direction: "rtl", textAlign: "center", pointerEvents: "none", zIndex: 9999, color: "#fff", textShadow: "0 1px 6px #000" }}>
+          סובב את המכשיר לאופק כדי לשחק במיני ישראל
+        </div>
+      )}
       <div className={styles.boardLayer}>
         <GameBoard onOtherHouseClick={(target) => { setComposeTarget(target); setComposeText(""); setComposeItemIndex(null); }} justPoopedUid={justPoopedUid} />
       </div>
