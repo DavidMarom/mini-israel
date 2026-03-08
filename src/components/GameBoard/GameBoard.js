@@ -68,6 +68,11 @@ const POLL_H = 3;
 const POLL_COL = 6;
 const POLL_ROW = 215;
 
+const CANDLE_ROW = POLL_ROW - 7;
+const CANDLE_COL = POLL_COL;
+const CANDLE_W = 3;
+const CANDLE_H = 3;
+
 const EILAT_ROW = 222;
 const EILAT_COL = 6;
 const EILAT_W = 3;
@@ -127,6 +132,11 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid }) {
   };
 
   const [showAzrieliShop, setShowAzrieliShop] = useState(false);
+
+  // Candle shop
+  const [showCandleShop, setShowCandleShop] = useState(false);
+  const [candleBuying, setCandleBuying] = useState(false);
+  const [candleDone, setCandleDone] = useState(false);
 
   // Config: star house + treasure winner + yad sara visibility
   const dismissedTreasureRef = useRef(null); // claimedAt string of dismissed toast
@@ -447,6 +457,30 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid }) {
   };
 
   const handleAzrieliClick = () => setShowAzrieliShop(true);
+
+  const handleBuyCandle = async () => {
+    if (!user || candleBuying) return;
+    const uid = user.firebaseUid || user.uid;
+    setCandleBuying(true);
+    try {
+      const res = await fetch("/api/candle", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid, name: user.name }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error === "Insufficient funds" ? "אין מספיק מטבעות" : "שגיאה, נסה שוב");
+        return;
+      }
+      setUser((prev) => ({ ...prev, money: data.money, inventory: data.inventory }));
+      setCandleDone(true);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setCandleBuying(false);
+    }
+  };
 
   const [buyingItem, setBuyingItem] = useState(null);
 
@@ -1115,6 +1149,22 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid }) {
           <span className={styles.cashoutBuildingLabel}>המר לכסף אמיתי!!</span>
         </div>
 
+        {/* Candle Building */}
+        <div
+          className={styles.azrieliBoard}
+          style={{
+            top: CANDLE_ROW * TILE_SIZE,
+            left: CANDLE_COL * TILE_SIZE,
+            width: CANDLE_W * TILE_SIZE,
+            height: CANDLE_H * TILE_SIZE,
+            cursor: "pointer",
+            filter: "drop-shadow(10px -6px 10px rgba(0,0,0,0.6))",
+          }}
+          onClick={() => { setShowCandleShop(true); setCandleDone(false); }}
+        >
+          <img src="/assets/candle-building.png" alt="בניין הנר" className={styles.azrieliBuilding} />
+        </div>
+
         {/* Poll Widget */}
         {(() => {
           const total = pollMessi + pollRonaldo;
@@ -1294,6 +1344,38 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid }) {
               ))}
             </div>
             <button className={styles.shopCloseBtn} onClick={() => setShowAzrieliShop(false)}>סגור</button>
+          </div>
+        </div>
+      )}
+
+      {/* Candle Shop */}
+      {showCandleShop && (
+        <div className={styles.shopBackdrop} onClick={() => setShowCandleShop(false)}>
+          <div className={styles.candleModal} onClick={(e) => e.stopPropagation()}>
+            <p className={styles.candleTitle}>🕯️ חנות הנרות</p>
+            <p className={styles.candleSubtitle}>יום האשה הבינלאומי</p>
+            {candleDone ? (
+              <>
+                <p className={styles.candleThanks}>הנר נרכש! 🕯️✨<br />חג האשה שמח!</p>
+                <button className={styles.shopCloseBtn} onClick={() => setShowCandleShop(false)}>סגור</button>
+              </>
+            ) : (
+              <>
+                <img src="/assets/candle-building.png" alt="נר" className={styles.candleImg} />
+                <p className={styles.candleDesc}>רכוש נר לכבוד יום האשה הבינלאומי 🌸</p>
+                <p className={styles.candleBalance}>יתרתך: {user?.money ?? 0} מטבעות</p>
+                <div className={styles.candleActions}>
+                  <button
+                    className={styles.candleBuyBtn}
+                    onClick={handleBuyCandle}
+                    disabled={candleBuying || !user || (user?.money ?? 0) < 40}
+                  >
+                    {candleBuying ? "מעבד..." : "רכוש נר — 40 🪙"}
+                  </button>
+                  <button className={styles.shopCloseBtn} onClick={() => setShowCandleShop(false)}>סגור</button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
