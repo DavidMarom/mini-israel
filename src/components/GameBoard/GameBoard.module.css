@@ -65,7 +65,7 @@
 
 .parashaModal {
   background: #f5f5f5;
-  border-radius: 16px;
+  border-radius: 8px;
   padding: 28px 24px;
   width: 100%;
   max-width: 480px;
@@ -152,7 +152,7 @@
 
 .shopModal {
   background: #f5f5f5;
-  border-radius: 16px;
+  border-radius: 8px;
   padding: 28px 24px;
   width: 100%;
   max-width: 320px;
@@ -188,7 +188,7 @@
   align-items: center;
   gap: 10px;
   background: #e8e8e8;
-  border-radius: 10px;
+  border-radius: 5px;
   padding: 10px 14px;
 }
 
@@ -201,7 +201,7 @@
   width: 36px;
   height: 36px;
   object-fit: contain;
-  border-radius: 6px;
+  border-radius: 3px;
   flex-shrink: 0;
 }
 
@@ -221,7 +221,7 @@
   background: #e2b455;
   color: #1a1a2e;
   border: none;
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 6px 14px;
   font-size: 13px;
   font-weight: 700;
@@ -239,7 +239,7 @@
   height: 14px;
   border: 2px solid rgba(26, 26, 46, 0.3);
   border-top-color: #1a1a2e;
-  border-radius: 50%;
+  border-radius: 25%;
   animation: spin 0.6s linear infinite;
   vertical-align: middle;
 }
@@ -252,7 +252,7 @@
   background: transparent;
   color: #555;
   border: 1px solid #ccc;
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 8px 14px;
   font-size: 13px;
   cursor: pointer;
@@ -293,7 +293,7 @@
   transform: translate(-50%, calc(-100% - 10px));
   background: rgba(20, 20, 30, 0.92);
   color: #f0f0f0;
-  border-radius: 10px;
+  border-radius: 5px;
   padding: 10px 14px;
   min-width: 120px;
   max-width: 200px;
@@ -322,9 +322,9 @@
 
 .adBoard {
   position: absolute;
-  background: linear-gradient(160deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+  background: #1a1a2e;
   border: 2px solid #e2b455;
-  border-radius: 8px;
+  border-radius: 4px;
   box-shadow: 0 0 18px rgba(226, 180, 85, 0.45), inset 0 0 12px rgba(0, 0, 0, 0.4);
   z-index: 10;
   overflow: hidden;
@@ -338,7 +338,7 @@
   left: 6px;
   width: 22px;
   height: 22px;
-  border-radius: 50%;
+  border-radius: 25%;
   border: none;
   background: #e2b455;
   color: #1a1a2e;
@@ -406,7 +406,7 @@
 
 .adPopupModal {
   background: #1e1e2e;
-  border-radius: 16px;
+  border-radius: 8px;
   padding: 28px 24px;
   width: 100%;
   max-width: 340px;
@@ -425,7 +425,7 @@
 
 .adPopupTextarea {
   resize: none;
-  border-radius: 10px;
+  border-radius: 5px;
   border: 1px solid #3a3a55;
   background: #2a2a3e;
   color: #e0e0e0;
@@ -457,7 +457,7 @@
   background: #e2b455;
   color: #1a1a2e;
   border: none;
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 8px 20px;
   font-size: 13px;
   font-weight: 700;
@@ -473,7 +473,7 @@
   background: transparent;
   color: #aaa;
   border: 1px solid #3a3a55;
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 8px 14px;
   font-size: 13px;
   cursor: pointer;
@@ -489,7 +489,7 @@
   cursor: pointer;
   background: #111827;
   border: 2px solid #374151;
-  border-radius: 10px;
+  border-radius: 5px;
   overflow: hidden;
   display: flex;
   align-items: flex-start;
@@ -558,7 +558,7 @@
 
 .cameraModal {
   background: #1e1e2e;
-  border-radius: 16px;
+  border-radius: 8px;
   padding: 24px;
   display: flex;
   flex-direction: column;
@@ -584,7 +584,7 @@
 .cameraVideo {
   width: 420px;
   height: 315px;
-  border-radius: 10px;
+  border-radius: 5px;
   object-fit: cover;
   background: #000;
   display: block;
@@ -600,7 +600,7 @@
   background: #394a75;
   color: #fff;
   border: none;
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 10px 32px;
   font-size: 14px;
   font-weight: 700;
@@ -616,7 +616,7 @@
   background: transparent;
   color: #aaa;
   border: 1px solid #3a3a55;
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 10px 16px;
   font-size: 14px;
   cursor: pointer;
@@ -672,9 +672,9 @@
   bottom: 32px;
   left: 50%;
   transform: translateX(-50%);
-  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 60%, #4c1d95 100%);
+  background: #1e1b4b;
   border: 2px solid #a855f7;
-  border-radius: 16px;
+  border-radius: 8px;
   padding: 14px 20px;
   display: flex;
   align-items: center;
@@ -733,9 +733,9 @@
   position: absolute;
   z-index: 10;
   cursor: pointer;
-  background: linear-gradient(160deg, #78350f 0%, #92400e 60%, #b45309 100%);
+  background: #78350f;
   border: 2px solid #f59e0b;
-  border-radius: 10px;
+  border-radius: 5px;
   box-shadow: 0 0 18px rgba(245, 158, 11, 0.4), inset 0 0 10px rgba(0,0,0,0.3);
   display: flex;
   flex-direction: column;
@@ -778,7 +778,7 @@
   gap: 10px;
   padding: 8px 12px;
   background: #e8e8e8;
-  border-radius: 8px;
+  border-radius: 4px;
 }
 
 .leaderboardRowMe {
@@ -820,7 +820,7 @@
   background: #16a34a;
   color: #fff;
   border: none;
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 6px 14px;
   font-size: 13px;
   font-weight: 700;
@@ -855,7 +855,7 @@
   position: absolute;
   z-index: 10;
   cursor: pointer;
-  border-radius: 10px;
+  border-radius: 5px;
   overflow: hidden;
   border: 2px solid #e11d48;
   box-shadow: 0 0 16px rgba(225, 29, 72, 0.4);
@@ -877,7 +877,7 @@
 
 .yadSaraModal {
   background: #fff;
-  border-radius: 16px;
+  border-radius: 8px;
   padding: 0 0 24px;
   width: 100%;
   max-width: 340px;
@@ -933,7 +933,7 @@
   background: #e11d48;
   color: #fff;
   border: none;
-  border-radius: 10px;
+  border-radius: 5px;
   padding: 11px 28px;
   font-size: 14px;
   font-weight: 700;
@@ -971,7 +971,7 @@
   font-size: 13px;
   font-weight: 500;
   padding: 6px 12px;
-  border-radius: 20px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -983,7 +983,7 @@
 .onlineDot {
   width: 8px;
   height: 8px;
-  border-radius: 50%;
+  border-radius: 25%;
   background: #4ade80;
   flex-shrink: 0;
   box-shadow: 0 0 6px #4ade80;
@@ -995,9 +995,9 @@
   position: absolute;
   z-index: 10;
   cursor: pointer;
-  background: linear-gradient(135deg, #14532d, #166534);
+  background: #14532d;
   border: 2px solid #4ade80;
-  border-radius: 10px;
+  border-radius: 5px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1030,7 +1030,7 @@
 .cashoutModal {
   background: #1a2e1a;
   border: 1px solid #4ade80;
-  border-radius: 16px;
+  border-radius: 8px;
   padding: 28px 24px;
   width: 100%;
   max-width: 380px;
@@ -1052,7 +1052,7 @@
 
 .cashoutInfo {
   background: rgba(74, 222, 128, 0.1);
-  border-radius: 10px;
+  border-radius: 5px;
   padding: 12px 16px;
   display: flex;
   flex-direction: column;
@@ -1093,7 +1093,7 @@
 
 .cashoutInput {
   padding: 8px 12px;
-  border-radius: 8px;
+  border-radius: 4px;
   border: 1px solid #4ade80;
   background: #0f2010;
   color: #fff;
@@ -1138,7 +1138,7 @@
   background: #16a34a;
   color: #fff;
   border: none;
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 10px 24px;
   font-size: 15px;
   font-weight: 700;
@@ -1166,7 +1166,7 @@
   line-height: 1.2;
   color: #f9fafb;
   background-color: rgba(15, 23, 42, 0.7);
-  border-radius: 3px;
+  border-radius: 2px;
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1179,25 +1179,22 @@
   position: absolute;
   z-index: 10;
   cursor: pointer;
-  background: linear-gradient(135deg, #1e1b4b, #312e81);
-  border: 2px solid #818cf8;
-  border-radius: 10px;
+  background: transparent;
+  border: none;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  transition: transform 0.15s, box-shadow 0.15s;
-  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+  transition: transform 0.15s;
 }
 
 .triviaBuilding:hover {
   transform: scale(1.04);
-  box-shadow: 0 6px 24px rgba(99, 102, 241, 0.6);
 }
 
 .triviaBuildingIcon {
-  font-size: 40px;
+  font-size: 80px;
 }
 
 .triviaBuildingLabel {
@@ -1212,7 +1209,7 @@
 .triviaModal {
   background: #1e1b4b;
   border: 2px solid #818cf8;
-  border-radius: 14px;
+  border-radius: 7px;
   padding: 28px 24px 20px;
   width: 420px;
   max-width: 95vw;
@@ -1257,7 +1254,7 @@
   background: #312e81;
   color: #e0e7ff;
   border: 2px solid #4f46e5;
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 10px 8px;
   font-size: 14px;
   font-weight: 600;
@@ -1313,7 +1310,7 @@
   background: #4f46e5;
   color: #fff;
   border: none;
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 8px 22px;
   font-size: 14px;
   font-weight: 700;
@@ -1330,7 +1327,7 @@
 .poopPopup {
   background: #1a1a1a;
   border: 2px solid #8B4513;
-  border-radius: 14px;
+  border-radius: 7px;
   padding: 24px 20px 18px;
   width: 320px;
   max-width: 95vw;
@@ -1353,7 +1350,7 @@
   background: #8B4513;
   color: #fff;
   border: none;
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 10px 16px;
   font-size: 14px;
   font-weight: 700;
@@ -1376,7 +1373,7 @@
   background: #2a2a2a;
   color: #ccc;
   border: 1px solid #444;
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 8px 16px;
   font-size: 14px;
   cursor: pointer;
@@ -1391,7 +1388,7 @@
   font-size: 9px;
   color: #fbbf24;
   background: rgba(0,0,0,0.6);
-  border-radius: 4px;
+  border-radius: 2px;
   padding: 1px 4px;
   position: absolute;
   bottom: 18px;
@@ -1411,7 +1408,7 @@
   gap: 2px;
   background: rgba(0, 0, 0, 0.7);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 4px 10px 5px;
   pointer-events: none;
   min-width: 120px;
@@ -1443,7 +1440,7 @@
   background: #facc15;
   color: #000;
   border: none;
-  border-radius: 6px;
+  border-radius: 3px;
   padding: 3px 10px;
   font-size: 11px;
   font-weight: 800;
@@ -1549,7 +1546,7 @@
   width: 88%;
   height: 7px;
   background: #3a7bd5;
-  border-radius: 4px;
+  border-radius: 2px;
   overflow: hidden;
 }
 
@@ -1557,7 +1554,7 @@
   display: block;
   height: 100%;
   background: #e2b714;
-  border-radius: 4px;
+  border-radius: 2px;
   transition: width 0.4s;
 }
 
@@ -1577,7 +1574,7 @@
 .pollModal {
   background: #1a1a2e;
   border: 2px solid #e2b714;
-  border-radius: 14px;
+  border-radius: 7px;
   padding: 28px 24px 20px;
   width: 400px;
   max-width: 95vw;
@@ -1606,7 +1603,7 @@
   width: 100%;
   height: 12px;
   background: #3a7bd5;
-  border-radius: 6px;
+  border-radius: 3px;
   overflow: hidden;
 }
 
@@ -1614,7 +1611,7 @@
   display: block;
   height: 100%;
   background: #e2b714;
-  border-radius: 6px;
+  border-radius: 3px;
   transition: width 0.4s;
 }
 
@@ -1631,7 +1628,7 @@
   align-items: center;
   gap: 8px;
   padding: 12px 8px;
-  border-radius: 12px;
+  border-radius: 6px;
   border: 2px solid transparent;
   cursor: pointer;
   transition: transform 0.15s, border-color 0.15s, background 0.15s;
@@ -1662,7 +1659,7 @@
   max-height: 140px;
   object-fit: contain;
   object-position: bottom;
-  border-radius: 8px;
+  border-radius: 4px;
 }
 
 .pollCandidatePct {
@@ -1693,7 +1690,7 @@
 .candleModal {
   background: #1e1e2e;
   border: 1px solid #3a2a50;
-  border-radius: 16px;
+  border-radius: 8px;
   padding: 28px 24px 20px;
   width: 300px;
   display: flex;
@@ -1722,7 +1719,7 @@
   width: 100px;
   height: 100px;
   object-fit: contain;
-  border-radius: 12px;
+  border-radius: 6px;
 }
 
 .candleDesc {
@@ -1745,10 +1742,10 @@
 }
 
 .candleBuyBtn {
-  background: linear-gradient(135deg, #f5c842, #e07b20);
+  background: #f5c842;
   color: #1a1a1a;
   border: none;
-  border-radius: 10px;
+  border-radius: 5px;
   padding: 10px 0;
   font-size: 15px;
   font-weight: 700;

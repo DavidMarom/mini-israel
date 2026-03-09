@@ -949,7 +949,8 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
             const ownerUid = user && (user.firebaseUid || user.uid);
             const hasMainHouse = cell && cell.building === "main-house";
             const hasFarm = cell && cell.building === "farm";
-            const hasEgg = hasFarm && cell.eggReady && cell.ownerUid === ownerUid;
+            const hasEgg = hasFarm && cell.eggReady;
+            const canCollectEgg = hasEgg && cell.ownerUid === ownerUid;
             const hasApple = cell && cell.item === "apple";
             const hasOrange = cell && cell.item === "orange";
             const hasShirt = cell && cell.item === "shirt";
@@ -981,7 +982,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
               hasShirt ||
               hasPoop ||
               hasTreasure ||
-              hasEgg ||
+              canCollectEgg ||
               (hasMainHouse && cell.ownerUid !== ownerUid) ||
               (hasMainHouse && cell.ownerUid === ownerUid && isPoopHouse) ||
               canPreview;
