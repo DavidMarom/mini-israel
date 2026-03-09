@@ -3,7 +3,7 @@
 import { useState } from "react";
 import styles from "./AuthCard.module.css";
 
-export default function AuthCard({ loading, user, displayName, bio, money, inventory, photoURL, onGoogleSignIn, onLogout, error, onUpdateName }) {
+export default function AuthCard({ loading, user, displayName, bio, money, inventory, photoURL, onGoogleSignIn, onLogout, error, onUpdateName, onBuyFarm, hasFarm, buyingFarm }) {
 
   const [avatarBroken, setAvatarBroken] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
@@ -90,6 +90,16 @@ export default function AuthCard({ loading, user, displayName, bio, money, inven
                 ))}
               </div>
             </div>
+          )}
+
+          {!hasFarm && (
+            <button
+              onClick={onBuyFarm}
+              className={styles.farmButton}
+              disabled={buyingFarm || (money ?? 0) < 500}
+            >
+              {buyingFarm ? "קונה חווה..." : "🌾 קנה חווה – 500 שקלים"}
+            </button>
           )}
 
           <button onClick={onLogout} className={styles.secondaryButton}>התנתק</button>
