@@ -36,6 +36,7 @@ export default function AuthCard({ loading, user, displayName, bio, money, inven
         <>
           <p className={styles.text}>התחבר/י כדי להתחיל לשחק</p>
           <button onClick={onGoogleSignIn} className={styles.primaryButton}>התחבר/י</button>
+          <a href="/horaot" target="_blank" rel="noopener noreferrer" className={styles.horaotLink}>📖 הוראות משחק</a>
         </>
       )}
 
@@ -102,6 +103,7 @@ export default function AuthCard({ loading, user, displayName, bio, money, inven
             </button>
           )}
 
+          <a href="/horaot" target="_blank" rel="noopener noreferrer" className={styles.horaotLink}>📖 הוראות משחק</a>
           <button onClick={onLogout} className={styles.secondaryButton}>התנתק</button>
         </>
       )}
