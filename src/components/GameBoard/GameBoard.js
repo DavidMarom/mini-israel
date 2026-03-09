@@ -549,6 +549,8 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                 ownerName: cell.ownerName || null,
                 item: cell.item || null,
                 pooped: cell.pooped || false,
+                eggReady: cell.eggReady || false,
+                lastEggEpoch: cell.lastEggEpoch ?? null,
               };
             }
           });
@@ -604,6 +606,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
             ownerUid: cell.ownerUid || null,
             ownerName: cell.ownerName || null,
             item: cell.item || null,
+            ...(cell.building === "farm" ? { eggReady: cell.eggReady || false, lastEggEpoch: cell.lastEggEpoch ?? null } : {}),
           });
         }
       }
@@ -679,6 +682,28 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
     if (!ownerUid) return;
 
     const cell = grid[row][col];
+
+    // Collecting egg from own farm
+    if (cell && cell.building === "farm" && cell.ownerUid === ownerUid && cell.eggReady) {
+      const next = grid.map((r) => r.slice());
+      next[row][col] = { ...cell, eggReady: false };
+      setGrid(next);
+
+      fetch("/api/farm/collect", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid: ownerUid }),
+      })
+        .then((r) => r.json())
+        .then((data) => {
+          if (typeof data.money === "number") {
+            setUser((prev) => ({ ...prev, money: data.money }));
+          }
+        })
+        .catch(console.error);
+
+      return;
+    }
 
     // Collecting an apple or orange
     if (cell && cell.item === "treasure") {
@@ -921,8 +946,10 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
           Array.from({ length: COLS }).map((_, col) => {
             const key = `${row}-${col}`;
             const cell = grid[row][col];
+            const ownerUid = user && (user.firebaseUid || user.uid);
             const hasMainHouse = cell && cell.building === "main-house";
             const hasFarm = cell && cell.building === "farm";
+            const hasEgg = hasFarm && cell.eggReady && cell.ownerUid === ownerUid;
             const hasApple = cell && cell.item === "apple";
             const hasOrange = cell && cell.item === "orange";
             const hasShirt = cell && cell.item === "shirt";
@@ -931,7 +958,6 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
             const isPoopHouse = hasMainHouse && cell.pooped;
             const isStarHouse = hasMainHouse && !isPoopHouse && starHouseUid && cell.ownerUid === starHouseUid;
             const isEmpty = !cell;
-            const ownerUid = user && (user.firebaseUid || user.uid);
             const userHasHouse =
               !!ownerUid &&
               grid.some((r) =>
@@ -955,6 +981,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
               hasShirt ||
               hasPoop ||
               hasTreasure ||
+              hasEgg ||
               (hasMainHouse && cell.ownerUid !== ownerUid) ||
               (hasMainHouse && cell.ownerUid === ownerUid && isPoopHouse) ||
               canPreview;
@@ -1009,7 +1036,10 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                   </div>
                 )}
                 {hasFarm && (
-                  <img src="/assets/farm.png" alt="חווה" className={styles.mainHouse} />
+                  <div className={styles.farmWrapper}>
+                    <img src="/assets/farm.png" alt="חווה" className={styles.mainHouse} />
+                    {hasEgg && <span className={styles.eggBadge}>🥚</span>}
+                  </div>
                 )}
                 {!hasMainHouse &&
                   canPreview &&

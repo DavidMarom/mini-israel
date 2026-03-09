@@ -58,7 +58,18 @@ export async function GET() {
       cells.some((c) => c.row === t.row && c.col === t.col && c.building === "synagogue")
     );
 
-    if (!hasApples || !hasAzrieli || !hasSynagogue) {
+    // Generate eggs for farm cells every round hour
+    const currentHourEpoch = Math.floor(Date.now() / 3600000);
+    let farmUpdated = false;
+    cells = cells.map((c) => {
+      if (c.building === "farm" && (c.lastEggEpoch ?? -1) < currentHourEpoch) {
+        farmUpdated = true;
+        return { ...c, eggReady: true, lastEggEpoch: currentHourEpoch };
+      }
+      return c;
+    });
+
+    if (farmUpdated || !hasApples || !hasAzrieli || !hasSynagogue) {
       if (!hasApples) {
         const apples = seedApples(cells);
         cells = [...cells, ...apples];
