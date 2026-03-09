@@ -179,3 +179,25 @@
   font-size: 15px;
 }
 
+.farmButton {
+  border-radius: 5px;
+  padding: 7px 0px;
+  border: 1px solid transparent;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  background-color: #4a7c3f;
+  color: #fff;
+  transition: background-color 0.16s ease, transform 0.08s ease;
+}
+
+.farmButton:hover:not(:disabled) {
+  background-color: #3a6230;
+  transform: translateY(-1px);
+}
+
+.farmButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+

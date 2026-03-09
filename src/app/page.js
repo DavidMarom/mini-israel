@@ -59,6 +59,9 @@ export default function Home() {
   const [composeItemIndex, setComposeItemIndex] = useState(null);
   const [poopThrowing, setPoopThrowing] = useState(false);
   const [justPoopedUid, setJustPoopedUid] = useState(null);
+  const [hasFarm, setHasFarm] = useState(false);
+  const [buyingFarm, setBuyingFarm] = useState(false);
+  const [boardRefreshKey, setBoardRefreshKey] = useState(0);
 
   const {
     user: storedUser,
@@ -255,6 +258,39 @@ export default function Home() {
     }
   };
 
+  const handleBuyFarm = async () => {
+    if (!storedUser || buyingFarm) return;
+    const uid = storedUser.firebaseUid;
+    setBuyingFarm(true);
+    try {
+      const res = await fetch("/api/farm/buy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(
+          data.error === "Insufficient funds" ? "אין מספיק מטבעות" :
+          data.error === "No house found" ? "יש לבנות בית לפני קניית חווה" :
+          data.error === "Already has farm" ? "כבר יש לך חווה" :
+          "שגיאה, נסה שוב"
+        );
+        return;
+      }
+      setUserStore((prev) => ({ ...prev, money: data.money }));
+      if (data.newHouseRow != null) {
+        setUserStore((prev) => ({ ...prev, mainHouse: { row: data.newHouseRow, col: data.newHouseCol } }));
+      }
+      setHasFarm(true);
+      setBoardRefreshKey((k) => k + 1);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setBuyingFarm(false);
+    }
+  };
+
   const handleThrowPoop = async () => {
     if (!composeTarget || !storedUser || poopThrowing) return;
     const uid = storedUser.firebaseUid || storedUser.uid;
@@ -289,7 +325,7 @@ export default function Home() {
         </div>
       )}
       <div className={styles.boardLayer}>
-        <GameBoard onOtherHouseClick={(target) => { setComposeTarget(target); setComposeText(""); setComposeItemIndex(null); }} justPoopedUid={justPoopedUid} />
+        <GameBoard onOtherHouseClick={(target) => { setComposeTarget(target); setComposeText(""); setComposeItemIndex(null); }} justPoopedUid={justPoopedUid} boardRefreshKey={boardRefreshKey} onHasFarmChange={setHasFarm} />
       </div>
 
       <div className={styles.scrollHint} aria-hidden="true">
@@ -348,6 +384,9 @@ export default function Home() {
           onLogout={handleLogout}
           error={error}
           onUpdateName={saveName}
+          onBuyFarm={handleBuyFarm}
+          hasFarm={hasFarm}
+          buyingFarm={buyingFarm}
         />
         <MessagesCard user={storedUser} />
         {starHouse && (

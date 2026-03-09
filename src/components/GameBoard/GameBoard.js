@@ -86,7 +86,7 @@ const AD_H = 2;
 const createEmptyGrid = () =>
   Array.from({ length: ROWS }, () => Array(COLS).fill(null));
 
-export default function GameBoard({ onOtherHouseClick, justPoopedUid }) {
+export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefreshKey, onHasFarmChange }) {
   const [grid, setGrid] = useState(createEmptyGrid);
   const [hover, setHover] = useState(null);
   const [houseTooltip, setHouseTooltip] = useState(null); // { x, y, ownerName, bio }
@@ -95,6 +95,14 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid }) {
 
   const [onlineCount, setOnlineCount] = useState(null);
   useEffect(() => { setOnlineCount(Math.floor(Math.random() * 500) + 500); }, []);
+
+  useEffect(() => {
+    if (!onHasFarmChange || !user) return;
+    const uid = user.firebaseUid || user.uid;
+    const hasFarm = grid.some((r) => r.some((c) => c && c.building === "farm" && c.ownerUid === uid));
+    onHasFarmChange(hasFarm);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [grid, user]);
 
   // Cashout
   const [showCashout, setShowCashout] = useState(false);
@@ -559,7 +567,8 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid }) {
       cancelled = true;
       clearInterval(interval);
     };
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [boardRefreshKey]);
 
   const loadAds = () => {
     fetch("/api/ads")
@@ -913,6 +922,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid }) {
             const key = `${row}-${col}`;
             const cell = grid[row][col];
             const hasMainHouse = cell && cell.building === "main-house";
+            const hasFarm = cell && cell.building === "farm";
             const hasApple = cell && cell.item === "apple";
             const hasOrange = cell && cell.item === "orange";
             const hasShirt = cell && cell.item === "shirt";
@@ -997,6 +1007,9 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid }) {
                     )}
                     {isStarHouse && <span className={styles.starBadge}>⭐</span>}
                   </div>
+                )}
+                {hasFarm && (
+                  <img src="/assets/farm.png" alt="חווה" className={styles.mainHouse} />
                 )}
                 {!hasMainHouse &&
                   canPreview &&
