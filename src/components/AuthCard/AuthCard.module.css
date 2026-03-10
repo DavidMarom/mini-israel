@@ -9,6 +9,28 @@
   gap: 18px;
   pointer-events: auto;
   margin-right: auto;
+  position: relative;
+}
+
+.logoutBtn {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: transparent;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: color 0.15s, background-color 0.15s;
+}
+
+.logoutBtn:hover {
+  color: #111;
+  background-color: rgba(0, 0, 0, 0.08);
 }
 
 .text {
