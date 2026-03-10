@@ -1278,7 +1278,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
           }}
           onClick={handlePowerPlantClick}
         >
-          <img src="/assets/powerplant.svg" alt="תחנת כוח" className={styles.azrieliBuilding} />
+          <img src="/assets/electric.png" alt="תחנת כוח" className={styles.azrieliBuilding} />
         </div>
 
         {/* Candle Building */}
