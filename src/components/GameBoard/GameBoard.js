@@ -1484,13 +1484,12 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                     : <span className={styles.shopEmoji}>{item.emoji}</span>
                   }
                   <span className={styles.shopItemName}>{item.name}</span>
-                  <span className={styles.shopItemPrice}>{item.price} ₪</span>
                   <button
                     className={styles.shopBuyBtn}
                     onClick={() => handleBuyItem(item)}
                     disabled={!user || (user.money ?? 0) < item.price || !!buyingItem}
                   >
-                    {buyingItem === item.id ? <span className={styles.shopSpinner} /> : "קנה"}
+                    {buyingItem === item.id ? <span className={styles.shopSpinner} /> : `${item.price} 🪙`}
                   </button>
                 </div>
               ))}
