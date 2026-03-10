@@ -29,10 +29,11 @@ export async function POST(request) {
       { $pull: { inventory: null } }
     );
 
-    // Add item to recipient
+    // Add item to recipient (mark as received from a friend)
+    const itemWithFriendFlag = { ...item, fromFriend: true };
     await db.collection("users").updateOne(
       { uid: toUid },
-      { $push: { inventory: item } }
+      { $push: { inventory: itemWithFriendFlag } }
     );
 
     const messageText = text?.trim()

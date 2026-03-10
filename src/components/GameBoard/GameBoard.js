@@ -117,6 +117,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
   const [showFarmModal, setShowFarmModal] = useState(null); // { row, col, cell }
   const [farmUpgrading, setFarmUpgrading] = useState(false);
   const [farmCollecting, setFarmCollecting] = useState(false);
+  const [farmUpgradeMsg, setFarmUpgradeMsg] = useState(null);
 
   // Cashout
   const [showCashout, setShowCashout] = useState(false);
@@ -313,7 +314,21 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
     const currentLevel = showFarmModal.cell.farmLevel || 1;
     if (currentLevel >= 3) return;
     const cost = currentLevel === 1 ? 600 : 1200;
-    if ((user.money || 0) < cost) { alert("אין מספיק מטבעות"); return; }
+
+    // Check conditions before calling API
+    if ((user.money || 0) < cost) {
+      setFarmUpgradeMsg("אין מספיק מטבעות לשדרוג");
+      return;
+    }
+    if (currentLevel === 1) {
+      const friendShirts = (user.inventory || []).filter((i) => i.id === "shirt" && i.fromFriend);
+      if (friendShirts.length < 2) {
+        setFarmUpgradeMsg("לשדרוג ראשון נדרשות לפחות 2 חולצות שקיבלת מחברים");
+        return;
+      }
+    }
+
+    setFarmUpgradeMsg(null);
     setFarmUpgrading(true);
     try {
       const res = await fetch("/api/farm/upgrade", {
@@ -323,9 +338,14 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       });
       const data = await res.json();
       if (!res.ok) {
-        alert(data.error === "Insufficient funds" ? "אין מספיק מטבעות" : "שגיאה, נסה שוב");
+        setFarmUpgradeMsg(
+          data.error === "Insufficient funds" ? "אין מספיק מטבעות לשדרוג" :
+          data.error === "Need friend shirts" ? "לשדרוג ראשון נדרשות לפחות 2 חולצות שקיבלת מחברים" :
+          "שגיאה, נסה שוב"
+        );
         return;
       }
+      setFarmUpgradeMsg(null);
       setUser((prev) => ({ ...prev, money: data.money }));
       const { row, col } = showFarmModal;
       const next = grid.map((r) => r.slice());
@@ -1502,7 +1522,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                     onClick={handleBuyCandle}
                     disabled={candleBuying || !user || (user?.money ?? 0) < 40}
                   >
-                    {candleBuying ? "מעבד..." : "רכוש נר — 40 🪙"}
+                    {candleBuying ? "מעבד..." : "רכוש נר - 40 🪙"}
                   </button>
                   <button className={styles.shopCloseBtn} onClick={() => setShowCandleShop(false)}>סגור</button>
                 </div>
@@ -1569,7 +1589,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
         </div>
       )}
 
-      {/* Knesset — Sell Items */}
+      {/* Knesset - Sell Items */}
       {showKnesset && (
         <div className={styles.shopBackdrop} onClick={() => setShowKnesset(false)}>
           <div className={styles.shopModal} onClick={(e) => e.stopPropagation()}>
@@ -1708,7 +1728,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
         <div className={styles.shopBackdrop} onClick={() => setShowTrivia(false)}>
           <div className={styles.triviaModal} onClick={(e) => e.stopPropagation()}>
             <p className={styles.triviaTitle}>🧠 טריוויה</p>
-            <p className={styles.triviaLevel}>{triviaQuestion.hard ? "שאלה קשה — 20 מטבעות" : "שאלה קלה — 10 מטבעות"}</p>
+            <p className={styles.triviaLevel}>{triviaQuestion.hard ? "שאלה קשה - 20 מטבעות" : "שאלה קלה - 10 מטבעות"}</p>
             <p className={styles.triviaQuestion}>{triviaQuestion.q}</p>
             <div className={styles.triviaOptions}>
               {triviaQuestion.options.map((opt, i) => {
@@ -1779,12 +1799,12 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
 
       {/* Farm Modal */}
       {showFarmModal && (
-        <div className={styles.shopBackdrop} onClick={() => setShowFarmModal(null)}>
+        <div className={styles.shopBackdrop} onClick={() => { setShowFarmModal(null); setFarmUpgradeMsg(null); }}>
           <div className={styles.shopModal} onClick={(e) => e.stopPropagation()}>
             <p className={styles.shopTitle}>🌾 החווה שלי</p>
             <p className={styles.shopBalance}>יתרה: {user?.money ?? 0} שקלים</p>
             <p style={{ margin: 0, fontSize: 14 }}>
-              רמה {showFarmModal.cell.farmLevel || 1} — {(showFarmModal.cell.farmLevel || 1) === 1 ? "20" : (showFarmModal.cell.farmLevel || 1) === 2 ? "40" : "80"} מטבעות לביצה
+              רמה {showFarmModal.cell.farmLevel || 1} - {(showFarmModal.cell.farmLevel || 1) === 1 ? "20" : (showFarmModal.cell.farmLevel || 1) === 2 ? "40" : "80"} מטבעות לביצה
             </p>
             {showFarmModal.cell.eggReady ? (
               <button className={styles.shopBuyBtn} onClick={handleFarmModalCollect} disabled={farmCollecting}>
@@ -1794,19 +1814,24 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
               <p style={{ margin: 0, fontSize: 12, color: "#888" }}>הביצה הבאה תהיה מוכנה בשעה הקרובה</p>
             )}
             {(showFarmModal.cell.farmLevel || 1) < 3 ? (
-              <button
-                className={styles.shopBuyBtn}
-                onClick={handleFarmUpgrade}
-                disabled={farmUpgrading || (user?.money ?? 0) < ((showFarmModal.cell.farmLevel || 1) === 1 ? 600 : 1200)}
-              >
-                {farmUpgrading
-                  ? "משדרג..."
-                  : `⬆️ שדרג לרמה ${(showFarmModal.cell.farmLevel || 1) + 1} – ${(showFarmModal.cell.farmLevel || 1) === 1 ? "600" : "1,200"} שקלים`}
-              </button>
+              <>
+                {farmUpgradeMsg && (
+                  <p style={{ margin: "4px 0", fontSize: 12, color: "#c0392b", direction: "rtl" }}>{farmUpgradeMsg}</p>
+                )}
+                <button
+                  className={styles.shopBuyBtn}
+                  onClick={handleFarmUpgrade}
+                  disabled={farmUpgrading}
+                >
+                  {farmUpgrading
+                    ? "משדרג..."
+                    : `⬆️ שדרג לרמה ${(showFarmModal.cell.farmLevel || 1) + 1} – ${(showFarmModal.cell.farmLevel || 1) === 1 ? "600" : "1,200"} שקלים`}
+                </button>
+              </>
             ) : (
               <p style={{ margin: 0, fontSize: 12, color: "#4a7c3f", fontWeight: 600 }}>✅ חווה ברמה מקסימלית! (80 מטבעות לביצה)</p>
             )}
-            <button className={styles.shopCloseBtn} onClick={() => setShowFarmModal(null)}>סגור</button>
+            <button className={styles.shopCloseBtn} onClick={() => { setShowFarmModal(null); setFarmUpgradeMsg(null); }}>סגור</button>
           </div>
         </div>
       )}

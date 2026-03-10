@@ -652,11 +652,11 @@ export default function AdminPage() {
               const statusLabels = { new: "חדש", paid: "שולם", cancelled: "בוטל" };
               return (
                 <tr key={id} style={{ borderBottom: "1px solid #ddd", background: r.status === "new" ? "#f0fdf4" : "white" }}>
-                  <td style={td}>{r.name || "—"}</td>
+                  <td style={td}>{r.name || "-"}</td>
                   <td style={{ ...td, fontWeight: 600 }}>{r.phone}</td>
                   <td style={td}>{r.coins?.toLocaleString()}</td>
                   <td style={{ ...td, color: "#15803d", fontWeight: 700 }}>₪{r.ils}</td>
-                  <td style={{ ...td, whiteSpace: "nowrap" }}>{r.createdAt ? new Date(r.createdAt).toLocaleDateString("he-IL") : "—"}</td>
+                  <td style={{ ...td, whiteSpace: "nowrap" }}>{r.createdAt ? new Date(r.createdAt).toLocaleDateString("he-IL") : "-"}</td>
                   <td style={td}>
                     <span style={{ color: statusColors[r.status] || "#333", fontWeight: 600 }}>
                       {statusLabels[r.status] || r.status}
@@ -708,10 +708,10 @@ export default function AdminPage() {
           <tbody>
             {users.map((u) => (
               <tr key={u.uid} style={{ borderBottom: "1px solid #ddd", background: u.suspended ? "#fff0f0" : "white" }}>
-                <td style={td}>{u.name || "—"}</td>
+                <td style={td}>{u.name || "-"}</td>
                 <td style={td}>{u.email}</td>
                 <td style={td}>{u.money ?? 0}</td>
-                <td style={td}>{u.createdAt ? new Date(u.createdAt).toLocaleDateString("he-IL") : "—"}</td>
+                <td style={td}>{u.createdAt ? new Date(u.createdAt).toLocaleDateString("he-IL") : "-"}</td>
                 <td style={td}>
                   {u.suspended
                     ? <span style={{ color: "#c00", fontWeight: 600 }}>מושעה</span>
@@ -790,10 +790,10 @@ export default function AdminPage() {
           <tbody>
             {donations.map((d) => (
               <tr key={String(d._id)} style={{ borderBottom: "1px solid #ddd" }}>
-                <td style={td}>{d.name || "—"}</td>
+                <td style={td}>{d.name || "-"}</td>
                 <td style={td}>{d.coins}</td>
                 <td style={{ ...td, color: "#15803d", fontWeight: 600 }}>₪{d.ils}</td>
-                <td style={td}>{d.createdAt ? new Date(d.createdAt).toLocaleDateString("he-IL") : "—"}</td>
+                <td style={td}>{d.createdAt ? new Date(d.createdAt).toLocaleDateString("he-IL") : "-"}</td>
               </tr>
             ))}
           </tbody>
@@ -831,11 +831,11 @@ export default function AdminPage() {
               return (
                 <tr key={id} style={{ borderBottom: "1px solid #ddd", background: r.status === "new" ? "#eff6ff" : "white" }}>
                   <td style={td}>{r.name}</td>
-                  <td style={{ ...td, color: "#666" }}>{r.company || "—"}</td>
+                  <td style={{ ...td, color: "#666" }}>{r.company || "-"}</td>
                   <td style={td}>{r.phone}</td>
-                  <td style={{ ...td, fontSize: 12, color: "#555" }}>{r.email || "—"}</td>
+                  <td style={{ ...td, fontSize: 12, color: "#555" }}>{r.email || "-"}</td>
                   <td style={{ ...td, maxWidth: 240, wordBreak: "break-word" }}>{r.message}</td>
-                  <td style={{ ...td, whiteSpace: "nowrap" }}>{r.createdAt ? new Date(r.createdAt).toLocaleDateString("he-IL") : "—"}</td>
+                  <td style={{ ...td, whiteSpace: "nowrap" }}>{r.createdAt ? new Date(r.createdAt).toLocaleDateString("he-IL") : "-"}</td>
                   <td style={td}>
                     <span style={{ color: statusColors[r.status] || "#333", fontWeight: 600 }}>
                       {statusLabels[r.status] || r.status}
@@ -900,10 +900,10 @@ export default function AdminPage() {
                   <td style={{ ...td, fontSize: 11, color: "#666" }}>{u.uid}</td>
                   <td style={td}>{u.money?.toLocaleString()}</td>
                   <td style={{ ...td, fontSize: 12, color: "#555" }}>
-                    {u.houseRow !== undefined ? `שורה ${u.houseRow}, עמודה ${u.houseCol}` : "—"}
+                    {u.houseRow !== undefined ? `שורה ${u.houseRow}, עמודה ${u.houseCol}` : "-"}
                   </td>
                   <td style={{ ...td, whiteSpace: "nowrap" }}>
-                    {u.createdAt ? new Date(u.createdAt).toLocaleDateString("he-IL") : "—"}
+                    {u.createdAt ? new Date(u.createdAt).toLocaleDateString("he-IL") : "-"}
                   </td>
                   <td style={td}>
                     <button

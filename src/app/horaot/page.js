@@ -30,11 +30,11 @@ export default function HoraotPage() {
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>💰 איך מרוויחים מטבעות?</h2>
           <ul className={styles.list}>
-            <li>איסוף תפוחים 🍎 ותפוזים 🍊 מהמפה — 5 שקלים לכל אחד.</li>
-            <li>מציאת אוצר 💎 — פרס מיוחד למוצא הראשון.</li>
-            <li>מענה נכון בטריוויה 🧠 — 10 שקלים (שאלה קלה) או 20 שקלים (שאלה קשה).</li>
-            <li>איסוף ביצה מהחווה 🥚 — 20 שקלים לשעה.</li>
-            <li>בונוס שכונה יומי 🎁 — 50 שקלים פעם ביום לכל שכונה שאתם חלק ממנה.</li>
+            <li>איסוף תפוחים 🍎 ותפוזים 🍊 מהמפה - 5 שקלים לכל אחד.</li>
+            <li>מציאת אוצר 💎 - פרס מיוחד למוצא הראשון.</li>
+            <li>מענה נכון בטריוויה 🧠 - 10 שקלים (שאלה קלה) או 20 שקלים (שאלה קשה).</li>
+            <li>איסוף ביצה מהחווה 🥚 - 20 שקלים לשעה.</li>
+            <li>בונוס שכונה יומי 🎁 - 50 שקלים פעם ביום לכל שכונה שאתם חלק ממנה.</li>
           </ul>
         </section>
 
@@ -47,7 +47,7 @@ export default function HoraotPage() {
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>💩 מערכת הקקי</h2>
           <p>אם יש לכם קקי במלאי, ניתן לזרוק אותו על הבית של שחקן אחר. הבית שלהם יראה מלוכלך עד שהבעלים ינקה אותו.</p>
-          <p>כדי לנקות את הבית שלכם לאחר שהושלך עליו קקי — פשוט לחצו עליו.</p>
+          <p>כדי לנקות את הבית שלכם לאחר שהושלך עליו קקי - פשוט לחצו עליו.</p>
         </section>
 
         <section className={styles.section}>
@@ -69,14 +69,14 @@ export default function HoraotPage() {
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>📍 מבנים מיוחדים במפה</h2>
           <ul className={styles.list}>
-            <li><strong>קניון אזריאלי</strong> — חנות לרכישת פריטים.</li>
-            <li><strong>בית כנסת</strong> — פרשת השבוע.</li>
-            <li><strong>הכנסת</strong> — מכירת פריטים מהמלאי.</li>
-            <li><strong>יד שרה</strong> — תרומה לצדקה.</li>
-            <li><strong>טריוויה</strong> — שאלות ידע כללי לזכיה במטבעות.</li>
-            <li><strong>מצעד העשירים</strong> — טבלת מובילים.</li>
-            <li><strong>מצלמה</strong> — צלמו את עצמכם ושתפו עם כולם.</li>
-            <li><strong>אילת</strong> — יעד תיירות בקצה המפה.</li>
+            <li><strong>קניון אזריאלי</strong> - חנות לרכישת פריטים.</li>
+            <li><strong>בית כנסת</strong> - פרשת השבוע.</li>
+            <li><strong>הכנסת</strong> - מכירת פריטים מהמלאי.</li>
+            <li><strong>יד שרה</strong> - תרומה לצדקה.</li>
+            <li><strong>טריוויה</strong> - שאלות ידע כללי לזכיה במטבעות.</li>
+            <li><strong>מצעד העשירים</strong> - טבלת מובילים.</li>
+            <li><strong>מצלמה</strong> - צלמו את עצמכם ושתפו עם כולם.</li>
+            <li><strong>אילת</strong> - יעד תיירות בקצה המפה.</li>
           </ul>
         </section>
 

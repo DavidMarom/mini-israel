@@ -25,6 +25,15 @@ export async function POST(request) {
     const newLevel = currentLevel + 1;
     const cost = UPGRADE_COSTS[newLevel];
 
+    // First upgrade requires at least 2 shirts received from friends
+    if (currentLevel === 1) {
+      const user = await db.collection("users").findOne({ uid });
+      const friendShirts = (user?.inventory || []).filter((i) => i.id === "shirt" && i.fromFriend);
+      if (friendShirts.length < 2) {
+        return NextResponse.json({ error: "Need friend shirts" }, { status: 400 });
+      }
+    }
+
     const result = await db.collection("users").findOneAndUpdate(
       { uid, money: { $gte: cost } },
       { $inc: { money: -cost }, $set: { updatedAt: new Date() } },

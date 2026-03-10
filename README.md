@@ -10,7 +10,7 @@
 
 ### Buildings
 - **Farm** (500₪): Place next to your house to generate an egg every hour worth 20 coins
-- **Power Plant** (row 90): New landmark — buy an energy subscription to boost farm income
+- **Power Plant** (row 90): New landmark - buy an energy subscription to boost farm income
 - **Azrieli Mall**: Shop for items (flowers, bikes, PCs, and more)
 - **Knesset**: Buy and sell items from your inventory
 - **Trivia**: Answer questions to earn 10–20 coins
