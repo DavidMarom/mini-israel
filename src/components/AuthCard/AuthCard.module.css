@@ -1,6 +1,6 @@
 .card {
   background-color: #c1c1c1;
-  border-radius: 16px;
+  border-radius: 8px;
   padding: 32px 28px;
   max-width: 280px;
   width: 100%;
@@ -19,7 +19,7 @@
 
 .primaryButton,
 .secondaryButton {
-  border-radius: 5px;
+  border-radius: 3px;
   padding: 7px 0px;
   border: 1px solid transparent;
   font-size: 12px;
@@ -132,7 +132,7 @@
 }
 
 .bioInput {
-  border-radius: 8px;
+  border-radius: 4px;
   border: 1px solid #d1d5db;
   padding: 6px 10px;
   font-size: 12px;
@@ -174,7 +174,7 @@
 
 .inventoryItem {
   background: #e5e5e5;
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 4px 8px;
   font-size: 15px;
 }
@@ -192,7 +192,7 @@
 }
 
 .farmButton {
-  border-radius: 5px;
+  border-radius: 3px;
   padding: 7px 0px;
   border: 1px solid transparent;
   font-size: 12px;
@@ -209,6 +209,39 @@
 }
 
 .farmButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.vipBadge {
+  font-size: 11px;
+  font-weight: 700;
+  color: #b8860b;
+  background: #fff9e6;
+  border: 1px solid #f0c040;
+  border-radius: 999px;
+  padding: 1px 7px;
+  white-space: nowrap;
+}
+
+.vipButton {
+  border-radius: 3px;
+  padding: 7px 0px;
+  border: 1px solid #f0c040;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  background-color: #fff9e6;
+  color: #b8860b;
+  transition: background-color 0.16s ease, transform 0.08s ease;
+}
+
+.vipButton:hover:not(:disabled) {
+  background-color: #ffeeba;
+  transform: translateY(-1px);
+}
+
+.vipButton:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
