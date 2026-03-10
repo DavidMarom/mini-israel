@@ -83,6 +83,11 @@ const AD_COL = 6;
 const AD_W = 3;
 const AD_H = 2;
 
+const POWERPLANT_ROW = 90;
+const POWERPLANT_COL = 4;
+const POWERPLANT_W = 3;
+const POWERPLANT_H = 3;
+
 const createEmptyGrid = () =>
   Array.from({ length: ROWS }, () => Array(COLS).fill(null));
 
@@ -103,6 +108,15 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
     onHasFarmChange(hasFarm);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [grid, user]);
+
+  // Power Plant
+  const [showPowerPlant, setShowPowerPlant] = useState(false);
+  const [powerPlantSubscribing, setPowerPlantSubscribing] = useState(false);
+
+  // Farm Modal (upgrade + collect)
+  const [showFarmModal, setShowFarmModal] = useState(null); // { row, col, cell }
+  const [farmUpgrading, setFarmUpgrading] = useState(false);
+  const [farmCollecting, setFarmCollecting] = useState(false);
 
   // Cashout
   const [showCashout, setShowCashout] = useState(false);
@@ -248,6 +262,78 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       if (Array.isArray(data.users)) setLeaderboard(data.users);
     } catch (e) { console.error(e); }
     finally { setLeaderboardLoading(false); }
+  };
+
+  const handlePowerPlantClick = () => setShowPowerPlant(true);
+
+  const handlePowerSubscribe = async () => {
+    if (!user || powerPlantSubscribing) return;
+    const ownerUid = user.firebaseUid || user.uid;
+    setPowerPlantSubscribing(true);
+    try {
+      const res = await fetch("/api/powerplant/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid: ownerUid }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error === "Insufficient funds" ? "אין מספיק מטבעות" : "שגיאה, נסה שוב");
+        return;
+      }
+      setUser((prev) => ({ ...prev, money: data.money, powerBoostExpiry: data.powerBoostExpiry }));
+    } catch (e) { console.error(e); }
+    finally { setPowerPlantSubscribing(false); }
+  };
+
+  const handleFarmModalCollect = async () => {
+    if (!user || !showFarmModal || farmCollecting) return;
+    const ownerUid = user.firebaseUid || user.uid;
+    const { row, col } = showFarmModal;
+    setFarmCollecting(true);
+    const next = grid.map((r) => r.slice());
+    next[row][col] = { ...next[row][col], eggReady: false };
+    setGrid(next);
+    setShowFarmModal((prev) => prev ? { ...prev, cell: { ...prev.cell, eggReady: false } } : null);
+    try {
+      const res = await fetch("/api/farm/collect", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid: ownerUid }),
+      });
+      const data = await res.json();
+      if (data.money != null) setUser((prev) => ({ ...prev, money: data.money }));
+    } catch (e) { console.error(e); }
+    finally { setFarmCollecting(false); }
+  };
+
+  const handleFarmUpgrade = async () => {
+    if (!user || !showFarmModal || farmUpgrading) return;
+    const ownerUid = user.firebaseUid || user.uid;
+    const currentLevel = showFarmModal.cell.farmLevel || 1;
+    if (currentLevel >= 3) return;
+    const cost = currentLevel === 1 ? 600 : 1200;
+    if ((user.money || 0) < cost) { alert("אין מספיק מטבעות"); return; }
+    setFarmUpgrading(true);
+    try {
+      const res = await fetch("/api/farm/upgrade", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid: ownerUid }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error === "Insufficient funds" ? "אין מספיק מטבעות" : "שגיאה, נסה שוב");
+        return;
+      }
+      setUser((prev) => ({ ...prev, money: data.money }));
+      const { row, col } = showFarmModal;
+      const next = grid.map((r) => r.slice());
+      next[row][col] = { ...next[row][col], farmLevel: data.farmLevel };
+      setGrid(next);
+      setShowFarmModal((prev) => prev ? { ...prev, cell: { ...prev.cell, farmLevel: data.farmLevel } } : null);
+    } catch (e) { console.error(e); }
+    finally { setFarmUpgrading(false); }
   };
 
   const handleCloseCameraPopup = () => {
@@ -683,25 +769,9 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
 
     const cell = grid[row][col];
 
-    // Collecting egg from own farm
-    if (cell && cell.building === "farm" && cell.ownerUid === ownerUid && cell.eggReady) {
-      const next = grid.map((r) => r.slice());
-      next[row][col] = { ...cell, eggReady: false };
-      setGrid(next);
-
-      fetch("/api/farm/collect", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ uid: ownerUid }),
-      })
-        .then((r) => r.json())
-        .then((data) => {
-          if (typeof data.money === "number") {
-            setUser((prev) => ({ ...prev, money: data.money }));
-          }
-        })
-        .catch(console.error);
-
+    // Own farm - open farm modal (collect + upgrade)
+    if (cell && cell.building === "farm" && cell.ownerUid === ownerUid) {
+      setShowFarmModal({ row, col, cell });
       return;
     }
 
@@ -982,6 +1052,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
               hasPoop ||
               hasTreasure ||
               hasEgg ||
+              (hasFarm && cell.ownerUid === ownerUid) ||
               (hasMainHouse && cell.ownerUid !== ownerUid) ||
               (hasMainHouse && cell.ownerUid === ownerUid && isPoopHouse) ||
               canPreview;
@@ -1039,6 +1110,9 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                   <div className={styles.farmWrapper}>
                     <img src="/assets/farm.png" alt="חווה" className={styles.mainHouse} />
                     {hasEgg && <span className={styles.eggBadge}>🥚</span>}
+                    {cell.ownerUid === ownerUid && (cell.farmLevel || 1) > 1 && (
+                      <span className={styles.farmLevelBadge}>L{cell.farmLevel}</span>
+                    )}
                   </div>
                 )}
                 {!hasMainHouse &&
@@ -1190,6 +1264,21 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
         >
           <span className={styles.cashoutBuildingIcon}>💵</span>
           <span className={styles.cashoutBuildingLabel}>המר לכסף אמיתי!!</span>
+        </div>
+
+        {/* Power Plant Building */}
+        <div
+          className={styles.azrieliBoard}
+          style={{
+            top: POWERPLANT_ROW * TILE_SIZE,
+            left: POWERPLANT_COL * TILE_SIZE,
+            width: POWERPLANT_W * TILE_SIZE,
+            height: POWERPLANT_H * TILE_SIZE,
+            cursor: "pointer",
+          }}
+          onClick={handlePowerPlantClick}
+        >
+          <img src="/assets/electric.png" alt="תחנת כוח" className={styles.azrieliBuilding} />
         </div>
 
         {/* Candle Building */}
@@ -1684,6 +1773,70 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
               <p className={styles.parashaLoading}>לא נמצאה פרשה</p>
             )}
             <button className={styles.shopCloseBtn} onClick={() => setShowSynagogue(false)}>סגור</button>
+          </div>
+        </div>
+      )}
+
+      {/* Farm Modal */}
+      {showFarmModal && (
+        <div className={styles.shopBackdrop} onClick={() => setShowFarmModal(null)}>
+          <div className={styles.shopModal} onClick={(e) => e.stopPropagation()}>
+            <p className={styles.shopTitle}>🌾 החווה שלי</p>
+            <p className={styles.shopBalance}>יתרה: {user?.money ?? 0} שקלים</p>
+            <p style={{ margin: 0, fontSize: 14 }}>
+              רמה {showFarmModal.cell.farmLevel || 1} — {(showFarmModal.cell.farmLevel || 1) === 1 ? "20" : (showFarmModal.cell.farmLevel || 1) === 2 ? "40" : "80"} מטבעות לביצה
+            </p>
+            {showFarmModal.cell.eggReady ? (
+              <button className={styles.shopBuyBtn} onClick={handleFarmModalCollect} disabled={farmCollecting}>
+                {farmCollecting ? "אוסף..." : "🥚 אסוף ביצה"}
+              </button>
+            ) : (
+              <p style={{ margin: 0, fontSize: 12, color: "#888" }}>הביצה הבאה תהיה מוכנה בשעה הקרובה</p>
+            )}
+            {(showFarmModal.cell.farmLevel || 1) < 3 ? (
+              <button
+                className={styles.shopBuyBtn}
+                onClick={handleFarmUpgrade}
+                disabled={farmUpgrading || (user?.money ?? 0) < ((showFarmModal.cell.farmLevel || 1) === 1 ? 600 : 1200)}
+              >
+                {farmUpgrading
+                  ? "משדרג..."
+                  : `⬆️ שדרג לרמה ${(showFarmModal.cell.farmLevel || 1) + 1} – ${(showFarmModal.cell.farmLevel || 1) === 1 ? "600" : "1,200"} שקלים`}
+              </button>
+            ) : (
+              <p style={{ margin: 0, fontSize: 12, color: "#4a7c3f", fontWeight: 600 }}>✅ חווה ברמה מקסימלית! (80 מטבעות לביצה)</p>
+            )}
+            <button className={styles.shopCloseBtn} onClick={() => setShowFarmModal(null)}>סגור</button>
+          </div>
+        </div>
+      )}
+
+      {/* Power Plant Modal */}
+      {showPowerPlant && (
+        <div className={styles.shopBackdrop} onClick={() => setShowPowerPlant(false)}>
+          <div className={styles.shopModal} onClick={(e) => e.stopPropagation()}>
+            <p className={styles.shopTitle}>⚡ תחנת הכוח</p>
+            <p className={styles.shopBalance}>יתרה: {user?.money ?? 0} שקלים</p>
+            {user?.powerBoostExpiry && new Date(user.powerBoostExpiry) > new Date() ? (
+              <>
+                <p style={{ margin: 0, fontSize: 13, color: "#4a7c3f" }}>✅ מנוי חשמל פעיל! +20 מטבעות לכל ביצה</p>
+                <p style={{ margin: 0, fontSize: 11, color: "#888" }}>
+                  פג תוקף: {new Date(user.powerBoostExpiry).toLocaleDateString("he-IL")}
+                </p>
+              </>
+            ) : (
+              <>
+                <p style={{ margin: 0, fontSize: 13 }}>קנה מנוי חשמל ל-7 ימים וקבל +20 מטבעות על כל ביצה שאתה אוסף!</p>
+                <button
+                  className={styles.shopBuyBtn}
+                  onClick={handlePowerSubscribe}
+                  disabled={powerPlantSubscribing || !user || (user.money ?? 0) < 400}
+                >
+                  {powerPlantSubscribing ? "רוכש..." : "⚡ קנה מנוי – 400 שקלים"}
+                </button>
+              </>
+            )}
+            <button className={styles.shopCloseBtn} onClick={() => setShowPowerPlant(false)}>סגור</button>
           </div>
         </div>
       )}

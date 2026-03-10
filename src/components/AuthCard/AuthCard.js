@@ -3,7 +3,7 @@
 import { useState } from "react";
 import styles from "./AuthCard.module.css";
 
-export default function AuthCard({ loading, user, displayName, bio, money, inventory, photoURL, onGoogleSignIn, onLogout, error, onUpdateName, onBuyFarm, hasFarm, buyingFarm }) {
+export default function AuthCard({ loading, user, displayName, bio, money, inventory, photoURL, onGoogleSignIn, onLogout, error, onUpdateName, onBuyFarm, hasFarm, buyingFarm, isVIP, onBuyVip }) {
 
   const [avatarBroken, setAvatarBroken] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
@@ -58,6 +58,7 @@ export default function AuthCard({ loading, user, displayName, bio, money, inven
             ) : (
               <div className={styles.nameRow}>
                 <p className={styles.text}>{displayName}</p>
+                {isVIP && <span className={styles.vipBadge}>👑 VIP</span>}
                 <button type="button" className={styles.editButton} onClick={handleStartEdit} aria-label="עריכת שם">✎</button>
               </div>
             )}
@@ -100,6 +101,16 @@ export default function AuthCard({ loading, user, displayName, bio, money, inven
               disabled={buyingFarm || (money ?? 0) < 500}
             >
               {buyingFarm ? "קונה חווה..." : "🌾 קנה חווה – 500 שקלים"}
+            </button>
+          )}
+
+          {!isVIP && (
+            <button
+              onClick={onBuyVip}
+              className={styles.vipButton}
+              disabled={!onBuyVip || (money ?? 0) < 1500}
+            >
+              👑 שדרג ל-VIP – 1,500 שקלים
             </button>
           )}
 

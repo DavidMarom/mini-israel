@@ -121,6 +121,8 @@ export default function Home() {
           money: typeof data.user.money === "number" ? data.user.money : 0,
           bio: data.user.bio ?? null,
           inventory: data.user.inventory ?? [],
+          isVIP: data.user.isVIP ?? false,
+          powerBoostExpiry: data.user.powerBoostExpiry ?? null,
           createdAt: data.user.createdAt,
           updatedAt: data.user.updatedAt,
         };
@@ -258,6 +260,30 @@ export default function Home() {
     }
   };
 
+  const handleBuyVip = async () => {
+    if (!storedUser) return;
+    const uid = storedUser.firebaseUid;
+    try {
+      const res = await fetch("/api/upgrade/vip", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(
+          data.error === "Insufficient funds" ? "אין מספיק מטבעות" :
+          data.error === "Already VIP" ? "כבר VIP!" :
+          "שגיאה, נסה שוב"
+        );
+        return;
+      }
+      setUserStore((prev) => ({ ...prev, money: data.money, isVIP: true }));
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const handleBuyFarm = async () => {
     if (!storedUser || buyingFarm) return;
     const uid = storedUser.firebaseUid;
@@ -387,6 +413,8 @@ export default function Home() {
           onBuyFarm={handleBuyFarm}
           hasFarm={hasFarm}
           buyingFarm={buyingFarm}
+          isVIP={storedUser?.isVIP ?? false}
+          onBuyVip={handleBuyVip}
         />
         <MessagesCard user={storedUser} />
         {starHouse && (

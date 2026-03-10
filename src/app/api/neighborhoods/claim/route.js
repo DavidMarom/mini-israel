@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import clientPromise from "../../../../services/mongo";
 
 const DAILY_BONUS = 50;
+const VIP_BONUS = 100;
 
 export async function POST(req) {
   try {
@@ -22,7 +23,8 @@ export async function POST(req) {
     const user = await db.collection("users").findOne({ uid });
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-    const newMoney = (user.money || 0) + DAILY_BONUS;
+    const bonus = user.isVIP ? VIP_BONUS : DAILY_BONUS;
+    const newMoney = (user.money || 0) + bonus;
     await db.collection("users").updateOne({ uid }, { $set: { money: newMoney } });
     await db.collection("neighborhood_claims").insertOne({
       uid,
@@ -31,7 +33,7 @@ export async function POST(req) {
       createdAt: new Date(),
     });
 
-    return NextResponse.json({ ok: true, money: newMoney, bonus: DAILY_BONUS });
+    return NextResponse.json({ ok: true, money: newMoney, bonus });
   } catch (e) {
     console.error(e);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

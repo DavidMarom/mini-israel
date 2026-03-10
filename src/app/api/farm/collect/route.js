@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import clientPromise from "../../../../services/mongo";
 
 const BOARD_ID = "main-board";
-const EGG_REWARD = 20;
+const BASE_EGG_REWARD = 20;
 
 export async function POST(request) {
   try {
@@ -25,6 +25,20 @@ export async function POST(request) {
       return NextResponse.json({ error: "No egg to collect" }, { status: 400 });
     }
 
+    const farmLevel = cells[farmIndex].farmLevel || 1;
+    let reward = BASE_EGG_REWARD * farmLevel;
+
+    // Apply upgrade bonuses from user doc
+    const userDoc = await db.collection("users").findOne({ uid }, { projection: { powerBoostExpiry: 1, isVIP: 1 } });
+    if (userDoc) {
+      if (userDoc.powerBoostExpiry && new Date(userDoc.powerBoostExpiry) > new Date()) {
+        reward += 20;
+      }
+      if (userDoc.isVIP) {
+        reward += 20;
+      }
+    }
+
     // Mark egg as collected
     cells = cells.map((c, i) =>
       i === farmIndex ? { ...c, eggReady: false } : c
@@ -38,7 +52,7 @@ export async function POST(request) {
     // Give user coins
     const result = await db.collection("users").findOneAndUpdate(
       { uid },
-      { $inc: { money: EGG_REWARD }, $set: { updatedAt: new Date() } },
+      { $inc: { money: reward }, $set: { updatedAt: new Date() } },
       { returnDocument: "after" }
     );
 
@@ -46,7 +60,7 @@ export async function POST(request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ ok: true, money: result.money });
+    return NextResponse.json({ ok: true, money: result.money, reward });
   } catch (error) {
     console.error("Error in POST /api/farm/collect", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
