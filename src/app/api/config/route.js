@@ -5,10 +5,11 @@ export async function GET() {
   try {
     const client = await clientPromise;
     const db = client.db("main");
-    const [starHouseDoc, treasureWinnerDoc, yadSaraDoc] = await Promise.all([
+    const [starHouseDoc, treasureWinnerDoc, yadSaraDoc, lotteryPopupDoc] = await Promise.all([
       db.collection("config").findOne({ _id: "star_house" }),
       db.collection("config").findOne({ _id: "treasure_winner" }),
       db.collection("config").findOne({ _id: "yad_sara_visible" }),
+      db.collection("config").findOne({ _id: "lottery_popup" }),
     ]);
 
     const treasureWinner = treasureWinnerDoc
@@ -20,8 +21,9 @@ export async function GET() {
       : null;
 
     const yadSaraVisible = yadSaraDoc ? yadSaraDoc.visible !== false : true;
+    const lotteryPopupEnabled = lotteryPopupDoc ? lotteryPopupDoc.enabled !== false : true;
 
-    return NextResponse.json({ starHouse, treasureWinner, yadSaraVisible });
+    return NextResponse.json({ starHouse, treasureWinner, yadSaraVisible, lotteryPopupEnabled });
   } catch (e) {
     console.error(e);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

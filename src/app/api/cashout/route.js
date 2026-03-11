@@ -31,7 +31,7 @@ export async function POST(req) {
       return NextResponse.json({ error: "אין מספיק מטבעות" }, { status: 400 });
     }
 
-    const ils = Math.floor(coins / 100);
+    const ils = Math.floor(coins / 200);
 
     await db.collection("users").updateOne({ uid }, { $inc: { money: -coins } });
     await db.collection("cashout_requests").insertOne({
