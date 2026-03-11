@@ -119,6 +119,17 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
   const [farmCollecting, setFarmCollecting] = useState(false);
   const [farmUpgradeMsg, setFarmUpgradeMsg] = useState(null);
 
+  // House Upgrade Modal
+  const [showHouseModal, setShowHouseModal] = useState(null); // { row, col, cell }
+  const [houseUpgrading, setHouseUpgrading] = useState(false);
+  const [houseUpgradeMsg, setHouseUpgradeMsg] = useState(null);
+
+  // Community Center Modal
+  const [showCCModal, setShowCCModal] = useState(null); // { row, col, cell }
+  const [ccUpgrading, setCCUpgrading] = useState(false);
+  const [ccBuying, setCCBuying] = useState(false);
+  const [ccMsg, setCCMsg] = useState(null);
+
   // Cashout
   const [showCashout, setShowCashout] = useState(false);
   const [cashoutPhone, setCashoutPhone] = useState("");
@@ -356,6 +367,142 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
     finally { setFarmUpgrading(false); }
   };
 
+  const handleHouseUpgrade = async () => {
+    if (!user || !showHouseModal || houseUpgrading) return;
+    const ownerUid = user.firebaseUid || user.uid;
+    const currentLevel = showHouseModal.cell.houseLevel || 1;
+    if (currentLevel >= 5) return;
+    const req = HOUSE_UPGRADE_COSTS[currentLevel + 1];
+    if ((user.money || 0) < req.cost) {
+      setHouseUpgradeMsg("אין מספיק מטבעות לשדרוג");
+      return;
+    }
+    for (const { id, count } of req.friendItems) {
+      const have = (user.inventory || []).filter((i) => i.id === id && i.fromFriend).length;
+      if (have < count) {
+        setHouseUpgradeMsg(`נדרשים ${count} ${ITEM_NAMES[id]} שקיבלת מחברים (יש לך ${have})`);
+        return;
+      }
+    }
+    setHouseUpgradeMsg(null);
+    setHouseUpgrading(true);
+    try {
+      const res = await fetch("/api/house/upgrade", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid: ownerUid }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setHouseUpgradeMsg(
+          data.error === "Insufficient funds" ? "אין מספיק מטבעות לשדרוג" :
+          data.error === "Max level reached" ? "הבית כבר ברמה המקסימלית" :
+          data.error?.startsWith("Need friend") ? `נדרשים פריטים מחברים` :
+          "שגיאה, נסה שוב"
+        );
+        return;
+      }
+      setUser((prev) => ({ ...prev, money: data.money, inventory: data.inventory }));
+      const { row, col } = showHouseModal;
+      const next = grid.map((r) => r.slice());
+      next[row][col] = { ...next[row][col], houseLevel: data.houseLevel };
+      setGrid(next);
+      setShowHouseModal((prev) => prev ? { ...prev, cell: { ...prev.cell, houseLevel: data.houseLevel } } : null);
+    } catch (e) { console.error(e); }
+    finally { setHouseUpgrading(false); }
+  };
+
+  const handleBuyCC = async () => {
+    if (!user || ccBuying) return;
+    const ownerUid = user.firebaseUid || user.uid;
+    const houseLevel = showHouseModal?.cell?.houseLevel || 1;
+    if (houseLevel < 3) { setCCMsg("נדרש בית ברמה 3 לפחות"); return; }
+    if ((user.money || 0) < 600) { setCCMsg("אין מספיק מטבעות"); return; }
+    const friendFlags = (user.inventory || []).filter((i) => i.id === "flag" && i.fromFriend);
+    if (friendFlags.length < 2) { setCCMsg("נדרשים 2 דגלים שקיבלת מחברים"); return; }
+    setCCMsg(null);
+    setCCBuying(true);
+    try {
+      const res = await fetch("/api/community-center/buy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid: ownerUid }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setCCMsg(
+          data.error === "Insufficient funds" ? "אין מספיק מטבעות" :
+          data.error === "House level 3 required" ? "נדרש בית ברמה 3 לפחות" :
+          data.error === "Already has community center" ? "כבר יש לך מרכז קהילתי" :
+          data.error?.startsWith("Need friend") ? "נדרשים 2 דגלים מחברים" :
+          "שגיאה, נסה שוב"
+        );
+        return;
+      }
+      setUser((prev) => ({ ...prev, money: data.money, inventory: data.inventory }));
+      const next = grid.map((r) => r.slice());
+      next[data.ccRow][data.ccCol] = {
+        building: "community-center",
+        ownerUid,
+        ownerName: user.name,
+        ccLevel: 1,
+        houseLevel: 1,
+        farmLevel: 1,
+        item: null,
+        pooped: false,
+        eggReady: false,
+        lastEggEpoch: null,
+      };
+      setGrid(next);
+      setShowHouseModal(null);
+    } catch (e) { console.error(e); }
+    finally { setCCBuying(false); }
+  };
+
+  const handleCCUpgrade = async () => {
+    if (!user || !showCCModal || ccUpgrading) return;
+    const ownerUid = user.firebaseUid || user.uid;
+    const currentLevel = showCCModal.cell.ccLevel || 1;
+    if (currentLevel >= 5) return;
+    const req = CC_UPGRADE_COSTS[currentLevel + 1];
+    if ((user.money || 0) < req.cost) {
+      setCCMsg("אין מספיק מטבעות לשדרוג");
+      return;
+    }
+    for (const { id, count } of req.friendItems) {
+      const have = (user.inventory || []).filter((i) => i.id === id && i.fromFriend).length;
+      if (have < count) {
+        setCCMsg(`נדרשים ${count} ${ITEM_NAMES[id]} שקיבלת מחברים (יש לך ${have})`);
+        return;
+      }
+    }
+    setCCMsg(null);
+    setCCUpgrading(true);
+    try {
+      const res = await fetch("/api/community-center/upgrade", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid: ownerUid }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setCCMsg(
+          data.error === "Insufficient funds" ? "אין מספיק מטבעות לשדרוג" :
+          data.error === "Max level reached" ? "המרכז כבר ברמה המקסימלית" :
+          "שגיאה, נסה שוב"
+        );
+        return;
+      }
+      setUser((prev) => ({ ...prev, money: data.money, inventory: data.inventory }));
+      const { row, col } = showCCModal;
+      const next = grid.map((r) => r.slice());
+      next[row][col] = { ...next[row][col], ccLevel: data.ccLevel };
+      setGrid(next);
+      setShowCCModal((prev) => prev ? { ...prev, cell: { ...prev.cell, ccLevel: data.ccLevel } } : null);
+    } catch (e) { console.error(e); }
+    finally { setCCUpgrading(false); }
+  };
+
   const handleCloseCameraPopup = () => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((t) => t.stop());
@@ -382,6 +529,28 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       setParashaLoading(false);
     }
   };
+
+  const ITEM_NAMES = {
+    flower: "פרחים", falafel: "פלאפל", flag: "דגלים",
+    shirt: "חולצות", headphones: "אוזניות", pc: "מחשבים", bike: "אופניים",
+  };
+
+  const HOUSE_UPGRADE_COSTS = {
+    2: { cost: 200,  friendItems: [{ id: "flower", count: 1 }] },
+    3: { cost: 400,  friendItems: [{ id: "flag", count: 2 }] },
+    4: { cost: 800,  friendItems: [{ id: "falafel", count: 2 }, { id: "shirt", count: 1 }] },
+    5: { cost: 1500, friendItems: [{ id: "shirt", count: 2 }, { id: "headphones", count: 1 }] },
+  };
+
+  const CC_UPGRADE_COSTS = {
+    2: { cost: 1000, friendItems: [{ id: "falafel", count: 3 }] },
+    3: { cost: 1500, friendItems: [{ id: "shirt", count: 2 }, { id: "flag", count: 1 }] },
+    4: { cost: 2200, friendItems: [{ id: "shirt", count: 2 }, { id: "pc", count: 1 }] },
+    5: { cost: 3500, friendItems: [{ id: "headphones", count: 3 }] },
+  };
+
+  const HOUSE_EGG_BONUS = [0, 0, 5, 10, 20, 35];
+  const CC_ITEM_BONUS = [0, 5, 10, 20, 30, 50];
 
   const SHOP_ITEMS = [
     { id: "flower",      emoji: "🌸", name: "פרח",         price: 10,  sellPrice: 7   },
@@ -657,6 +826,9 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                 pooped: cell.pooped || false,
                 eggReady: cell.eggReady || false,
                 lastEggEpoch: cell.lastEggEpoch ?? null,
+                farmLevel: cell.farmLevel ?? 1,
+                houseLevel: cell.houseLevel ?? 1,
+                ccLevel: cell.ccLevel ?? 1,
               };
             }
           });
@@ -712,7 +884,9 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
             ownerUid: cell.ownerUid || null,
             ownerName: cell.ownerName || null,
             item: cell.item || null,
-            ...(cell.building === "farm" ? { eggReady: cell.eggReady || false, lastEggEpoch: cell.lastEggEpoch ?? null } : {}),
+            ...(cell.building === "farm" ? { farmLevel: cell.farmLevel || 1, eggReady: cell.eggReady || false, lastEggEpoch: cell.lastEggEpoch ?? null } : {}),
+          ...(cell.building === "main-house" ? { houseLevel: cell.houseLevel || 1 } : {}),
+          ...(cell.building === "community-center" ? { ccLevel: cell.ccLevel || 1 } : {}),
           });
         }
       }
@@ -885,9 +1059,23 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       return;
     }
 
+    // Clicking own CC → open CC upgrade modal
+    if (cell && cell.building === "community-center" && cell.ownerUid === ownerUid) {
+      setShowCCModal({ row, col, cell });
+      setCCMsg(null);
+      return;
+    }
+
     // Clicking own poophouse → clean it
     if (cell && cell.building === "main-house" && cell.ownerUid === ownerUid && cell.pooped) {
       handleCleanHouse();
+      return;
+    }
+
+    // Clicking own non-pooped house → open house upgrade modal
+    if (cell && cell.building === "main-house" && cell.ownerUid === ownerUid && !cell.pooped) {
+      setShowHouseModal({ row, col, cell });
+      setHouseUpgradeMsg(null);
       return;
     }
 
@@ -1065,6 +1253,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
               !userHasHouse &&
               isEmpty;
 
+            const hasCC = !!(cell && cell.building === "community-center");
             const isClickable =
               hasApple ||
               hasOrange ||
@@ -1075,6 +1264,8 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
               (hasFarm && cell.ownerUid === ownerUid) ||
               (hasMainHouse && cell.ownerUid !== ownerUid) ||
               (hasMainHouse && cell.ownerUid === ownerUid && isPoopHouse) ||
+              (hasMainHouse && cell.ownerUid === ownerUid && !isPoopHouse) ||
+              (hasCC && cell.ownerUid === ownerUid) ||
               canPreview;
 
             return (
@@ -1114,6 +1305,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                       src={isPoopHouse ? "/assets/poophouse.png" : "/assets/main-house.png"}
                       alt={isPoopHouse ? "בית מלוכלך" : "בית ראשי"}
                       className={styles.mainHouse}
+                      style={(cell.houseLevel || 1) >= 5 && !isPoopHouse ? { filter: "sepia(1) saturate(4) hue-rotate(10deg)" } : undefined}
                     />
                     {(cell.ownerUid === ownerUid ? (user?.name || cell.ownerName) : cell.ownerName) && (
                       <span className={styles.houseLabel}>
@@ -1124,6 +1316,17 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                       <span className={styles.cleanHouseHint}>לחץ לניקוי 🧹</span>
                     )}
                     {isStarHouse && <span className={styles.starBadge}>⭐</span>}
+                    {cell.ownerUid === ownerUid && (cell.houseLevel || 1) > 1 && (
+                      <span className={styles.houseLevelBadge}>L{cell.houseLevel}</span>
+                    )}
+                  </div>
+                )}
+                {hasCC && (
+                  <div className={styles.ccWrapper}>
+                    <span className={styles.ccIcon}>🏛️</span>
+                    {cell.ownerUid === ownerUid && (cell.ccLevel || 1) > 1 && (
+                      <span className={styles.farmLevelBadge}>L{cell.ccLevel}</span>
+                    )}
                   </div>
                 )}
                 {hasFarm && (
@@ -1846,6 +2049,102 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
               <p style={{ margin: 0, fontSize: 12, color: "#4a7c3f", fontWeight: 600 }}>✅ חווה ברמה מקסימלית! (80 מטבעות לביצה)</p>
             )}
             <button className={styles.shopCloseBtn} onClick={() => { setShowFarmModal(null); setFarmUpgradeMsg(null); }}>סגור</button>
+          </div>
+        </div>
+      )}
+
+      {/* House Upgrade Modal */}
+      {showHouseModal && (
+        <div className={styles.shopBackdrop} onClick={() => { setShowHouseModal(null); setHouseUpgradeMsg(null); setCCMsg(null); }}>
+          <div className={styles.shopModal} onClick={(e) => e.stopPropagation()}>
+            <p className={styles.shopTitle}>🏠 הבית שלי</p>
+            <p className={styles.shopBalance}>יתרה: {user?.money ?? 0} שקלים</p>
+            <p style={{ margin: "4px 0", fontSize: 14 }}>
+              רמה {showHouseModal.cell.houseLevel || 1} מתוך 5
+              {" · "}בונוס: +{HOUSE_EGG_BONUS[showHouseModal.cell.houseLevel || 1]} מטבעות לביצה
+            </p>
+            {(showHouseModal.cell.houseLevel || 1) < 5 && (() => {
+              const req = HOUSE_UPGRADE_COSTS[(showHouseModal.cell.houseLevel || 1) + 1];
+              return (
+                <p style={{ margin: "2px 0", fontSize: 11, color: "#888", direction: "rtl" }}>
+                  לרמה {(showHouseModal.cell.houseLevel || 1) + 1}: {req.cost} שקלים +{" "}
+                  {req.friendItems.map(({ id, count }) => `${count} ${ITEM_NAMES[id]} מחברים`).join(" + ")}
+                </p>
+              );
+            })()}
+            {houseUpgradeMsg && (
+              <p style={{ margin: "4px 0", fontSize: 12, color: "#c0392b", direction: "rtl" }}>
+                {houseUpgradeMsg}
+                {houseUpgradeMsg.includes("חברים") && (
+                  <>{" "}<a href="https://wa.me/?text=%D7%91%D7%95%D7%90%D7%95%20%D7%9C%D7%A9%D7%97%D7%A7%20%D7%91%D7%9E%D7%99%D7%A0%D7%99%20%D7%99%D7%A9%D7%A8%D7%90%D7%9C%21%20https%3A%2F%2Fwww.mini-israel.com%2F" target="_blank" rel="noopener noreferrer" style={{ color: "#25D366", textDecoration: "underline" }}>הזמן חברים</a></>
+                )}
+              </p>
+            )}
+            {(showHouseModal.cell.houseLevel || 1) < 5 ? (
+              <button className={styles.shopBuyBtn} onClick={handleHouseUpgrade} disabled={houseUpgrading}>
+                {houseUpgrading ? "משדרג..." : `⬆️ שדרג לרמה ${(showHouseModal.cell.houseLevel || 1) + 1} – ${HOUSE_UPGRADE_COSTS[(showHouseModal.cell.houseLevel || 1) + 1].cost} שקלים`}
+              </button>
+            ) : (
+              <p style={{ margin: 0, fontSize: 12, color: "#c8a200", fontWeight: 600 }}>✅ בית זהב! רמה מקסימלית (+35 מטבעות לביצה)</p>
+            )}
+            {(showHouseModal.cell.houseLevel || 1) >= 3 && !grid.flat().some((c) => c && c.building === "community-center" && c.ownerUid === (user?.firebaseUid || user?.uid)) && (
+              <>
+                <hr style={{ margin: "10px 0", border: "none", borderTop: "1px solid #eee" }} />
+                <p style={{ margin: "4px 0", fontSize: 13, color: "#4a7c3f" }}>🏛️ מרכז קהילתי זמין לרכישה!</p>
+                <p style={{ margin: "2px 0", fontSize: 11, color: "#888", direction: "rtl" }}>600 שקלים + 2 דגלים מחברים</p>
+                {ccMsg && (
+                  <p style={{ margin: "4px 0", fontSize: 12, color: "#c0392b", direction: "rtl" }}>
+                    {ccMsg}
+                    {ccMsg.includes("חברים") && (
+                      <>{" "}<a href="https://wa.me/?text=%D7%91%D7%95%D7%90%D7%95%20%D7%9C%D7%A9%D7%97%D7%A7%20%D7%91%D7%9E%D7%99%D7%A0%D7%99%20%D7%99%D7%A9%D7%A8%D7%90%D7%9C%21%20https%3A%2F%2Fwww.mini-israel.com%2F" target="_blank" rel="noopener noreferrer" style={{ color: "#25D366", textDecoration: "underline" }}>הזמן חברים</a></>
+                    )}
+                  </p>
+                )}
+                <button className={styles.shopBuyBtn} onClick={handleBuyCC} disabled={ccBuying}>
+                  {ccBuying ? "רוכש..." : "🏛️ קנה מרכז קהילתי – 600 שקלים"}
+                </button>
+              </>
+            )}
+            <button className={styles.shopCloseBtn} onClick={() => { setShowHouseModal(null); setHouseUpgradeMsg(null); setCCMsg(null); }}>סגור</button>
+          </div>
+        </div>
+      )}
+
+      {/* Community Center Modal */}
+      {showCCModal && (
+        <div className={styles.shopBackdrop} onClick={() => { setShowCCModal(null); setCCMsg(null); }}>
+          <div className={styles.shopModal} onClick={(e) => e.stopPropagation()}>
+            <p className={styles.shopTitle}>🏛️ המרכז הקהילתי</p>
+            <p className={styles.shopBalance}>יתרה: {user?.money ?? 0} שקלים</p>
+            <p style={{ margin: "4px 0", fontSize: 14 }}>
+              רמה {showCCModal.cell.ccLevel || 1} מתוך 5
+              {" · "}בונוס: +{CC_ITEM_BONUS[showCCModal.cell.ccLevel || 1]} מטבעות על כל פריט שמתקבל מחבר
+            </p>
+            {(showCCModal.cell.ccLevel || 1) < 5 && (() => {
+              const req = CC_UPGRADE_COSTS[(showCCModal.cell.ccLevel || 1) + 1];
+              return (
+                <p style={{ margin: "2px 0", fontSize: 11, color: "#888", direction: "rtl" }}>
+                  לרמה {(showCCModal.cell.ccLevel || 1) + 1}: {req.cost} שקלים +{" "}
+                  {req.friendItems.map(({ id, count }) => `${count} ${ITEM_NAMES[id]} מחברים`).join(" + ")}
+                </p>
+              );
+            })()}
+            {ccMsg && (
+              <p style={{ margin: "4px 0", fontSize: 12, color: "#c0392b", direction: "rtl" }}>
+                {ccMsg}
+                {ccMsg.includes("חברים") && (
+                  <>{" "}<a href="https://wa.me/?text=%D7%91%D7%95%D7%90%D7%95%20%D7%9C%D7%A9%D7%97%D7%A7%20%D7%91%D7%9E%D7%99%D7%A0%D7%99%20%D7%99%D7%A9%D7%A8%D7%90%D7%9C%21%20https%3A%2F%2Fwww.mini-israel.com%2F" target="_blank" rel="noopener noreferrer" style={{ color: "#25D366", textDecoration: "underline" }}>הזמן חברים</a></>
+                )}
+              </p>
+            )}
+            {(showCCModal.cell.ccLevel || 1) < 5 ? (
+              <button className={styles.shopBuyBtn} onClick={handleCCUpgrade} disabled={ccUpgrading}>
+                {ccUpgrading ? "משדרג..." : `⬆️ שדרג לרמה ${(showCCModal.cell.ccLevel || 1) + 1} – ${CC_UPGRADE_COSTS[(showCCModal.cell.ccLevel || 1) + 1].cost} שקלים`}
+              </button>
+            ) : (
+              <p style={{ margin: 0, fontSize: 12, color: "#4a7c3f", fontWeight: 600 }}>✅ מרכז קהילתי ברמה מקסימלית! (+50 מטבעות לכל פריט)</p>
+            )}
+            <button className={styles.shopCloseBtn} onClick={() => { setShowCCModal(null); setCCMsg(null); }}>סגור</button>
           </div>
         </div>
       )}

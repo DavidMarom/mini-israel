@@ -36,6 +36,20 @@ export async function POST(request) {
       { $push: { inventory: itemWithFriendFlag } }
     );
 
+    // Apply Community Center bonus if recipient has one
+    const CC_BONUS = { 1: 5, 2: 10, 3: 20, 4: 30, 5: 50 };
+    const boardDoc = await db.collection("board").findOne({ _id: "main-board" });
+    const ccCell = boardDoc?.cells?.find((c) => c.building === "community-center" && c.ownerUid === toUid);
+    if (ccCell) {
+      const bonus = CC_BONUS[ccCell.ccLevel || 1] ?? 0;
+      if (bonus > 0) {
+        await db.collection("users").updateOne(
+          { uid: toUid },
+          { $inc: { money: bonus }, $set: { updatedAt: new Date() } }
+        );
+      }
+    }
+
     const messageText = text?.trim()
       ? `${item.emoji} ${item.name}: ${text.trim()}`
       : `שלח לך ${item.emoji} ${item.name}`;

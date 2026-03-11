@@ -3,6 +3,7 @@ import clientPromise from "../../../../services/mongo";
 
 const BOARD_ID = "main-board";
 const BASE_EGG_REWARD = 20;
+const HOUSE_EGG_BONUS = { 1: 0, 2: 5, 3: 10, 4: 20, 5: 35 };
 
 export async function POST(request) {
   try {
@@ -26,7 +27,9 @@ export async function POST(request) {
     }
 
     const farmLevel = cells[farmIndex].farmLevel || 1;
-    let reward = BASE_EGG_REWARD * farmLevel;
+    const houseCell = cells.find((c) => c.building === "main-house" && c.ownerUid === uid);
+    const houseBonus = HOUSE_EGG_BONUS[houseCell?.houseLevel || 1] ?? 0;
+    let reward = BASE_EGG_REWARD * farmLevel + houseBonus;
 
     // Apply upgrade bonuses from user doc
     const userDoc = await db.collection("users").findOne({ uid }, { projection: { powerBoostExpiry: 1, isVIP: 1 } });
