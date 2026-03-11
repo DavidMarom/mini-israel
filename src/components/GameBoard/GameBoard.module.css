@@ -1810,3 +1810,8 @@
   color: #f5c842;
   line-height: 1.6;
 }
+
+@keyframes godzillaPulse {
+  0%, 100% { filter: drop-shadow(0 0 18px rgba(0,255,80,0.7)); transform: scale(1); }
+  50% { filter: drop-shadow(0 0 30px rgba(0,255,80,1)); transform: scale(1.04); }
+}
