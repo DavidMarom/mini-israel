@@ -574,6 +574,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
   const [showYadSara, setShowYadSara] = useState(false);
   const [donating, setDonating] = useState(false);
   const [donationDone, setDonationDone] = useState(false);
+  const [donationCooldown, setDonationCooldown] = useState(false);
 
   // Trivia
   const [showTrivia, setShowTrivia] = useState(false);
@@ -709,6 +710,10 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       });
       const data = await res.json();
       if (!res.ok) {
+        if (data.error === "Already donated this week") {
+          setDonationCooldown(true);
+          return;
+        }
         alert(data.error === "Insufficient funds" ? "אין מספיק מטבעות לתרומה" : "שגיאה, נסה שוב");
         return;
       }
@@ -1428,7 +1433,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
               width: YAD_SARA_W * TILE_SIZE,
               height: YAD_SARA_H * TILE_SIZE,
             }}
-            onClick={() => { setShowYadSara(true); setDonationDone(false); }}
+            onClick={() => { setShowYadSara(true); setDonationDone(false); setDonationCooldown(false); }}
           >
             <img src="/assets/yad-sara.jpg" alt="יד שרה" className={styles.yadSaraImg} />
           </div>
@@ -1845,6 +1850,11 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
             {donationDone ? (
               <>
                 <p className={styles.yadSaraThanks}>תודה רבה על תרומתך! 🙏</p>
+                <button className={styles.shopCloseBtn} onClick={() => setShowYadSara(false)}>סגור</button>
+              </>
+            ) : donationCooldown ? (
+              <>
+                <p className={styles.yadSaraMsg}>כבר תרמת השבוע — תודה! ניתן לתרום שוב בשבוע הבא 💙</p>
                 <button className={styles.shopCloseBtn} onClick={() => setShowYadSara(false)}>סגור</button>
               </>
             ) : (
