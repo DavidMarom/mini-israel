@@ -552,6 +552,11 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
   const HOUSE_EGG_BONUS = [0, 0, 5, 10, 20, 35];
   const CC_ITEM_BONUS = [0, 5, 10, 20, 30, 50];
 
+  const trackWaClick = () => {
+    const uid = user?.firebaseUid || user?.uid;
+    if (uid) fetch("/api/track/wa-click", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ uid }) });
+  };
+
   const SHOP_ITEMS = [
     { id: "flower",      emoji: "🌸", name: "פרח",         price: 10,  sellPrice: 7   },
     { id: "falafel",     emoji: "🧆", name: "פלאפל",       price: 25,  sellPrice: 17  },
@@ -1876,7 +1881,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
               <>
                 <div className={styles.cashoutInfo}>
                   <p>הכסף יעבור בביט למספר שתזינו</p>
-                  <p>על כל 100 מטבעות תקבלו 1 שקל אמיתי</p>
+                  <p>על כל 200 מטבעות תקבלו 1 שקל אמיתי</p>
                   <p>מינימום 1000 מטבעות משחק להעברה</p>
                 </div>
                 <p className={styles.cashoutBalance}>יתרתך: <strong>{user?.money ?? 0}</strong> מטבעות</p>
@@ -1905,7 +1910,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                   </div>
                 </div>
                 {cashoutAmount >= 1000 && (
-                  <p className={styles.cashoutCalc}>תקבל: ₪{Math.floor(Number(cashoutAmount) / 100)}</p>
+                  <p className={styles.cashoutCalc}>תקבל: ₪{Math.floor(Number(cashoutAmount) / 200)}</p>
                 )}
                 {cashoutError && <p className={styles.cashoutError}>{cashoutError}</p>}
                 <div className={styles.cashoutActions}>
@@ -2027,6 +2032,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                           href="https://wa.me/?text=%D7%91%D7%95%D7%90%D7%95%20%D7%9C%D7%A9%D7%97%D7%A7%20%D7%91%D7%9E%D7%99%D7%A0%D7%99%20%D7%99%D7%A9%D7%A8%D7%90%D7%9C%21%20https%3A%2F%2Fwww.mini-israel.com%2F"
                           target="_blank"
                           rel="noopener noreferrer"
+                          onClick={trackWaClick}
                           style={{ color: "#25D366", textDecoration: "underline", cursor: "pointer" }}
                         >
                           הזמן חברים
@@ -2076,7 +2082,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
               <p style={{ margin: "4px 0", fontSize: 12, color: "#c0392b", direction: "rtl" }}>
                 {houseUpgradeMsg}
                 {houseUpgradeMsg.includes("חברים") && (
-                  <>{" "}<a href="https://wa.me/?text=%D7%91%D7%95%D7%90%D7%95%20%D7%9C%D7%A9%D7%97%D7%A7%20%D7%91%D7%9E%D7%99%D7%A0%D7%99%20%D7%99%D7%A9%D7%A8%D7%90%D7%9C%21%20https%3A%2F%2Fwww.mini-israel.com%2F" target="_blank" rel="noopener noreferrer" style={{ color: "#25D366", textDecoration: "underline" }}>הזמן חברים</a></>
+                  <>{" "}<a href="https://wa.me/?text=%D7%91%D7%95%D7%90%D7%95%20%D7%9C%D7%A9%D7%97%D7%A7%20%D7%91%D7%9E%D7%99%D7%A0%D7%99%20%D7%99%D7%A9%D7%A8%D7%90%D7%9C%21%20https%3A%2F%2Fwww.mini-israel.com%2F" target="_blank" rel="noopener noreferrer" onClick={trackWaClick} style={{ color: "#25D366", textDecoration: "underline" }}>הזמן חברים</a></>
                 )}
               </p>
             )}
@@ -2096,7 +2102,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                   <p style={{ margin: "4px 0", fontSize: 12, color: "#c0392b", direction: "rtl" }}>
                     {ccMsg}
                     {ccMsg.includes("חברים") && (
-                      <>{" "}<a href="https://wa.me/?text=%D7%91%D7%95%D7%90%D7%95%20%D7%9C%D7%A9%D7%97%D7%A7%20%D7%91%D7%9E%D7%99%D7%A0%D7%99%20%D7%99%D7%A9%D7%A8%D7%90%D7%9C%21%20https%3A%2F%2Fwww.mini-israel.com%2F" target="_blank" rel="noopener noreferrer" style={{ color: "#25D366", textDecoration: "underline" }}>הזמן חברים</a></>
+                      <>{" "}<a href="https://wa.me/?text=%D7%91%D7%95%D7%90%D7%95%20%D7%9C%D7%A9%D7%97%D7%A7%20%D7%91%D7%9E%D7%99%D7%A0%D7%99%20%D7%99%D7%A9%D7%A8%D7%90%D7%9C%21%20https%3A%2F%2Fwww.mini-israel.com%2F" target="_blank" rel="noopener noreferrer" onClick={trackWaClick} style={{ color: "#25D366", textDecoration: "underline" }}>הזמן חברים</a></>
                     )}
                   </p>
                 )}
@@ -2133,7 +2139,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
               <p style={{ margin: "4px 0", fontSize: 12, color: "#c0392b", direction: "rtl" }}>
                 {ccMsg}
                 {ccMsg.includes("חברים") && (
-                  <>{" "}<a href="https://wa.me/?text=%D7%91%D7%95%D7%90%D7%95%20%D7%9C%D7%A9%D7%97%D7%A7%20%D7%91%D7%9E%D7%99%D7%A0%D7%99%20%D7%99%D7%A9%D7%A8%D7%90%D7%9C%21%20https%3A%2F%2Fwww.mini-israel.com%2F" target="_blank" rel="noopener noreferrer" style={{ color: "#25D366", textDecoration: "underline" }}>הזמן חברים</a></>
+                  <>{" "}<a href="https://wa.me/?text=%D7%91%D7%95%D7%90%D7%95%20%D7%9C%D7%A9%D7%97%D7%A7%20%D7%91%D7%9E%D7%99%D7%A0%D7%99%20%D7%99%D7%A9%D7%A8%D7%90%D7%9C%21%20https%3A%2F%2Fwww.mini-israel.com%2F" target="_blank" rel="noopener noreferrer" onClick={trackWaClick} style={{ color: "#25D366", textDecoration: "underline" }}>הזמן חברים</a></>
                 )}
               </p>
             )}

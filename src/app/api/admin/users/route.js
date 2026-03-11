@@ -6,7 +6,7 @@ export async function GET() {
     const client = await clientPromise;
     const db = client.db("main");
     const users = await db.collection("users")
-      .find({}, { projection: { uid: 1, email: 1, name: 1, money: 1, suspended: 1, createdAt: 1 } })
+      .find({}, { projection: { uid: 1, email: 1, name: 1, money: 1, suspended: 1, createdAt: 1, waClicks: 1 } })
       .sort({ createdAt: -1 })
       .toArray();
     return NextResponse.json({ users }, { status: 200 });

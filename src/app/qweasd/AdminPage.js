@@ -181,6 +181,31 @@ export default function AdminPage() {
     }
   };
 
+  // ── Lottery Popup ────────────────────────────────────
+  const [lotteryPopupEnabled, setLotteryPopupEnabled] = useState(true);
+  const [lotteryPopupLoading, setLotteryPopupLoading] = useState(false);
+
+  const loadLotteryPopup = async () => {
+    try {
+      const res = await fetch("/api/admin/lottery-popup");
+      const data = await res.json();
+      setLotteryPopupEnabled(data.enabled !== false);
+    } catch (e) { console.error(e); }
+  };
+
+  const handleToggleLotteryPopup = async () => {
+    setLotteryPopupLoading(true);
+    try {
+      const res = await fetch("/api/admin/lottery-popup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ enabled: !lotteryPopupEnabled }),
+      });
+      const data = await res.json();
+      if (data.ok) setLotteryPopupEnabled(data.enabled);
+    } catch (e) { console.error(e); } finally { setLotteryPopupLoading(false); }
+  };
+
   // ── Yad Sara Visibility ──────────────────────────────
   const [yadSaraVisible, setYadSaraVisible] = useState(true);
   const [yadSaraToggleLoading, setYadSaraToggleLoading] = useState(false);
@@ -401,6 +426,7 @@ export default function AdminPage() {
     loadYadSaraVisible();
     loadCashouts();
     loadFictiveUsers();
+    loadLotteryPopup();
   }, []);
 
   const [tab, setTab] = useState("general");
@@ -437,6 +463,23 @@ export default function AdminPage() {
       </div>
 
       {tab === "general" && <>
+
+      {/* ── Lottery Popup ── */}
+      <h2>🎰 פופאפ הגרלה</h2>
+      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+        <span style={{ fontSize: 14 }}>
+          הפופאפ כרגע: <strong style={{ color: lotteryPopupEnabled ? "#16a34a" : "#dc2626" }}>{lotteryPopupEnabled ? "פעיל" : "כבוי"}</strong>
+        </span>
+        <button
+          onClick={handleToggleLotteryPopup}
+          disabled={lotteryPopupLoading}
+          style={{ padding: "8px 20px", cursor: "pointer", background: lotteryPopupEnabled ? "#dc2626" : "#16a34a", color: "#fff", border: "none", borderRadius: 6, fontWeight: 700 }}
+        >
+          {lotteryPopupLoading ? "..." : lotteryPopupEnabled ? "כבה פופאפ" : "הפעל פופאפ"}
+        </button>
+      </div>
+
+      <hr style={{ margin: "32px 0" }} />
 
       {/* ── Board ── */}
       <h2>לוח</h2>
@@ -700,6 +743,7 @@ export default function AdminPage() {
               <th style={th}>שם</th>
               <th style={th}>אימייל</th>
               <th style={th}>מטבעות</th>
+              <th style={th}>📲 הזמנות WA</th>
               <th style={th}>נרשם</th>
               <th style={th}>סטטוס</th>
               <th style={th}>פעולות</th>
@@ -711,6 +755,7 @@ export default function AdminPage() {
                 <td style={td}>{u.name || "-"}</td>
                 <td style={td}>{u.email}</td>
                 <td style={td}>{u.money ?? 0}</td>
+                <td style={{ ...td, textAlign: "center", fontWeight: u.waClicks ? 700 : 400, color: u.waClicks ? "#16a34a" : "#aaa" }}>{u.waClicks ?? 0}</td>
                 <td style={td}>{u.createdAt ? new Date(u.createdAt).toLocaleDateString("he-IL") : "-"}</td>
                 <td style={td}>
                   {u.suspended
