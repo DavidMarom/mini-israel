@@ -88,6 +88,11 @@ const POWERPLANT_COL = 4;
 const POWERPLANT_W = 3;
 const POWERPLANT_H = 3;
 
+const GODZILLA_ROW = 57; // left of Knesset (rows 57-60, cols 5-8 — Synagogue ends row 51, Camera starts row 69)
+const GODZILLA_COL = 5;
+const GODZILLA_W = 4;
+const GODZILLA_H = 4;
+
 const createEmptyGrid = () =>
   Array.from({ length: ROWS }, () => Array(COLS).fill(null));
 
@@ -277,6 +282,8 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
   };
 
   const handlePowerPlantClick = () => setShowPowerPlant(true);
+
+  const [showGodzilla, setShowGodzilla] = useState(false);
 
   const handlePowerSubscribe = async () => {
     if (!user || powerPlantSubscribing) return;
@@ -1333,7 +1340,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                 )}
                 {hasCC && (
                   <div className={styles.ccWrapper}>
-                    <span className={styles.ccIcon}>🏛️</span>
+                    <img src="/assets/community-center.png" alt="מרכז קהילתי" className={styles.mainHouse} />
                     {cell.ownerUid === ownerUid && (cell.ccLevel || 1) > 1 && (
                       <span className={styles.farmLevelBadge}>L{cell.ccLevel}</span>
                     )}
@@ -1497,6 +1504,24 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
         >
           <span className={styles.cashoutBuildingIcon}>💵</span>
           <span className={styles.cashoutBuildingLabel}>המר לכסף אמיתי!!</span>
+        </div>
+
+        {/* Godzilla */}
+        <div
+          style={{
+            position: "absolute",
+            top: GODZILLA_ROW * TILE_SIZE,
+            left: GODZILLA_COL * TILE_SIZE,
+            width: GODZILLA_W * TILE_SIZE,
+            height: GODZILLA_H * TILE_SIZE,
+            cursor: "pointer",
+            zIndex: 10,
+            filter: "drop-shadow(0 0 18px rgba(0,255,80,0.7))",
+            animation: "godzillaPulse 2.5s ease-in-out infinite",
+          }}
+          onClick={() => setShowGodzilla(true)}
+        >
+          <img src="/assets/godzilla.png" alt="גודזילה" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
         </div>
 
         {/* Power Plant Building */}
@@ -2191,6 +2216,24 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
               </>
             )}
             <button className={styles.shopCloseBtn} onClick={() => setShowPowerPlant(false)}>סגור</button>
+          </div>
+        </div>
+      )}
+      {/* Godzilla Modal */}
+      {showGodzilla && (
+        <div className={styles.shopBackdrop} onClick={() => setShowGodzilla(false)}>
+          <div className={styles.shopModal} onClick={(e) => e.stopPropagation()} style={{ textAlign: "center" }}>
+            <div style={{ fontSize: 64, lineHeight: 1, marginBottom: 8 }}>🦖</div>
+            <p className={styles.shopTitle} style={{ fontSize: 22 }}>גודזילה!</p>
+            <img src="/assets/godzilla.png" alt="גודזילה" style={{ width: 140, height: 140, objectFit: "contain", margin: "8px auto", display: "block" }} />
+            <p style={{ margin: "8px 0 4px", fontSize: 15, direction: "rtl", color: "#333" }}>
+              🚨 <strong>אזהרה!</strong> גודזילה נמצא בשכונה!
+            </p>
+            <p style={{ margin: "4px 0 16px", fontSize: 13, color: "#666", direction: "rtl" }}>
+              המפלצת הענקית מסתובבת בין הבתים ומאיימת על כל מה שבנית.<br />
+              רק הבתים החזקים ישרדו...
+            </p>
+            <button className={styles.shopCloseBtn} onClick={() => setShowGodzilla(false)}>ברח! 🏃</button>
           </div>
         </div>
       )}
