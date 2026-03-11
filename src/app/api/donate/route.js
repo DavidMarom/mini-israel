@@ -35,6 +35,15 @@ export async function POST(req) {
       return NextResponse.json({ error: "Insufficient funds" }, { status: 400 });
     }
 
+    const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const recentDonation = await db.collection("donations").findOne({
+      uid,
+      createdAt: { $gte: oneWeekAgo },
+    });
+    if (recentDonation) {
+      return NextResponse.json({ error: "Already donated this week" }, { status: 429 });
+    }
+
     const newMoney = user.money - DONATION_COINS;
     await db.collection("users").updateOne(
       { uid },
