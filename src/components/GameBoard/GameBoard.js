@@ -1688,7 +1688,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
         <div className={styles.shopBackdrop} onClick={() => setShowAzrieliShop(false)}>
           <div className={styles.shopModal} onClick={(e) => e.stopPropagation()}>
             <p className={styles.shopTitle}>🏬 קניון אזריאלי</p>
-            <p className={styles.shopBalance}>יתרה: {user?.money ?? 0} שקלים</p>
+            <p className={styles.shopBalance}>יתרה: {user?.money ?? 0} 🪙</p>
             <div className={styles.shopItems}>
               {SHOP_ITEMS.map((item) => (
                 <div key={item.id} className={styles.shopItem}>
@@ -1806,7 +1806,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
         <div className={styles.shopBackdrop} onClick={() => setShowKnesset(false)}>
           <div className={styles.shopModal} onClick={(e) => e.stopPropagation()}>
             <p className={styles.shopTitle}>🏛️ הכנסת</p>
-            <p className={styles.shopBalance}>יתרה שלך: {user?.money ?? 0} שקלים</p>
+            <p className={styles.shopBalance}>יתרה שלך: {user?.money ?? 0} 🪙</p>
             {!user ? (
               <p className={styles.knessetEmpty}>התחבר כדי למכור פריטים</p>
             ) : !user.inventory?.length ? (
@@ -1859,7 +1859,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
               </>
             ) : (
               <>
-                <p className={styles.yadSaraMsg}>בכל תרומה של 100 מטבעות משחק, אנחנו נתרום 2 שקלים לעמותת יד שרה!</p>
+                <p className={styles.yadSaraMsg}>בכל תרומה של 100 🪙 משחק, אנחנו נתרום ₪2 לעמותת יד שרה!</p>
                 <p className={styles.yadSaraBalance}>יתרתך: {user?.money ?? 0} מטבעות</p>
                 <div className={styles.yadSaraActions}>
                   <button
@@ -2019,7 +2019,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
         <div className={styles.shopBackdrop} onClick={() => { setShowFarmModal(null); setFarmUpgradeMsg(null); }}>
           <div className={styles.shopModal} onClick={(e) => e.stopPropagation()}>
             <p className={styles.shopTitle}>🌾 החווה שלי</p>
-            <p className={styles.shopBalance}>יתרה: {user?.money ?? 0} שקלים</p>
+            <p className={styles.shopBalance}>יתרה: {user?.money ?? 0} 🪙</p>
             <p style={{ margin: 0, fontSize: 14 }}>
               רמה {showFarmModal.cell.farmLevel || 1} - {(showFarmModal.cell.farmLevel || 1) === 1 ? "20" : (showFarmModal.cell.farmLevel || 1) === 2 ? "40" : "80"} מטבעות לביצה
             </p>
@@ -2058,7 +2058,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                 >
                   {farmUpgrading
                     ? "משדרג..."
-                    : `⬆️ שדרג לרמה ${(showFarmModal.cell.farmLevel || 1) + 1} – ${(showFarmModal.cell.farmLevel || 1) === 1 ? "600" : "1,200"} שקלים`}
+                    : `⬆️ שדרג לרמה ${(showFarmModal.cell.farmLevel || 1) + 1} – ${(showFarmModal.cell.farmLevel || 1) === 1 ? "600" : "1,200"} 🪙`}
                 </button>
               </>
             ) : (
@@ -2074,7 +2074,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
         <div className={styles.shopBackdrop} onClick={() => { setShowHouseModal(null); setHouseUpgradeMsg(null); setCCMsg(null); }}>
           <div className={styles.shopModal} onClick={(e) => e.stopPropagation()}>
             <p className={styles.shopTitle}>🏠 הבית שלי</p>
-            <p className={styles.shopBalance}>יתרה: {user?.money ?? 0} שקלים</p>
+            <p className={styles.shopBalance}>יתרה: {user?.money ?? 0} 🪙</p>
             <p style={{ margin: "4px 0", fontSize: 14 }}>
               רמה {showHouseModal.cell.houseLevel || 1} מתוך 5
               {" · "}בונוס: +{HOUSE_EGG_BONUS[showHouseModal.cell.houseLevel || 1]} מטבעות לביצה
@@ -2083,7 +2083,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
               const req = HOUSE_UPGRADE_COSTS[(showHouseModal.cell.houseLevel || 1) + 1];
               return (
                 <p style={{ margin: "2px 0", fontSize: 11, color: "#888", direction: "rtl" }}>
-                  לרמה {(showHouseModal.cell.houseLevel || 1) + 1}: {req.cost} שקלים +{" "}
+                  לרמה {(showHouseModal.cell.houseLevel || 1) + 1}: {req.cost} 🪙 +{" "}
                   {req.friendItems.map(({ id, count }) => `${count} ${ITEM_NAMES[id]} מחברים`).join(" + ")}
                 </p>
               );
@@ -2098,7 +2098,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
             )}
             {(showHouseModal.cell.houseLevel || 1) < 5 ? (
               <button className={styles.shopBuyBtn} onClick={handleHouseUpgrade} disabled={houseUpgrading}>
-                {houseUpgrading ? "משדרג..." : `⬆️ שדרג לרמה ${(showHouseModal.cell.houseLevel || 1) + 1} – ${HOUSE_UPGRADE_COSTS[(showHouseModal.cell.houseLevel || 1) + 1].cost} שקלים`}
+                {houseUpgrading ? "משדרג..." : `⬆️ שדרג לרמה ${(showHouseModal.cell.houseLevel || 1) + 1} – ${HOUSE_UPGRADE_COSTS[(showHouseModal.cell.houseLevel || 1) + 1].cost} 🪙`}
               </button>
             ) : (
               <p style={{ margin: 0, fontSize: 12, color: "#c8a200", fontWeight: 600 }}>✅ בית זהב! רמה מקסימלית (+35 מטבעות לביצה)</p>
@@ -2107,7 +2107,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
               <>
                 <hr style={{ margin: "10px 0", border: "none", borderTop: "1px solid #eee" }} />
                 <p style={{ margin: "4px 0", fontSize: 13, color: "#4a7c3f" }}>🏛️ מרכז קהילתי זמין לרכישה!</p>
-                <p style={{ margin: "2px 0", fontSize: 11, color: "#888", direction: "rtl" }}>600 שקלים + 2 דגלים מחברים</p>
+                <p style={{ margin: "2px 0", fontSize: 11, color: "#888", direction: "rtl" }}>600 🪙 + 2 דגלים מחברים</p>
                 {ccMsg && (
                   <p style={{ margin: "4px 0", fontSize: 12, color: "#c0392b", direction: "rtl" }}>
                     {ccMsg}
@@ -2117,7 +2117,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                   </p>
                 )}
                 <button className={styles.shopBuyBtn} onClick={handleBuyCC} disabled={ccBuying}>
-                  {ccBuying ? "רוכש..." : "🏛️ קנה מרכז קהילתי – 600 שקלים"}
+                  {ccBuying ? "רוכש..." : "🏛️ קנה מרכז קהילתי – 600 🪙"}
                 </button>
               </>
             )}
@@ -2131,7 +2131,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
         <div className={styles.shopBackdrop} onClick={() => { setShowCCModal(null); setCCMsg(null); }}>
           <div className={styles.shopModal} onClick={(e) => e.stopPropagation()}>
             <p className={styles.shopTitle}>🏛️ המרכז הקהילתי</p>
-            <p className={styles.shopBalance}>יתרה: {user?.money ?? 0} שקלים</p>
+            <p className={styles.shopBalance}>יתרה: {user?.money ?? 0} 🪙</p>
             <p style={{ margin: "4px 0", fontSize: 14 }}>
               רמה {showCCModal.cell.ccLevel || 1} מתוך 5
               {" · "}בונוס: +{CC_ITEM_BONUS[showCCModal.cell.ccLevel || 1]} מטבעות על כל פריט שמתקבל מחבר
@@ -2140,7 +2140,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
               const req = CC_UPGRADE_COSTS[(showCCModal.cell.ccLevel || 1) + 1];
               return (
                 <p style={{ margin: "2px 0", fontSize: 11, color: "#888", direction: "rtl" }}>
-                  לרמה {(showCCModal.cell.ccLevel || 1) + 1}: {req.cost} שקלים +{" "}
+                  לרמה {(showCCModal.cell.ccLevel || 1) + 1}: {req.cost} 🪙 +{" "}
                   {req.friendItems.map(({ id, count }) => `${count} ${ITEM_NAMES[id]} מחברים`).join(" + ")}
                 </p>
               );
@@ -2155,7 +2155,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
             )}
             {(showCCModal.cell.ccLevel || 1) < 5 ? (
               <button className={styles.shopBuyBtn} onClick={handleCCUpgrade} disabled={ccUpgrading}>
-                {ccUpgrading ? "משדרג..." : `⬆️ שדרג לרמה ${(showCCModal.cell.ccLevel || 1) + 1} – ${CC_UPGRADE_COSTS[(showCCModal.cell.ccLevel || 1) + 1].cost} שקלים`}
+                {ccUpgrading ? "משדרג..." : `⬆️ שדרג לרמה ${(showCCModal.cell.ccLevel || 1) + 1} – ${CC_UPGRADE_COSTS[(showCCModal.cell.ccLevel || 1) + 1].cost} 🪙`}
               </button>
             ) : (
               <p style={{ margin: 0, fontSize: 12, color: "#4a7c3f", fontWeight: 600 }}>✅ מרכז קהילתי ברמה מקסימלית! (+50 מטבעות לכל פריט)</p>
@@ -2170,7 +2170,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
         <div className={styles.shopBackdrop} onClick={() => setShowPowerPlant(false)}>
           <div className={styles.shopModal} onClick={(e) => e.stopPropagation()}>
             <p className={styles.shopTitle}>⚡ תחנת הכוח</p>
-            <p className={styles.shopBalance}>יתרה: {user?.money ?? 0} שקלים</p>
+            <p className={styles.shopBalance}>יתרה: {user?.money ?? 0} 🪙</p>
             {user?.powerBoostExpiry && new Date(user.powerBoostExpiry) > new Date() ? (
               <>
                 <p style={{ margin: 0, fontSize: 13, color: "#4a7c3f" }}>✅ מנוי חשמל פעיל! +20 מטבעות לכל ביצה</p>
@@ -2186,7 +2186,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                   onClick={handlePowerSubscribe}
                   disabled={powerPlantSubscribing || !user || (user.money ?? 0) < 400}
                 >
-                  {powerPlantSubscribing ? "רוכש..." : "⚡ קנה מנוי – 400 שקלים"}
+                  {powerPlantSubscribing ? "רוכש..." : "⚡ קנה מנוי – 400 🪙"}
                 </button>
               </>
             )}

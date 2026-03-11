@@ -682,7 +682,7 @@ export default function AdminPage() {
               <th style={th}>שם</th>
               <th style={th}>טלפון</th>
               <th style={th}>מטבעות</th>
-              <th style={th}>שקלים</th>
+              <th style={th}>₪</th>
               <th style={th}>תאריך</th>
               <th style={th}>סטטוס</th>
               <th style={th}>פעולות</th>
@@ -828,7 +828,7 @@ export default function AdminPage() {
             <tr style={{ background: "#f0f0f0", textAlign: "right" }}>
               <th style={th}>שם</th>
               <th style={th}>מטבעות</th>
-              <th style={th}>שקלים</th>
+              <th style={th}>₪</th>
               <th style={th}>תאריך</th>
             </tr>
           </thead>

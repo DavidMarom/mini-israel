@@ -502,7 +502,7 @@ export default function Home() {
             <div style={{ fontSize: 48, marginBottom: 12 }}>🎰</div>
             <h2 style={{ margin: "0 0 12px", fontSize: 20, color: "#1a1a1a" }}>הגרלה שבועית!</h2>
             <p style={{ margin: "0 0 20px", fontSize: 15, color: "#333", lineHeight: 1.6 }}>
-              ביום שלישי הקרוב תיערך הגרלה על <strong>100 שקלים (אמיתיים)</strong>.<br />
+              ביום שלישי הקרוב תיערך הגרלה על <strong>₪100 אמיתיים</strong>.<br />
               תנאי להשתתפות: הזמן/י 2 חברים.<br />
               <span style={{ fontSize: 13, color: "#666" }}>אין צורך להירשם</span>
             </p>

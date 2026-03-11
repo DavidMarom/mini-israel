@@ -74,7 +74,7 @@ export default function AuthCard({ loading, user, displayName, bio, money, inven
             <p className={styles.bio}>{bio}</p>
           )}
 
-          <p className={styles.balanceText}>מטבעות: <span className={styles.balanceValue}>{money ?? 0}</span> שקלים</p>
+          <p className={styles.balanceText}>מטבעות: <span className={styles.balanceValue}>{money ?? 0}</span> 🪙</p>
 
           {inventory && inventory.length > 0 && (
             <div className={styles.inventorySection}>
@@ -106,7 +106,7 @@ export default function AuthCard({ loading, user, displayName, bio, money, inven
               className={styles.farmButton}
               disabled={buyingFarm || (money ?? 0) < 500}
             >
-              {buyingFarm ? "קונה חווה..." : "🌾 קנה חווה – 500 שקלים"}
+              {buyingFarm ? "קונה חווה..." : "🌾 קנה חווה – 500 🪙"}
             </button>
           )}
 
@@ -116,7 +116,7 @@ export default function AuthCard({ loading, user, displayName, bio, money, inven
               className={styles.vipButton}
               disabled={!onBuyVip || (money ?? 0) < 1500}
             >
-              👑 שדרג ל-VIP – 1,500 שקלים
+              👑 שדרג ל-VIP – 1,500 🪙
             </button>
           )}
 
