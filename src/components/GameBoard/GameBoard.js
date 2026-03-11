@@ -1815,7 +1815,22 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
             {(showFarmModal.cell.farmLevel || 1) < 3 ? (
               <>
                 {farmUpgradeMsg && (
-                  <p style={{ margin: "4px 0", fontSize: 12, color: "#c0392b", direction: "rtl" }}>{farmUpgradeMsg}</p>
+                  <p style={{ margin: "4px 0", fontSize: 12, color: "#c0392b", direction: "rtl" }}>
+                    {farmUpgradeMsg}
+                    {farmUpgradeMsg.includes("חברים") && (
+                      <>
+                        {" "}
+                        <a
+                          href="https://wa.me/?text=%D7%91%D7%95%D7%90%D7%95%20%D7%9C%D7%A9%D7%97%D7%A7%20%D7%91%D7%9E%D7%99%D7%A0%D7%99%20%D7%99%D7%A9%D7%A8%D7%90%D7%9C%21%20https%3A%2F%2Fwww.mini-israel.com%2F"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ color: "#25D366", textDecoration: "underline", cursor: "pointer" }}
+                        >
+                          הזמן חברים
+                        </a>
+                      </>
+                    )}
+                  </p>
                 )}
                 <button
                   className={styles.shopBuyBtn}
