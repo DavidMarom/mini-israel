@@ -94,6 +94,13 @@ const GODZILLA_COL = 5;
 const GODZILLA_W = 4;
 const GODZILLA_H = 4;
 
+const HOUSE_IMAGES = [
+  "/assets/house/house_1.png",
+  "/assets/house/house_2.png",
+  "/assets/house/house_3.png",
+  "/assets/house/house_4.png",
+];
+
 const createEmptyGrid = () =>
   Array.from({ length: ROWS }, () => Array(COLS).fill(null));
 
@@ -129,6 +136,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
   const [showHouseModal, setShowHouseModal] = useState(null); // { row, col, cell }
   const [houseUpgrading, setHouseUpgrading] = useState(false);
   const [houseUpgradeMsg, setHouseUpgradeMsg] = useState(null);
+  const [houseSkinChanging, setHouseSkinChanging] = useState(false);
 
   // Community Center Modal
   const [showCCModal, setShowCCModal] = useState(null); // { row, col, cell }
@@ -421,6 +429,27 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       setShowHouseModal((prev) => prev ? { ...prev, cell: { ...prev.cell, houseLevel: data.houseLevel } } : null);
     } catch (e) { console.error(e); }
     finally { setHouseUpgrading(false); }
+  };
+
+  const handleChangeHouseSkin = async (img) => {
+    if (!user || houseSkinChanging) return;
+    const uid = user.firebaseUid || user.uid;
+    setHouseSkinChanging(true);
+    try {
+      const res = await fetch("/api/house/skin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid, houseImg: img }),
+      });
+      if (res.ok) {
+        const { row, col } = showHouseModal;
+        const next = grid.map((r) => r.slice());
+        next[row][col] = { ...next[row][col], houseImg: img };
+        setGrid(next);
+        setShowHouseModal((prev) => prev ? { ...prev, cell: { ...prev.cell, houseImg: img } } : null);
+      }
+    } catch (e) { console.error(e); }
+    finally { setHouseSkinChanging(false); }
   };
 
   const handleBuyCC = async () => {
@@ -854,6 +883,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                 lastEggEpoch: cell.lastEggEpoch ?? null,
                 farmLevel: cell.farmLevel ?? 1,
                 houseLevel: cell.houseLevel ?? 1,
+                houseImg: cell.houseImg || null,
                 ccLevel: cell.ccLevel ?? 1,
               };
             }
@@ -911,7 +941,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
             ownerName: cell.ownerName || null,
             item: cell.item || null,
             ...(cell.building === "farm" ? { farmLevel: cell.farmLevel || 1, eggReady: cell.eggReady || false, lastEggEpoch: cell.lastEggEpoch ?? null } : {}),
-          ...(cell.building === "main-house" ? { houseLevel: cell.houseLevel || 1 } : {}),
+          ...(cell.building === "main-house" ? { houseLevel: cell.houseLevel || 1, houseImg: cell.houseImg || null } : {}),
           ...(cell.building === "community-center" ? { ccLevel: cell.ccLevel || 1 } : {}),
           });
         }
@@ -1148,6 +1178,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       building: "main-house",
       ownerUid,
       ownerName: user.name || user.email,
+      houseImg: HOUSE_IMAGES[Math.floor(Math.random() * HOUSE_IMAGES.length)],
     };
 
     setGrid(next);
@@ -1330,7 +1361,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                 {hasMainHouse && (
                   <div className={styles.houseWrapper}>
                     <img
-                      src={isPoopHouse ? "/assets/poophouse.png" : "/assets/main-house.png"}
+                      src={isPoopHouse ? "/assets/poophouse.png" : (cell.houseImg || HOUSE_IMAGES[0])}
                       alt={isPoopHouse ? "בית מלוכלך" : "בית ראשי"}
                       className={styles.mainHouse}
                       style={(cell.houseLevel || 1) >= 5 && !isPoopHouse ? { filter: "sepia(1) saturate(4) hue-rotate(10deg)" } : undefined}
@@ -1373,7 +1404,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                   hover.col === col && (
                     <div className={styles.houseWrapper}>
                       <img
-                        src="/assets/main-house.png"
+                        src={HOUSE_IMAGES[0]}
                         alt="מיקום בית ראשי"
                         className={styles.mainHouse}
                       />
@@ -2111,6 +2142,28 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
           <div className={styles.shopModal} onClick={(e) => e.stopPropagation()}>
             <p className={styles.shopTitle}>🏠 הבית שלי</p>
             <p className={styles.shopBalance}>יתרה: {user?.money ?? 0} 🪙</p>
+            <div style={{ margin: "8px 0" }}>
+              <p style={{ margin: "0 0 6px 0", fontSize: 12, color: "#888" }}>עיצוב הבית:</p>
+              <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
+                {HOUSE_IMAGES.map((img) => (
+                  <button
+                    key={img}
+                    onClick={() => handleChangeHouseSkin(img)}
+                    disabled={houseSkinChanging}
+                    style={{
+                      border: (showHouseModal.cell.houseImg || HOUSE_IMAGES[0]) === img ? "2px solid #4a90d9" : "2px solid #3a3a55",
+                      background: "transparent",
+                      borderRadius: 6,
+                      padding: 4,
+                      cursor: houseSkinChanging ? "not-allowed" : "pointer",
+                      opacity: houseSkinChanging ? 0.6 : 1,
+                    }}
+                  >
+                    <img src={img} alt="house" style={{ width: 40, height: 40, objectFit: "contain", display: "block" }} />
+                  </button>
+                ))}
+              </div>
+            </div>
             <p style={{ margin: "4px 0", fontSize: 14 }}>
               רמה {showHouseModal.cell.houseLevel || 1} מתוך 5
               {" · "}בונוס: +{HOUSE_EGG_BONUS[showHouseModal.cell.houseLevel || 1]} מטבעות לביצה
