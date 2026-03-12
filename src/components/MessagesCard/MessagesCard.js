@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./MessagesCard.module.css";
+import useUserStore from "../../store/useUserStore";
 
 export default function MessagesCard({ user }) {
   const [messages, setMessages] = useState([]);
@@ -9,7 +10,10 @@ export default function MessagesCard({ user }) {
   const [expanded, setExpanded] = useState(false);
   const [replyTo, setReplyTo] = useState(null); // { fromUid, fromName }
   const [replyText, setReplyText] = useState("");
+  const [replyItemIndex, setReplyItemIndex] = useState(null);
   const [replySending, setReplySending] = useState(false);
+  const cardRef = useRef(null);
+  const setUserStore = useUserStore((s) => s.setUser);
 
   const uid = user && (user.firebaseUid || user.uid);
 
@@ -23,6 +27,17 @@ export default function MessagesCard({ user }) {
       .finally(() => setLoading(false));
   }, [uid]);
 
+  const scrollSidebarToTop = () => {
+    let el = cardRef.current?.parentElement;
+    while (el) {
+      if (el.scrollHeight > el.clientHeight && getComputedStyle(el).overflowY !== "visible") {
+        el.scrollTo({ top: 0, behavior: "smooth" });
+        break;
+      }
+      el = el.parentElement;
+    }
+  };
+
   const handleDelete = async (id) => {
     setMessages((prev) => prev.filter((m) => m._id !== id));
     try {
@@ -33,22 +48,41 @@ export default function MessagesCard({ user }) {
   };
 
   const handleSendReply = async () => {
-    if (!replyText.trim() || !replyTo || !user) return;
+    if (replyItemIndex === null && !replyText.trim()) return;
+    if (!replyTo || !user) return;
     setReplySending(true);
     try {
-      await fetch("/api/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fromUid: uid,
-          fromName: user.name,
-          toUid: replyTo.fromUid,
-          toName: replyTo.fromName,
-          text: replyText,
-        }),
-      });
+      if (replyItemIndex !== null) {
+        const res = await fetch("/api/items/send", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            fromUid: uid,
+            fromName: user.name,
+            toUid: replyTo.fromUid,
+            toName: replyTo.fromName,
+            itemIndex: replyItemIndex,
+            text: replyText,
+          }),
+        });
+        const data = await res.json();
+        if (res.ok && data.inventory) setUserStore((prev) => ({ ...prev, inventory: data.inventory }));
+      } else {
+        await fetch("/api/messages", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            fromUid: uid,
+            fromName: user.name,
+            toUid: replyTo.fromUid,
+            toName: replyTo.fromName,
+            text: replyText,
+          }),
+        });
+      }
       setReplyTo(null);
       setReplyText("");
+      setReplyItemIndex(null);
     } catch (err) {
       console.error(err);
     } finally {
@@ -62,7 +96,7 @@ export default function MessagesCard({ user }) {
 
   return (
     <>
-      <div className={styles.card}>
+      <div className={styles.card} ref={cardRef}>
         <button className={styles.header} onClick={() => setExpanded((v) => !v)}>
           <span>הודעות</span>
           {unread > 0 && <span className={styles.badge}>{unread}</span>}
@@ -83,7 +117,7 @@ export default function MessagesCard({ user }) {
                     <div className={styles.msgActions}>
                       <button
                         className={styles.replyBtn}
-                        onClick={() => { setReplyTo({ fromUid: msg.fromUid, fromName: msg.fromName }); setReplyText(""); }}
+                        onClick={() => { scrollSidebarToTop(); setReplyTo({ fromUid: msg.fromUid, fromName: msg.fromName }); setReplyText(""); }}
                         aria-label="השב להודעה"
                       >↩</button>
                       <button className={styles.deleteBtn} onClick={() => handleDelete(msg._id)} aria-label="מחק הודעה">🗑</button>
@@ -105,21 +139,38 @@ export default function MessagesCard({ user }) {
       </div>
 
       {replyTo && (
-        <div className={styles.replyBackdrop} onClick={() => setReplyTo(null)}>
+        <div className={styles.replyBackdrop} onClick={() => { setReplyTo(null); setReplyItemIndex(null); }}>
           <div className={styles.replyModal} onClick={(e) => e.stopPropagation()}>
             <p className={styles.replyTitle}>השב ל{replyTo.fromName}</p>
+            {user?.inventory?.length > 0 && (
+              <div>
+                <p className={styles.replyLabel}>שלח פריט (אופציונלי):</p>
+                <div className={styles.replyInventoryGrid}>
+                  {user.inventory.map((item, i) => (
+                    <button
+                      key={i}
+                      className={`${styles.replyInventoryItem} ${replyItemIndex === i ? styles.replyInventoryItemSelected : ""}`}
+                      onClick={() => setReplyItemIndex(replyItemIndex === i ? null : i)}
+                      title={item.name}
+                    >
+                      {item.img ? <img src={item.img} alt={item.name} style={{ width: 24, height: 24, objectFit: "contain" }} /> : item.emoji}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
             <textarea
               className={styles.replyTextarea}
               value={replyText}
               onChange={(e) => setReplyText(e.target.value)}
-              placeholder="כתוב תשובה..."
-              rows={4}
+              placeholder={replyItemIndex !== null ? "הוסף הודעה (אופציונלי)..." : "כתוב תשובה..."}
+              rows={3}
             />
             <div className={styles.replyActions}>
-              <button className={styles.replySend} onClick={handleSendReply} disabled={replySending || !replyText.trim()}>
+              <button className={styles.replySend} onClick={handleSendReply} disabled={replySending || (replyItemIndex === null && !replyText.trim())}>
                 {replySending ? "שולח..." : "שלח"}
               </button>
-              <button className={styles.replyCancel} onClick={() => setReplyTo(null)}>ביטול</button>
+              <button className={styles.replyCancel} onClick={() => { setReplyTo(null); setReplyItemIndex(null); }}>ביטול</button>
             </div>
           </div>
         </div>
