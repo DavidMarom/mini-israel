@@ -323,7 +323,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
         body: JSON.stringify({ uid: ownerUid }),
       });
       const data = await res.json();
-      if (data.money != null) setUser((prev) => ({ ...prev, money: data.money }));
+      if (data.money != null) { setUser((prev) => ({ ...prev, money: data.money })); fireConfetti(); }
     } catch (e) { console.error(e); }
     finally { setFarmCollecting(false); }
   };
@@ -752,6 +752,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       const data = await res.json();
       if (res.ok) {
         setUser((prev) => ({ ...prev, money: data.money, inventory: data.inventory }));
+        fireConfetti();
       } else {
         alert(data.error || "שגיאה, נסה שוב");
       }
@@ -1012,6 +1013,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
             next[row][col] = null;
             setGrid(next);
             setUser((prev) => ({ ...prev, money: data.money }));
+            fireConfetti();
             const toast = { name: user.name, sponsor: data.sponsor };
             setTreasureWinnerToast(toast);
             setTimeout(() => setTreasureWinnerToast(null), 8000);
@@ -1037,6 +1039,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
         .then((data) => {
           if (typeof data.money === "number") {
             setUser((prev) => ({ ...prev, money: data.money }));
+            fireConfetti();
           }
         })
         .catch(console.error);
@@ -1057,7 +1060,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       })
         .then((r) => r.json())
         .then((data) => {
-          if (data.inventory) setUser((prev) => ({ ...prev, inventory: data.inventory }));
+          if (data.inventory) { setUser((prev) => ({ ...prev, inventory: data.inventory })); fireConfetti(); }
         })
         .catch(console.error);
 
@@ -1077,7 +1080,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       })
         .then((r) => r.json())
         .then((data) => {
-          if (data.inventory) setUser((prev) => ({ ...prev, inventory: data.inventory }));
+          if (data.inventory) { setUser((prev) => ({ ...prev, inventory: data.inventory })); fireConfetti(); }
         })
         .catch(console.error);
 
