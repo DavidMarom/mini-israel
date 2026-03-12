@@ -6,6 +6,7 @@ import { auth } from "../services/fb";
 import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut, } from "firebase/auth";
 import { GameBoard, NameModal, AuthCard, MessagesCard } from "../components";
 import useUserStore from "../store/useUserStore";
+import { fireConfetti } from "../utils/confetti";
 
 const provider = new GoogleAuthProvider();
 
@@ -52,7 +53,17 @@ export default function Home() {
       })
       .catch(console.error);
   }, []);
+  const [showSplash, setShowSplash] = useState(true);
+  const [splashFading, setSplashFading] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setSplashFading(true);
+      setTimeout(() => setShowSplash(false), 300);
+    }, 2000);
+    return () => clearTimeout(t);
+  }, []);
   const [error, setError] = useState(null);
   const [backendUser, setBackendUser] = useState(null);
   const [showNameModal, setShowNameModal] = useState(false);
@@ -283,6 +294,7 @@ export default function Home() {
         return;
       }
       setUserStore((prev) => ({ ...prev, money: data.money, isVIP: true }));
+      fireConfetti();
     } catch (e) {
       console.error(e);
     }
@@ -309,6 +321,7 @@ export default function Home() {
         return;
       }
       setUserStore((prev) => ({ ...prev, money: data.money }));
+      fireConfetti();
       if (data.newHouseRow != null) {
         setUserStore((prev) => ({ ...prev, mainHouse: { row: data.newHouseRow, col: data.newHouseCol } }));
       }
@@ -349,6 +362,14 @@ export default function Home() {
 
   return (
     <div className={styles.page}>
+      {showSplash && (
+        <div className={`${styles.splash} ${splashFading ? styles.splashFading : ""}`}>
+          <img src="/assets/splash.png" alt="מיני ישראל" className={styles.splashImg} />
+          <div className={styles.splashLoader}>
+            <div className={styles.splashSpinner} />
+          </div>
+        </div>
+      )}
       {isMobile && (
         <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", fontSize: "1.1rem", direction: "rtl", textAlign: "center", pointerEvents: "none", zIndex: 9999, color: "#fff", textShadow: "0 1px 6px #000" }}>
           סובב את המכשיר לאופק כדי לשחק במיני ישראל

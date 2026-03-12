@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import styles from "./GameBoard.module.css";
 import useUserStore from "../../store/useUserStore";
 import TRIVIA_QUESTIONS from "../../data/triviaQuestions";
+import { fireConfetti } from "../../utils/confetti";
 
 const ROWS = 230;
 const COLS = 15;
@@ -301,6 +302,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
         return;
       }
       setUser((prev) => ({ ...prev, money: data.money, powerBoostExpiry: data.powerBoostExpiry }));
+      fireConfetti();
     } catch (e) { console.error(e); }
     finally { setPowerPlantSubscribing(false); }
   };
@@ -365,6 +367,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       }
       setFarmUpgradeMsg(null);
       setUser((prev) => ({ ...prev, money: data.money }));
+      fireConfetti();
       const { row, col } = showFarmModal;
       const next = grid.map((r) => r.slice());
       next[row][col] = { ...next[row][col], farmLevel: data.farmLevel };
@@ -410,6 +413,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
         return;
       }
       setUser((prev) => ({ ...prev, money: data.money, inventory: data.inventory }));
+      fireConfetti();
       const { row, col } = showHouseModal;
       const next = grid.map((r) => r.slice());
       next[row][col] = { ...next[row][col], houseLevel: data.houseLevel };
@@ -447,6 +451,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
         return;
       }
       setUser((prev) => ({ ...prev, money: data.money, inventory: data.inventory }));
+      fireConfetti();
       const next = grid.map((r) => r.slice());
       next[data.ccRow][data.ccCol] = {
         building: "community-center",
@@ -501,6 +506,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
         return;
       }
       setUser((prev) => ({ ...prev, money: data.money, inventory: data.inventory }));
+      fireConfetti();
       const { row, col } = showCCModal;
       const next = grid.map((r) => r.slice());
       next[row][col] = { ...next[row][col], ccLevel: data.ccLevel };
@@ -774,6 +780,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
         return;
       }
       setUser((prev) => ({ ...prev, money: data.money, inventory: data.inventory }));
+      fireConfetti();
       setCandleDone(true);
     } catch (e) {
       console.error(e);
@@ -800,6 +807,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
         return;
       }
       setUser((prev) => ({ ...prev, money: data.money, inventory: data.inventory }));
+      fireConfetti();
     } finally {
       setBuyingItem(null);
     }
