@@ -11,7 +11,7 @@ import { fireConfetti } from "../utils/confetti";
 const provider = new GoogleAuthProvider();
 
 export default function Home() {
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobilePortrait, setIsMobilePortrait] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [taglines, setTaglines] = useState([]);
@@ -21,7 +21,7 @@ export default function Home() {
   const [missileBottom, setMissileBottom] = useState(30);
 
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768);
+    const check = () => setIsMobilePortrait(window.innerWidth < window.innerHeight);
     check();
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
@@ -370,7 +370,7 @@ export default function Home() {
           </div>
         </div>
       )}
-      {isMobile && (
+      {isMobilePortrait && (
         <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", fontSize: "1.1rem", direction: "rtl", textAlign: "center", pointerEvents: "none", zIndex: 9999, color: "#fff", textShadow: "0 1px 6px #000" }}>
           סובב את המכשיר לאופק כדי לשחק במיני ישראל
         </div>
