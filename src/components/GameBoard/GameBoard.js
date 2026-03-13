@@ -169,6 +169,8 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       if (data.ok) {
         setCashoutDone(true);
         setUser((prev) => ({ ...prev, money: (prev?.money ?? 0) - coins }));
+      } else if (data.error === "not_eligible") {
+        setCashoutError(he.cashoutNotEligible);
       } else {
         setCashoutError(data.error || he.cashoutGenericError);
       }
@@ -1928,7 +1930,22 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                 {cashoutAmount >= 1000 && (
                   <p className={styles.cashoutCalc}>{he.cashoutCalc(cashoutAmount)}</p>
                 )}
-                {cashoutError && <p className={styles.cashoutError}>{cashoutError}</p>}
+                {cashoutError && (
+                  <div className={styles.cashoutErrorBlock}>
+                    <p className={styles.cashoutError}>{cashoutError}</p>
+                    {cashoutError === he.cashoutNotEligible && (
+                      <a
+                        href="https://wa.me/?text=%D7%91%D7%95%D7%90%D7%95%20%D7%9C%D7%A9%D7%97%D7%A7%20%D7%91%D7%9E%D7%99%D7%A0%D7%99%20%D7%99%D7%A9%D7%A8%D7%90%D7%9C%21%20https%3A%2F%2Fwww.mini-israel.com%2F"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={styles.cashoutInviteBtn}
+                        onClick={trackWaClick}
+                      >
+                        {he.cashoutInviteBtn}
+                      </a>
+                    )}
+                  </div>
+                )}
                 <div className={styles.cashoutActions}>
                   <button
                     className={styles.cashoutSubmitBtn}

@@ -115,6 +115,8 @@ const he = {
   onlineNow: "מחוברים כרגע:",
 
   // GameBoard — Cashout
+  cashoutNotEligible: "⚠️ כדי לפדות מטבעות, עליך להזמין לפחות חבר אחד למשחק דרך וואטסאפ",
+  cashoutInviteBtn: "📲 הזמן חבר/ה",
   cashoutMissingPhone: "יש להזין מספר טלפון",
   cashoutMinimum: "מינימום 1000 מטבעות",
   cashoutInsufficientFunds: "אין מספיק מטבעות",

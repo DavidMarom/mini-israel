@@ -1174,10 +1174,29 @@
   text-align: center;
 }
 
+.cashoutErrorBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
 .cashoutError {
   margin: 0;
   font-size: 13px;
   color: #f87171;
+  text-align: center;
+}
+
+.cashoutInviteBtn {
+  display: inline-block;
+  padding: 8px 16px;
+  background: #25D366;
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 8px;
+  text-decoration: none;
   text-align: center;
 }
 
