@@ -1,26 +1,26 @@
 "use client";
 
 import styles from "./NameModal.module.css";
+import he from "../../lang/he";
 
 export default function NameModal({ name, onChangeName, onSave }) {
   return (
     <div className={styles.modalBackdrop}>
       <div className={styles.modal}>
-        <h2 className={styles.modalTitle}>בחר שם לשחקן</h2>
+        <h2 className={styles.modalTitle}>{he.nameModalTitle}</h2>
         <p className={styles.modalText}>
-          זה השם שיופיע לשחקנים אחרים בעולם.
+          {he.nameModalText}
         </p>
         <input
           className={styles.modalInput}
           value={name}
           onChange={(e) => onChangeName(e.target.value)}
-          placeholder="השם שלך"
+          placeholder={he.nameModalPlaceholder}
         />
         <button className={styles.primaryButton} onClick={onSave}>
-          שמור
+          {he.save}
         </button>
       </div>
     </div>
   );
 }
-
