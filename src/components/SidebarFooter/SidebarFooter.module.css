@@ -1,0 +1,45 @@
+.sidebarFooter {
+  margin-top: auto;
+  padding-top: 16px;
+  font-size: 11px;
+  color: #888;
+  text-align: center;
+  width: 100%;
+  line-height: 1.8;
+  direction: rtl;
+}
+
+.takanonLink {
+  font-size: 12px;
+  color: #888;
+  text-decoration: none;
+  padding: 4px 8px;
+  border-radius: 3px;
+  border: 1px solid #333;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.takanonLink:hover {
+  color: #ccc;
+  border-color: #555;
+}
+
+.sidebarFooterLink {
+  color: #60a5fa;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.sidebarFooterLink:hover {
+  text-decoration: underline;
+}
+
+.sidebarFooterPhone {
+  color: #4ade80;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.sidebarFooterPhone:hover {
+  text-decoration: underline;
+}

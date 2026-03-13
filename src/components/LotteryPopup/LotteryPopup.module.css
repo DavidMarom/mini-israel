@@ -1,0 +1,64 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 20px;
+  padding: 32px 28px;
+  max-width: 360px;
+  width: 90%;
+  text-align: center;
+  direction: rtl;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+}
+
+.icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.title {
+  margin: 0 0 12px;
+  font-size: 20px;
+  color: #1a1a1a;
+}
+
+.body {
+  margin: 0 0 20px;
+  font-size: 15px;
+  color: #333;
+  line-height: 1.6;
+}
+
+.note {
+  font-size: 13px;
+  color: #666;
+}
+
+.waBtn {
+  display: inline-block;
+  background: #25D366;
+  color: #fff;
+  border-radius: 12px;
+  padding: 12px 28px;
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+  margin-bottom: 12px;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 13px;
+  cursor: pointer;
+  margin-top: 4px;
+}
