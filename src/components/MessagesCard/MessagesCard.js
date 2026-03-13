@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import styles from "./MessagesCard.module.css";
 import useUserStore from "../../store/useUserStore";
+import he from "../../lang/he";
 
 export default function MessagesCard({ user }) {
   const [messages, setMessages] = useState([]);
@@ -98,16 +99,16 @@ export default function MessagesCard({ user }) {
     <>
       <div className={styles.card} ref={cardRef}>
         <button className={styles.header} onClick={() => setExpanded((v) => !v)}>
-          <span>הודעות</span>
+          <span>{he.messagesTitle}</span>
           {unread > 0 && <span className={styles.badge}>{unread}</span>}
           <span className={styles.chevron}>{expanded ? "▲" : "▼"}</span>
         </button>
 
         {expanded && (
           <div className={styles.list}>
-            {loading && <p className={styles.empty}>טוען...</p>}
+            {loading && <p className={styles.empty}>{he.loading}</p>}
             {!loading && messages.length === 0 && (
-              <p className={styles.empty}>אין הודעות</p>
+              <p className={styles.empty}>{he.messagesEmpty}</p>
             )}
             {!loading &&
               messages.map((msg) => (
@@ -118,9 +119,9 @@ export default function MessagesCard({ user }) {
                       <button
                         className={styles.replyBtn}
                         onClick={() => { scrollSidebarToTop(); setReplyTo({ fromUid: msg.fromUid, fromName: msg.fromName }); setReplyText(""); }}
-                        aria-label="השב להודעה"
+                        aria-label={he.messagesReplyAriaLabel}
                       >↩</button>
-                      <button className={styles.deleteBtn} onClick={() => handleDelete(msg._id)} aria-label="מחק הודעה">🗑</button>
+                      <button className={styles.deleteBtn} onClick={() => handleDelete(msg._id)} aria-label={he.messagesDeleteAriaLabel}>🗑</button>
                     </div>
                   </div>
                   <p className={styles.text}>{msg.text}</p>
@@ -141,10 +142,10 @@ export default function MessagesCard({ user }) {
       {replyTo && (
         <div className={styles.replyBackdrop} onClick={() => { setReplyTo(null); setReplyItemIndex(null); }}>
           <div className={styles.replyModal} onClick={(e) => e.stopPropagation()}>
-            <p className={styles.replyTitle}>השב ל{replyTo.fromName}</p>
+            <p className={styles.replyTitle}>{he.messagesReplyTo(replyTo.fromName)}</p>
             {user?.inventory?.length > 0 && (
               <div>
-                <p className={styles.replyLabel}>שלח פריט (אופציונלי):</p>
+                <p className={styles.replyLabel}>{he.messagesSendItem}</p>
                 <div className={styles.replyInventoryGrid}>
                   {user.inventory.map((item, i) => (
                     <button
@@ -163,14 +164,14 @@ export default function MessagesCard({ user }) {
               className={styles.replyTextarea}
               value={replyText}
               onChange={(e) => setReplyText(e.target.value)}
-              placeholder={replyItemIndex !== null ? "הוסף הודעה (אופציונלי)..." : "כתוב תשובה..."}
+              placeholder={replyItemIndex !== null ? he.messagesAddMessageOptional : he.messagesWriteReply}
               rows={3}
             />
             <div className={styles.replyActions}>
               <button className={styles.replySend} onClick={handleSendReply} disabled={replySending || (replyItemIndex === null && !replyText.trim())}>
-                {replySending ? "שולח..." : "שלח"}
+                {replySending ? he.messagesReplySending : he.messagesReplySend}
               </button>
-              <button className={styles.replyCancel} onClick={() => { setReplyTo(null); setReplyItemIndex(null); }}>ביטול</button>
+              <button className={styles.replyCancel} onClick={() => { setReplyTo(null); setReplyItemIndex(null); }}>{he.messagesReplyCancel}</button>
             </div>
           </div>
         </div>

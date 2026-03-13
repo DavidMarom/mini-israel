@@ -1,11 +1,12 @@
 import styles from "./MobilePortraitOverlay.module.css";
+import he from "../../lang/he";
 
 export default function MobilePortraitOverlay({ show }) {
   if (!show) return null;
 
   return (
     <div className={styles.overlay}>
-      סובב את המכשיר לאופק כדי לשחק במיני ישראל
+      {he.mobilePortraitMessage}
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import styles from "./Sidebar.module.css";
 import { AuthCard, MessagesCard, StarHouseBanner, SiteHeader, SidebarFooter } from "../index";
+import he from "../../lang/he";
 
 export default function Sidebar({
   isOpen,
@@ -33,7 +34,7 @@ export default function Sidebar({
       <button
         className={`${styles.sidebarToggle}${isOpen ? ` ${styles.sidebarToggleHidden}` : ""}`}
         onClick={onOpen}
-        aria-label="פתח תפריט"
+        aria-label={he.sidebarOpenMenu}
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <rect x="3" y="3" width="7" height="18" rx="1" />
@@ -44,7 +45,7 @@ export default function Sidebar({
       {isOpen && <div className={styles.sidebarBackdrop} onClick={onClose} />}
 
       <div className={`${styles.overlay} ${isOpen ? styles.overlayOpen : ""}`}>
-        <button className={styles.sidebarClose} onClick={onClose} aria-label="סגור תפריט">
+        <button className={styles.sidebarClose} onClick={onClose} aria-label={he.sidebarCloseMenu}>
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M18 6L6 18M6 6l12 12" />
           </svg>

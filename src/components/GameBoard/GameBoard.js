@@ -5,6 +5,7 @@ import styles from "./GameBoard.module.css";
 import useUserStore from "../../store/useUserStore";
 import TRIVIA_QUESTIONS from "../../data/triviaQuestions";
 import { fireConfetti } from "../../utils/confetti";
+import he from "../../lang/he";
 
 const ROWS = 230;
 const COLS = 15;
@@ -155,9 +156,9 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
   const handleCashout = async () => {
     setCashoutError("");
     const coins = Number(cashoutAmount);
-    if (!cashoutPhone.trim()) { setCashoutError("יש להזין מספר טלפון"); return; }
-    if (!coins || coins < 1000) { setCashoutError("מינימום 1000 מטבעות"); return; }
-    if (!user || (user.money ?? 0) < coins) { setCashoutError("אין מספיק מטבעות"); return; }
+    if (!cashoutPhone.trim()) { setCashoutError(he.cashoutMissingPhone); return; }
+    if (!coins || coins < 1000) { setCashoutError(he.cashoutMinimum); return; }
+    if (!user || (user.money ?? 0) < coins) { setCashoutError(he.cashoutInsufficientFunds); return; }
     setCashoutSending(true);
     try {
       const res = await fetch("/api/cashout", {
@@ -170,10 +171,10 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
         setCashoutDone(true);
         setUser((prev) => ({ ...prev, money: (prev?.money ?? 0) - coins }));
       } else {
-        setCashoutError(data.error || "שגיאה, נסה שוב");
+        setCashoutError(data.error || he.cashoutGenericError);
       }
     } catch (e) {
-      setCashoutError("שגיאה, נסה שוב");
+      setCashoutError(he.cashoutGenericError);
     } finally {
       setCashoutSending(false);
     }
@@ -306,7 +307,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       });
       const data = await res.json();
       if (!res.ok) {
-        alert(data.error === "Insufficient funds" ? "אין מספיק מטבעות" : "שגיאה, נסה שוב");
+        alert(data.error === "Insufficient funds" ? he.powerPlantInsufficientFunds : he.error);
         return;
       }
       setUser((prev) => ({ ...prev, money: data.money, powerBoostExpiry: data.powerBoostExpiry }));
@@ -345,13 +346,13 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
 
     // Check conditions before calling API
     if ((user.money || 0) < cost) {
-      setFarmUpgradeMsg("אין מספיק מטבעות לשדרוג");
+      setFarmUpgradeMsg(he.farmInsufficientFunds);
       return;
     }
     if (currentLevel === 1) {
       const friendShirts = (user.inventory || []).filter((i) => i.id === "shirt" && i.fromFriend);
       if (friendShirts.length < 2) {
-        setFarmUpgradeMsg("לשדרוג ראשון נדרשות לפחות 2 חולצות שקיבלת מחברים");
+        setFarmUpgradeMsg(he.farmNeedShirts);
         return;
       }
     }
@@ -367,9 +368,9 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       const data = await res.json();
       if (!res.ok) {
         setFarmUpgradeMsg(
-          data.error === "Insufficient funds" ? "אין מספיק מטבעות לשדרוג" :
-          data.error === "Need friend shirts" ? "לשדרוג ראשון נדרשות לפחות 2 חולצות שקיבלת מחברים" :
-          "שגיאה, נסה שוב"
+          data.error === "Insufficient funds" ? he.farmInsufficientFunds :
+          data.error === "Need friend shirts" ? he.farmNeedShirts :
+          he.farmUpgradeError
         );
         return;
       }
@@ -392,7 +393,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
     if (currentLevel >= 5) return;
     const req = HOUSE_UPGRADE_COSTS[currentLevel + 1];
     if ((user.money || 0) < req.cost) {
-      setHouseUpgradeMsg("אין מספיק מטבעות לשדרוג");
+      setHouseUpgradeMsg(he.houseInsufficientFunds);
       return;
     }
     for (const { id, count } of req.friendItems) {
@@ -413,10 +414,10 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       const data = await res.json();
       if (!res.ok) {
         setHouseUpgradeMsg(
-          data.error === "Insufficient funds" ? "אין מספיק מטבעות לשדרוג" :
-          data.error === "Max level reached" ? "הבית כבר ברמה המקסימלית" :
-          data.error?.startsWith("Need friend") ? `נדרשים פריטים מחברים` :
-          "שגיאה, נסה שוב"
+          data.error === "Insufficient funds" ? he.houseInsufficientFunds :
+          data.error === "Max level reached" ? he.houseMaxLevel :
+          data.error?.startsWith("Need friend") ? he.houseFriendItemsRequired :
+          he.houseUpgradeError
         );
         return;
       }
@@ -456,10 +457,10 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
     if (!user || ccBuying) return;
     const ownerUid = user.firebaseUid || user.uid;
     const houseLevel = showHouseModal?.cell?.houseLevel || 1;
-    if (houseLevel < 3) { setCCMsg("נדרש בית ברמה 3 לפחות"); return; }
-    if ((user.money || 0) < 600) { setCCMsg("אין מספיק מטבעות"); return; }
+    if (houseLevel < 3) { setCCMsg(he.houseNeedLevel3); return; }
+    if ((user.money || 0) < 600) { setCCMsg(he.houseInsufficientFundsCC); return; }
     const friendFlags = (user.inventory || []).filter((i) => i.id === "flag" && i.fromFriend);
-    if (friendFlags.length < 2) { setCCMsg("נדרשים 2 דגלים שקיבלת מחברים"); return; }
+    if (friendFlags.length < 2) { setCCMsg(he.houseCCNeedFlags); return; }
     setCCMsg(null);
     setCCBuying(true);
     try {
@@ -471,11 +472,11 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       const data = await res.json();
       if (!res.ok) {
         setCCMsg(
-          data.error === "Insufficient funds" ? "אין מספיק מטבעות" :
-          data.error === "House level 3 required" ? "נדרש בית ברמה 3 לפחות" :
-          data.error === "Already has community center" ? "כבר יש לך מרכז קהילתי" :
-          data.error?.startsWith("Need friend") ? "נדרשים 2 דגלים מחברים" :
-          "שגיאה, נסה שוב"
+          data.error === "Insufficient funds" ? he.houseInsufficientFundsCC :
+          data.error === "House level 3 required" ? he.houseNeedLevel3 :
+          data.error === "Already has community center" ? he.houseCCAlreadyHas :
+          data.error?.startsWith("Need friend") ? he.houseCCNeedFlagsFromFriends :
+          he.houseCCError
         );
         return;
       }
@@ -507,7 +508,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
     if (currentLevel >= 5) return;
     const req = CC_UPGRADE_COSTS[currentLevel + 1];
     if ((user.money || 0) < req.cost) {
-      setCCMsg("אין מספיק מטבעות לשדרוג");
+      setCCMsg(he.ccInsufficientFunds);
       return;
     }
     for (const { id, count } of req.friendItems) {
@@ -528,9 +529,9 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       const data = await res.json();
       if (!res.ok) {
         setCCMsg(
-          data.error === "Insufficient funds" ? "אין מספיק מטבעות לשדרוג" :
-          data.error === "Max level reached" ? "המרכז כבר ברמה המקסימלית" :
-          "שגיאה, נסה שוב"
+          data.error === "Insufficient funds" ? he.ccInsufficientFunds :
+          data.error === "Max level reached" ? he.ccMaxLevel :
+          he.ccUpgradeError
         );
         return;
       }
@@ -573,8 +574,8 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
   };
 
   const ITEM_NAMES = {
-    flower: "פרחים", falafel: "פלאפל", flag: "דגלים",
-    shirt: "חולצות", headphones: "אוזניות", pc: "מחשבים", bike: "אופניים",
+    flower: he.itemFlowers, falafel: he.itemFalafel, flag: he.itemFlags,
+    shirt: he.itemShirts, headphones: he.itemHeadphones, pc: he.itemPCs, bike: he.itemBikes,
   };
 
   const HOUSE_UPGRADE_COSTS = {
@@ -600,13 +601,13 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
   };
 
   const SHOP_ITEMS = [
-    { id: "flower",      emoji: "🌸", name: "פרח",         price: 10,  sellPrice: 7   },
-    { id: "falafel",     emoji: "🧆", name: "פלאפל",       price: 25,  sellPrice: 17  },
-    { id: "flag",        emoji: "🇮🇱", name: "דגל ישראל",  price: 10,  sellPrice: 7   },
-    { id: "bike",        img: "/assets/items/bike.png",        name: "אופניים",    price: 80,  sellPrice: 55  },
-    { id: "headphones",  img: "/assets/items/headphones.png",  name: "אוזניות",    price: 50,  sellPrice: 35  },
-    { id: "pc",          img: "/assets/items/pc.png",          name: "מחשב",       price: 120, sellPrice: 85  },
-    { id: "shirt",       img: "/assets/items/shirt.png",       name: "חולצה",      price: 30,  sellPrice: 20  },
+    { id: "flower",      emoji: "🌸", name: he.shopItemFlower,      price: 10,  sellPrice: 7   },
+    { id: "falafel",     emoji: "🧆", name: he.shopItemFalafel,      price: 25,  sellPrice: 17  },
+    { id: "flag",        emoji: "🇮🇱", name: he.shopItemFlag,        price: 10,  sellPrice: 7   },
+    { id: "bike",        img: "/assets/items/bike.png",        name: he.shopItemBike,        price: 80,  sellPrice: 55  },
+    { id: "headphones",  img: "/assets/items/headphones.png",  name: he.shopItemHeadphones,  price: 50,  sellPrice: 35  },
+    { id: "pc",          img: "/assets/items/pc.png",          name: he.shopItemPC,          price: 120, sellPrice: 85  },
+    { id: "shirt",       img: "/assets/items/shirt.png",       name: he.shopItemShirt,       price: 30,  sellPrice: 20  },
   ];
   const DEFAULT_SELL_PRICE = 5;
 
@@ -756,7 +757,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
           setDonationCooldown(true);
           return;
         }
-        alert(data.error === "Insufficient funds" ? "אין מספיק מטבעות לתרומה" : "שגיאה, נסה שוב");
+        alert(data.error === "Insufficient funds" ? he.yadSaraInsufficientFunds : he.error);
         return;
       }
       setUser((prev) => ({ ...prev, money: data.money }));
@@ -783,7 +784,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
         setUser((prev) => ({ ...prev, money: data.money, inventory: data.inventory }));
         fireConfetti();
       } else {
-        alert(data.error || "שגיאה, נסה שוב");
+        alert(data.error || he.error);
       }
     } catch (e) {
       console.error(e);
@@ -806,7 +807,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       });
       const data = await res.json();
       if (!res.ok) {
-        alert(data.error === "Insufficient funds" ? "אין מספיק מטבעות" : "שגיאה, נסה שוב");
+        alert(data.error === "Insufficient funds" ? he.insufficientFunds : he.error);
         return;
       }
       setUser((prev) => ({ ...prev, money: data.money, inventory: data.inventory }));
@@ -833,7 +834,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       });
       const data = await res.json();
       if (!res.ok) {
-        alert(data.error === "Insufficient funds" ? "אין מספיק כסף" : "שגיאה, נסה שוב");
+        alert(data.error === "Insufficient funds" ? he.insufficientMoney : he.error);
         return;
       }
       setUser((prev) => ({ ...prev, money: data.money, inventory: data.inventory }));
@@ -1035,7 +1036,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
         .then((r) => r.json())
         .then((data) => {
           if (data.error === "Treasure already claimed") {
-            alert("מישהו אחר כבר מצא את האוצר!");
+            alert(he.treasureAlreadyClaimed);
             return;
           }
           if (data.ok) {
@@ -1243,7 +1244,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       });
       const data = await res.json();
       if (!res.ok) {
-        alert(data.error === "Insufficient funds" ? "אין מספיק כסף" : "שגיאה, נסה שוב");
+        alert(data.error === "Insufficient funds" ? he.insufficientMoney : he.error);
         return;
       }
       if (typeof data.money === "number") {
@@ -1254,7 +1255,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       setShowAdPopup(false);
     } catch (err) {
       console.error(err);
-      alert("שגיאה, נסה שוב");
+      alert(he.error);
     } finally {
       setAdSubmitting(false);
     }
@@ -1265,7 +1266,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       {onlineCount !== null && (
         <div className={styles.onlineLabel}>
           <span className={styles.onlineDot} />
-          מחוברים כרגע: <strong>{onlineCount}</strong>
+          {he.onlineNow} <strong>{onlineCount}</strong>
         </div>
       )}
 
@@ -1375,7 +1376,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                   <span className={styles.apple}>🍊</span>
                 )}
                 {hasShirt && (
-                  <img src="/assets/items/shirt.png" alt="חולצה" className={styles.tileItemImg} />
+                  <img src="/assets/items/shirt.png" alt={he.shirtAlt} className={styles.tileItemImg} />
                 )}
                 {hasPoop && (
                   <span className={styles.apple}>💩</span>
@@ -1387,7 +1388,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                   <div className={styles.houseWrapper}>
                     <img
                       src={isPoopHouse ? "/assets/poophouse.png" : (cell.houseImg || HOUSE_IMAGES[0])}
-                      alt={isPoopHouse ? "בית מלוכלך" : "בית ראשי"}
+                      alt={isPoopHouse ? he.dirtyHouseAlt : he.mainHouseAlt}
                       className={styles.mainHouse}
                       style={(cell.houseLevel || 1) >= 5 && !isPoopHouse ? { filter: "sepia(1) saturate(4) hue-rotate(10deg)" } : undefined}
                     />
@@ -1397,7 +1398,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                       </span>
                     )}
                     {isPoopHouse && cell.ownerUid === ownerUid && (
-                      <span className={styles.cleanHouseHint}>לחץ לניקוי 🧹</span>
+                      <span className={styles.cleanHouseHint}>{he.cleanHouseHint}</span>
                     )}
                     {isStarHouse && <span className={styles.starBadge}>⭐</span>}
                     {cell.ownerUid === ownerUid && (cell.houseLevel || 1) > 1 && (
@@ -1407,7 +1408,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                 )}
                 {hasCC && (
                   <div className={styles.ccWrapper}>
-                    <img src="/assets/community-center.png" alt="מרכז קהילתי" className={styles.mainHouse} />
+                    <img src="/assets/community-center.png" alt={he.communityCenter} className={styles.mainHouse} />
                     {cell.ownerUid === ownerUid && (cell.ccLevel || 1) > 1 && (
                       <span className={styles.farmLevelBadge}>L{cell.ccLevel}</span>
                     )}
@@ -1415,7 +1416,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                 )}
                 {hasFarm && (
                   <div className={styles.farmWrapper}>
-                    <img src="/assets/farm.png" alt="חווה" className={styles.mainHouse} />
+                    <img src="/assets/farm.png" alt={he.farmAlt} className={styles.mainHouse} />
                     {hasEgg && <span className={styles.eggBadge}>🥚</span>}
                     {cell.ownerUid === ownerUid && (cell.farmLevel || 1) > 1 && (
                       <span className={styles.farmLevelBadge}>L{cell.farmLevel}</span>
@@ -1430,7 +1431,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                     <div className={styles.houseWrapper}>
                       <img
                         src={HOUSE_IMAGES[0]}
-                        alt="מיקום בית ראשי"
+                        alt={he.mainHousePlacementAlt}
                         className={styles.mainHouse}
                       />
                     </div>
@@ -1454,7 +1455,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
           }}
           onClick={handleAzrieliClick}
         >
-          <img src="/assets/azrieli.png" alt="בניין אזריאלי" className={styles.azrieliBuilding} />
+          <img src="/assets/azrieli.png" alt={he.azrieliAlt} className={styles.azrieliBuilding} />
         </div>
 
         {/* Synagogue */}
@@ -1468,7 +1469,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
           }}
           onClick={handleSynagogueClick}
         >
-          <img src="/assets/synagogue.png" alt="בית כנסת" className={styles.azrieliBuilding} />
+          <img src="/assets/synagogue.png" alt={he.synagogueAlt} className={styles.azrieliBuilding} />
         </div>
 
         {/* Knesset */}
@@ -1482,7 +1483,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
           }}
           onClick={() => setShowKnesset(true)}
         >
-          <img src="/assets/knesset.png" alt="הכנסת" className={styles.azrieliBuilding} />
+          <img src="/assets/knesset.png" alt={he.knessetAlt} className={styles.azrieliBuilding} />
         </div>
 
         {/* Leaderboard Building */}
@@ -1497,7 +1498,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
           onClick={handleLeaderboardClick}
         >
           <span className={styles.leaderboardBuildingIcon}>🏆</span>
-          <span className={styles.leaderboardBuildingLabel}>מצעד העשירים</span>
+          <span className={styles.leaderboardBuildingLabel}>{he.leaderboardBuildingLabel}</span>
         </div>
 
         {/* Yad Sara Building */}
@@ -1512,7 +1513,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
             }}
             onClick={() => { setShowYadSara(true); setDonationDone(false); setDonationCooldown(false); }}
           >
-            <img src="/assets/yad-sara.jpg" alt="יד שרה" className={styles.yadSaraImg} />
+            <img src="/assets/yad-sara.jpg" alt={he.yadSaraAlt} className={styles.yadSaraImg} />
           </div>
         )}
 
@@ -1528,7 +1529,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
           onClick={openTrivia}
         >
           <span className={styles.triviaBuildingIcon}>🧠</span>
-          <span className={styles.triviaBuildingLabel}>טריוויה</span>
+          <span className={styles.triviaBuildingLabel}>{he.triviaBuildingLabel}</span>
         </div>
 
         {/* Camera Widget */}
@@ -1543,11 +1544,11 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
           onClick={() => setShowCameraPopup(true)}
         >
           {cameraPhoto && (
-            <img src={cameraPhoto} alt="תמונה שלי" className={styles.cameraPhoto} />
+            <img src={cameraPhoto} alt={he.cameraPhotoAlt} className={styles.cameraPhoto} />
           )}
           <div className={`${styles.cameraPlaceholder} ${cameraPhoto ? styles.cameraPlaceholderOverlay : ""}`}>
             <span className={styles.cameraIcon}>📷</span>
-            {!cameraPhoto && <span className={styles.cameraLabel}>צלם אותי</span>}
+            {!cameraPhoto && <span className={styles.cameraLabel}>{he.cameraTakePhoto}</span>}
           </div>
         </div>
         <div
@@ -1558,7 +1559,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
             width: CAMERA_W * TILE_SIZE,
           }}
         >
-          צלמו את עצמכם!
+          {he.cameraLabel}
         </div>
 
         {/* Cashout Building */}
@@ -1573,7 +1574,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
           onClick={() => { setShowCashout(true); setCashoutDone(false); setCashoutError(""); }}
         >
           <span className={styles.cashoutBuildingIcon}>💵</span>
-          <span className={styles.cashoutBuildingLabel}>המר לכסף אמיתי!!</span>
+          <span className={styles.cashoutBuildingLabel}>{he.cashoutBuildingLabel}</span>
         </div>
 
         {/* Godzilla */}
@@ -1591,7 +1592,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
           }}
           onClick={() => setShowGodzilla(true)}
         >
-          <img src="/assets/godzilla.png" alt="גודזילה" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+          <img src="/assets/godzilla.png" alt={he.godzillaAlt} style={{ width: "100%", height: "100%", objectFit: "contain" }} />
         </div>
 
         {/* Power Plant Building */}
@@ -1606,7 +1607,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
           }}
           onClick={handlePowerPlantClick}
         >
-          <img src="/assets/electric.png" alt="תחנת כוח" className={styles.azrieliBuilding} />
+          <img src="/assets/electric.png" alt={he.powerPlantAlt} className={styles.azrieliBuilding} />
         </div>
 
         {/* Candle Building */}
@@ -1622,7 +1623,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
           }}
           onClick={() => { setShowCandleShop(true); setCandleDone(false); }}
         >
-          <img src="/assets/candle-building.png" alt="בניין הנר" className={styles.azrieliBuilding} />
+          <img src="/assets/candle-building.png" alt={he.candleBuildingAlt} className={styles.azrieliBuilding} />
         </div>
 
         {/* Poll Widget */}
@@ -1644,18 +1645,18 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                 <div
                   className={`${styles.pollWidgetPlayer} ${pollUserVote === "messi" ? styles.pollWidgetVoted : ""}`}
                   onClick={() => handlePollVote("messi")}
-                  title="הצבע למסי"
+                  title={he.pollVoteMessi}
                 >
-                  <img src="/assets/messi.png" alt="מסי" className={styles.pollWidgetImg} />
+                  <img src="/assets/messi.png" alt={he.pollMessiAlt} className={styles.pollWidgetImg} />
                   {pollUserVote === "messi" && <span className={styles.pollWidgetCheck}>✓</span>}
                 </div>
                 <span className={styles.pollWidgetVs}>VS</span>
                 <div
                   className={`${styles.pollWidgetPlayer} ${pollUserVote === "ronaldo" ? styles.pollWidgetVoted : ""}`}
                   onClick={() => handlePollVote("ronaldo")}
-                  title="הצבע לרונאלדו"
+                  title={he.pollVoteRonaldo}
                 >
-                  <img src="/assets/ronaldo.png" alt="רונאלדו" className={styles.pollWidgetImg} />
+                  <img src="/assets/ronaldo.png" alt={he.pollRonaldoAlt} className={styles.pollWidgetImg} />
                   {pollUserVote === "ronaldo" && <span className={styles.pollWidgetCheck}>✓</span>}
                 </div>
               </div>
@@ -1685,7 +1686,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
               }}
             >
               <span className={styles.neighborhoodName}>{nbhd.name}</span>
-              <span className={styles.neighborhoodCount}>{nbhd.memberCount} שכנים</span>
+              <span className={styles.neighborhoodCount}>{he.neighborhoodCount(nbhd.memberCount)}</span>
               {isMyNbhd && !claimedToday && (
                 <button
                   className={styles.neighborhoodClaimBtn}
@@ -1696,7 +1697,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                 </button>
               )}
               {isMyNbhd && claimedToday && (
-                <span className={styles.neighborhoodClaimed}>✓ נאסף היום</span>
+                <span className={styles.neighborhoodClaimed}>{he.neighborhoodCollected}</span>
               )}
             </div>
           );
@@ -1712,7 +1713,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
             height: EILAT_H * TILE_SIZE,
           }}
         >
-          <img src="/assets/eilat.png" alt="אילת" className={styles.azrieliBuilding} />
+          <img src="/assets/eilat.png" alt={he.eilatAlt} className={styles.azrieliBuilding} />
         </div>
 
         {/* Advertisement Board */}
@@ -1729,7 +1730,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
             <button
               className={styles.adAddBtn}
               onClick={() => setShowAdPopup(true)}
-              title="הוסף פרסומת"
+              title={he.adBoardAddTitle}
             >
               +
             </button>
@@ -1738,7 +1739,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
             {ads.length > 0 ? (
               <span className={styles.adText}>{renderWithLinks(ads[adIndex]?.text ?? "")}</span>
             ) : (
-              <span className={styles.adEmptyText}>פרסם כאן!</span>
+              <span className={styles.adEmptyText}>{he.adBoardEmpty}</span>
             )}
           </div>
         </div>
@@ -1748,30 +1749,30 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       {showAdPopup && (
         <div className={styles.adPopupBackdrop}>
           <div className={styles.adPopupModal}>
-            <p className={styles.adPopupTitle}>הוסף פרסומת</p>
+            <p className={styles.adPopupTitle}>{he.adBoardAddPopupTitle}</p>
             <textarea
               className={styles.adPopupTextarea}
               value={adText}
               onChange={(e) => setAdText(e.target.value)}
-              placeholder="טקסט הפרסומת..."
+              placeholder={he.adBoardPlaceholder}
               rows={3}
               maxLength={120}
             />
-            <p className={styles.adPopupInfo}>עולה 100 מטבעות. הפרסום ישאר בלוח 5 ימים.</p>
-            <p className={styles.adPopupInfo}>מותר לפרסם הכל, גם קישורים. אנא שימרו על שפה נאותה.</p>
+            <p className={styles.adPopupInfo}>{he.adBoardInfo1}</p>
+            <p className={styles.adPopupInfo}>{he.adBoardInfo2}</p>
             <div className={styles.adPopupActions}>
               <button
                 className={styles.adPopupSubmit}
                 onClick={handleSubmitAd}
                 disabled={adSubmitting || !adText.trim()}
               >
-                {adSubmitting ? "שולח..." : "פרסם"}
+                {adSubmitting ? he.adBoardSubmitting : he.adBoardSubmit}
               </button>
               <button
                 className={styles.adPopupCancel}
                 onClick={() => { setShowAdPopup(false); setAdText(""); }}
               >
-                ביטול
+                {he.adBoardCancel}
               </button>
             </div>
           </div>
@@ -1782,8 +1783,8 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       {showAzrieliShop && (
         <div className={styles.shopBackdrop} onClick={() => setShowAzrieliShop(false)}>
           <div className={styles.shopModal} onClick={(e) => e.stopPropagation()}>
-            <p className={styles.shopTitle}>🏬 קניון אזריאלי</p>
-            <p className={styles.shopBalance}>יתרה: {user?.money ?? 0} 🪙</p>
+            <p className={styles.shopTitle}>{he.azrieliShopTitle}</p>
+            <p className={styles.shopBalance}>{he.azrieliShopBalance(user?.money ?? 0)}</p>
             <div className={styles.shopItems}>
               {SHOP_ITEMS.map((item) => (
                 <div key={item.id} className={styles.shopItem}>
@@ -1802,7 +1803,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                 </div>
               ))}
             </div>
-            <button className={styles.shopCloseBtn} onClick={() => setShowAzrieliShop(false)}>סגור</button>
+            <button className={styles.shopCloseBtn} onClick={() => setShowAzrieliShop(false)}>{he.azrieliShopClose}</button>
           </div>
         </div>
       )}
@@ -1811,27 +1812,27 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       {showCandleShop && (
         <div className={styles.shopBackdrop} onClick={() => setShowCandleShop(false)}>
           <div className={styles.candleModal} onClick={(e) => e.stopPropagation()}>
-            <p className={styles.candleTitle}>🕯️ חנות הנרות</p>
-            <p className={styles.candleSubtitle}>יום האשה הבינלאומי</p>
+            <p className={styles.candleTitle}>{he.candleShopTitle}</p>
+            <p className={styles.candleSubtitle}>{he.candleShopSubtitle}</p>
             {candleDone ? (
               <>
-                <p className={styles.candleThanks}>הנר נרכש! 🕯️✨<br />חג האשה שמח!</p>
-                <button className={styles.shopCloseBtn} onClick={() => setShowCandleShop(false)}>סגור</button>
+                <p className={styles.candleThanks}>{he.candleShopThanks}</p>
+                <button className={styles.shopCloseBtn} onClick={() => setShowCandleShop(false)}>{he.candleShopClose}</button>
               </>
             ) : (
               <>
-                <img src="/assets/candle-building.png" alt="נר" className={styles.candleImg} />
-                <p className={styles.candleDesc}>רכוש נר לכבוד יום האשה הבינלאומי 🌸</p>
-                <p className={styles.candleBalance}>יתרתך: {user?.money ?? 0} מטבעות</p>
+                <img src="/assets/candle-building.png" alt={he.candleAlt} className={styles.candleImg} />
+                <p className={styles.candleDesc}>{he.candleDesc}</p>
+                <p className={styles.candleBalance}>{he.candleBalance(user?.money ?? 0)}</p>
                 <div className={styles.candleActions}>
                   <button
                     className={styles.candleBuyBtn}
                     onClick={handleBuyCandle}
                     disabled={candleBuying || !user || (user?.money ?? 0) < 40}
                   >
-                    {candleBuying ? "מעבד..." : "רכוש נר - 40 🪙"}
+                    {candleBuying ? he.candleBuying : he.candleBuy}
                   </button>
-                  <button className={styles.shopCloseBtn} onClick={() => setShowCandleShop(false)}>סגור</button>
+                  <button className={styles.shopCloseBtn} onClick={() => setShowCandleShop(false)}>{he.candleShopClose}</button>
                 </div>
               </>
             )}
@@ -1843,11 +1844,11 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       {showCameraPopup && (
         <div className={styles.cameraBackdrop} onClick={handleCloseCameraPopup}>
           <div className={styles.cameraModal} onClick={(e) => e.stopPropagation()}>
-            <p className={styles.cameraTitle}>צלם תמונה</p>
+            <p className={styles.cameraTitle}>{he.cameraCaptureTitle}</p>
             <div className={styles.cameraBody}>
               <div className={styles.cameraActions}>
-                <button className={styles.cameraSnapBtn} onClick={handleCapture}>צלם</button>
-                <button className={styles.cameraCancelBtn} onClick={handleCloseCameraPopup}>ביטול</button>
+                <button className={styles.cameraSnapBtn} onClick={handleCapture}>{he.cameraCaptureBtn}</button>
+                <button className={styles.cameraCancelBtn} onClick={handleCloseCameraPopup}>{he.cameraCancelBtn}</button>
               </div>
               <video ref={videoRef} autoPlay playsInline className={styles.cameraVideo} />
             </div>
@@ -1860,9 +1861,9 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
         <div className={styles.treasureToast}>
           <span className={styles.treasureToastGem}>💎</span>
           <div className={styles.treasureToastText}>
-            <span className={styles.treasureToastName}>{treasureWinnerToast.name} מצא את האוצר!</span>
+            <span className={styles.treasureToastName}>{he.treasureFound(treasureWinnerToast.name)}</span>
             {treasureWinnerToast.sponsor && (
-              <span className={styles.treasureToastSponsor}>בחסות {treasureWinnerToast.sponsor}</span>
+              <span className={styles.treasureToastSponsor}>{he.treasureSponsor(treasureWinnerToast.sponsor)}</span>
             )}
           </div>
           <button className={styles.treasureToastClose} onClick={() => { dismissedTreasureRef.current = treasureWinnerToast.claimedAt; setTreasureWinnerToast(null); }}>✕</button>
@@ -1873,9 +1874,9 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       {showLeaderboard && (
         <div className={styles.shopBackdrop} onClick={() => setShowLeaderboard(false)}>
           <div className={styles.shopModal} onClick={(e) => e.stopPropagation()}>
-            <p className={styles.shopTitle}>🏆 מצעד העשירים</p>
+            <p className={styles.shopTitle}>{he.leaderboardTitle}</p>
             {leaderboardLoading ? (
-              <p className={styles.shopBalance}>טוען...</p>
+              <p className={styles.shopBalance}>{he.leaderboardLoading}</p>
             ) : (
               <div className={styles.leaderboardList}>
                 {leaderboard.map((u, i) => {
@@ -1884,14 +1885,14 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                   return (
                     <div key={u.uid || i} className={`${styles.leaderboardRow} ${isMe ? styles.leaderboardRowMe : ""}`}>
                       <span className={styles.leaderboardRank}>{medals[i] || `#${i + 1}`}</span>
-                      <span className={styles.leaderboardName}>{u.name || "אנונימי"}</span>
+                      <span className={styles.leaderboardName}>{u.name || he.leaderboardAnonymous}</span>
                       <span className={styles.leaderboardMoney}>{u.money ?? 0} ₪</span>
                     </div>
                   );
                 })}
               </div>
             )}
-            <button className={styles.shopCloseBtn} onClick={() => setShowLeaderboard(false)}>סגור</button>
+            <button className={styles.shopCloseBtn} onClick={() => setShowLeaderboard(false)}>{he.leaderboardClose}</button>
           </div>
         </div>
       )}
@@ -1900,12 +1901,12 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       {showKnesset && (
         <div className={styles.shopBackdrop} onClick={() => setShowKnesset(false)}>
           <div className={styles.shopModal} onClick={(e) => e.stopPropagation()}>
-            <p className={styles.shopTitle}>🏛️ הכנסת</p>
-            <p className={styles.shopBalance}>יתרה שלך: {user?.money ?? 0} 🪙</p>
+            <p className={styles.shopTitle}>{he.knessetTitle}</p>
+            <p className={styles.shopBalance}>{he.knessetBalance(user?.money ?? 0)}</p>
             {!user ? (
-              <p className={styles.knessetEmpty}>התחבר כדי למכור פריטים</p>
+              <p className={styles.knessetEmpty}>{he.knessetNotLoggedIn}</p>
             ) : !user.inventory?.length ? (
-              <p className={styles.knessetEmpty}>אין לך פריטים למכירה.<br />קנה פריטים בקניון אזריאלי!</p>
+              <p className={styles.knessetEmpty}>{he.knessetNoItems}</p>
             ) : (
               <div className={styles.shopItems}>
                 {user.inventory.map((item, i) => {
@@ -1924,14 +1925,14 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                         onClick={() => handleSellItem(i)}
                         disabled={sellingItem !== null}
                       >
-                        {sellingItem === i ? <span className={styles.shopSpinner} /> : "מכור"}
+                        {sellingItem === i ? <span className={styles.shopSpinner} /> : he.knessetSell}
                       </button>
                     </div>
                   );
                 })}
               </div>
             )}
-            <button className={styles.shopCloseBtn} onClick={() => setShowKnesset(false)}>סגור</button>
+            <button className={styles.shopCloseBtn} onClick={() => setShowKnesset(false)}>{he.knessetClose}</button>
           </div>
         </div>
       )}
@@ -1940,31 +1941,31 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       {showYadSara && (
         <div className={styles.shopBackdrop} onClick={() => setShowYadSara(false)}>
           <div className={styles.yadSaraModal} onClick={(e) => e.stopPropagation()}>
-            <img src="/assets/yad-sara.jpg" alt="יד שרה" className={styles.yadSaraModalImg} />
-            <p className={styles.yadSaraTitle}>❤️ תרומה לעמותת יד שרה</p>
+            <img src="/assets/yad-sara.jpg" alt={he.yadSaraAlt} className={styles.yadSaraModalImg} />
+            <p className={styles.yadSaraTitle}>{he.yadSaraTitle}</p>
             {donationDone ? (
               <>
-                <p className={styles.yadSaraThanks}>תודה רבה על תרומתך! 🙏</p>
-                <button className={styles.shopCloseBtn} onClick={() => setShowYadSara(false)}>סגור</button>
+                <p className={styles.yadSaraThanks}>{he.yadSaraThanks}</p>
+                <button className={styles.shopCloseBtn} onClick={() => setShowYadSara(false)}>{he.yadSaraClose}</button>
               </>
             ) : donationCooldown ? (
               <>
-                <p className={styles.yadSaraMsg}>כבר תרמת השבוע — תודה! ניתן לתרום שוב בשבוע הבא 💙</p>
-                <button className={styles.shopCloseBtn} onClick={() => setShowYadSara(false)}>סגור</button>
+                <p className={styles.yadSaraMsg}>{he.yadSaraCooldown}</p>
+                <button className={styles.shopCloseBtn} onClick={() => setShowYadSara(false)}>{he.yadSaraClose}</button>
               </>
             ) : (
               <>
-                <p className={styles.yadSaraMsg}>בכל תרומה של 100 🪙 משחק, אנחנו נתרום ₪2 לעמותת יד שרה!</p>
-                <p className={styles.yadSaraBalance}>יתרתך: {user?.money ?? 0} מטבעות</p>
+                <p className={styles.yadSaraMsg}>{he.yadSaraMsg}</p>
+                <p className={styles.yadSaraBalance}>{he.yadSaraBalance(user?.money ?? 0)}</p>
                 <div className={styles.yadSaraActions}>
                   <button
                     className={styles.yadSaraDonateBtn}
                     onClick={handleDonate}
                     disabled={donating || !user || (user?.money ?? 0) < 100}
                   >
-                    {donating ? "שולח תרומה..." : "תרום 100 מטבעות"}
+                    {donating ? he.yadSaraDonating : he.yadSaraDonate}
                   </button>
-                  <button className={styles.shopCloseBtn} onClick={() => setShowYadSara(false)}>סגור</button>
+                  <button className={styles.shopCloseBtn} onClick={() => setShowYadSara(false)}>{he.yadSaraClose}</button>
                 </div>
               </>
             )}
@@ -1976,23 +1977,23 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       {showCashout && (
         <div className={styles.shopBackdrop} onClick={() => setShowCashout(false)}>
           <div className={styles.cashoutModal} onClick={(e) => e.stopPropagation()}>
-            <p className={styles.cashoutTitle}>💵 המר מטבעות לכסף אמיתי</p>
+            <p className={styles.cashoutTitle}>{he.cashoutTitle}</p>
             {cashoutDone ? (
               <>
-                <p className={styles.cashoutSuccess}>✅ הבקשה התקבלה! הכסף יועבר בביט בהקדם.</p>
-                <button className={styles.shopCloseBtn} onClick={() => setShowCashout(false)}>סגור</button>
+                <p className={styles.cashoutSuccess}>{he.cashoutSuccess}</p>
+                <button className={styles.shopCloseBtn} onClick={() => setShowCashout(false)}>{he.cashoutClose}</button>
               </>
             ) : (
               <>
                 <div className={styles.cashoutInfo}>
-                  <p>הכסף יעבור בביט למספר שתזינו</p>
-                  <p>על כל 200 מטבעות תקבלו 1 שקל אמיתי</p>
-                  <p>מינימום 1000 מטבעות משחק להעברה</p>
+                  <p>{he.cashoutInfoBit}</p>
+                  <p>{he.cashoutInfoRate}</p>
+                  <p>{he.cashoutInfoMin}</p>
                 </div>
-                <p className={styles.cashoutBalance}>יתרתך: <strong>{user?.money ?? 0}</strong> מטבעות</p>
+                <p className={styles.cashoutBalance}>{he.cashoutBalanceLabel} <strong>{user?.money ?? 0}</strong> {he.coins}</p>
                 <div className={styles.cashoutFields}>
                   <div className={styles.cashoutField}>
-                    <label>מספר טלפון לביט</label>
+                    <label>{he.cashoutPhoneLabel}</label>
                     <input
                       type="tel"
                       value={cashoutPhone}
@@ -2003,19 +2004,19 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                     />
                   </div>
                   <div className={styles.cashoutField}>
-                    <label>כמות מטבעות לפדיון</label>
+                    <label>{he.cashoutAmountLabel}</label>
                     <input
                       type="number"
                       value={cashoutAmount}
                       onChange={(e) => setCashoutAmount(e.target.value)}
-                      placeholder="מינימום 1000"
+                      placeholder={he.cashoutAmountPlaceholder}
                       className={styles.cashoutInput}
                       min={1000}
                     />
                   </div>
                 </div>
                 {cashoutAmount >= 1000 && (
-                  <p className={styles.cashoutCalc}>תקבל: ₪{Math.floor(Number(cashoutAmount) / 200)}</p>
+                  <p className={styles.cashoutCalc}>{he.cashoutCalc(cashoutAmount)}</p>
                 )}
                 {cashoutError && <p className={styles.cashoutError}>{cashoutError}</p>}
                 <div className={styles.cashoutActions}>
@@ -2024,9 +2025,9 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                     onClick={handleCashout}
                     disabled={cashoutSending || !user}
                   >
-                    {cashoutSending ? "שולח..." : "שלח בקשה"}
+                    {cashoutSending ? he.cashoutSending : he.cashoutSubmit}
                   </button>
-                  <button className={styles.shopCloseBtn} onClick={() => setShowCashout(false)}>סגור</button>
+                  <button className={styles.shopCloseBtn} onClick={() => setShowCashout(false)}>{he.cashoutClose}</button>
                 </div>
               </>
             )}
@@ -2039,8 +2040,8 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       {showTrivia && triviaQuestion && (
         <div className={styles.shopBackdrop} onClick={() => setShowTrivia(false)}>
           <div className={styles.triviaModal} onClick={(e) => e.stopPropagation()}>
-            <p className={styles.triviaTitle}>🧠 טריוויה</p>
-            <p className={styles.triviaLevel}>{triviaQuestion.hard ? "שאלה קשה - 20 מטבעות" : "שאלה קלה - 10 מטבעות"}</p>
+            <p className={styles.triviaTitle}>{he.triviaTitle}</p>
+            <p className={styles.triviaLevel}>{triviaQuestion.hard ? he.triviaLevelHard : he.triviaLevelEasy}</p>
             <p className={styles.triviaQuestion}>{triviaQuestion.q}</p>
             <div className={styles.triviaOptions}>
               {triviaQuestion.options.map((opt, i) => {
@@ -2065,15 +2066,15 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
               <div className={styles.triviaResult}>
                 {triviaCorrect ? (
                   <p className={styles.triviaResultCorrect}>
-                    ✅ נכון! +{triviaQuestion.hard ? 20 : 10} מטבעות{triviaAwarding ? " (מעדכן...)" : ""}
+                    {he.triviaCorrect(triviaQuestion.hard ? 20 : 10, triviaAwarding)}
                   </p>
                 ) : (
-                  <p className={styles.triviaResultWrong}>❌ לא נכון. התשובה הנכונה: {triviaQuestion.options[triviaQuestion.answer]}</p>
+                  <p className={styles.triviaResultWrong}>{he.triviaWrong(triviaQuestion.options[triviaQuestion.answer])}</p>
                 )}
-                <button className={styles.triviaNextBtn} onClick={openTrivia}>שאלה הבאה</button>
+                <button className={styles.triviaNextBtn} onClick={openTrivia}>{he.triviaNextQuestion}</button>
               </div>
             )}
-            <button className={styles.shopCloseBtn} onClick={() => setShowTrivia(false)}>סגור</button>
+            <button className={styles.shopCloseBtn} onClick={() => setShowTrivia(false)}>{he.triviaClose}</button>
           </div>
         </div>
       )}
@@ -2082,8 +2083,8 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       {showSynagogue && (
         <div className={styles.shopBackdrop} onClick={() => setShowSynagogue(false)}>
           <div className={styles.parashaModal} onClick={(e) => e.stopPropagation()}>
-            <p className={styles.parashaTitle}>🕍 פרשת השבוע</p>
-            {parashaLoading && <p className={styles.parashaLoading}>טוען...</p>}
+            <p className={styles.parashaTitle}>{he.synagogueTitle}</p>
+            {parashaLoading && <p className={styles.parashaLoading}>{he.synagogueLoading}</p>}
             {!parashaLoading && parasha && (
               <>
                 <p className={styles.parashaName}>{parasha.name}</p>
@@ -2102,9 +2103,9 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
               </>
             )}
             {!parashaLoading && !parasha && (
-              <p className={styles.parashaLoading}>לא נמצאה פרשה</p>
+              <p className={styles.parashaLoading}>{he.synagogueNotFound}</p>
             )}
-            <button className={styles.shopCloseBtn} onClick={() => setShowSynagogue(false)}>סגור</button>
+            <button className={styles.shopCloseBtn} onClick={() => setShowSynagogue(false)}>{he.synagogueClose}</button>
           </div>
         </div>
       )}
@@ -2113,17 +2114,17 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       {showFarmModal && (
         <div className={styles.shopBackdrop} onClick={() => { setShowFarmModal(null); setFarmUpgradeMsg(null); }}>
           <div className={styles.shopModal} onClick={(e) => e.stopPropagation()}>
-            <p className={styles.shopTitle}>🌾 החווה שלי</p>
-            <p className={styles.shopBalance}>יתרה: {user?.money ?? 0} 🪙</p>
+            <p className={styles.shopTitle}>{he.farmTitle}</p>
+            <p className={styles.shopBalance}>{he.farmBalance(user?.money ?? 0)}</p>
             <p style={{ margin: 0, fontSize: 14 }}>
-              רמה {showFarmModal.cell.farmLevel || 1} - {(showFarmModal.cell.farmLevel || 1) === 1 ? "20" : (showFarmModal.cell.farmLevel || 1) === 2 ? "40" : "80"} מטבעות לביצה
+              {he.farmLevel(showFarmModal.cell.farmLevel || 1, (showFarmModal.cell.farmLevel || 1) === 1 ? "20" : (showFarmModal.cell.farmLevel || 1) === 2 ? "40" : "80")}
             </p>
             {showFarmModal.cell.eggReady ? (
               <button className={styles.shopBuyBtn} onClick={handleFarmModalCollect} disabled={farmCollecting}>
-                {farmCollecting ? "אוסף..." : "🥚 אסוף ביצה"}
+                {farmCollecting ? he.farmCollecting : he.farmCollect}
               </button>
             ) : (
-              <p style={{ margin: 0, fontSize: 12, color: "#888" }}>הביצה הבאה תהיה מוכנה בשעה הקרובה</p>
+              <p style={{ margin: 0, fontSize: 12, color: "#888" }}>{he.farmNextEgg}</p>
             )}
             {(showFarmModal.cell.farmLevel || 1) < 3 ? (
               <>
@@ -2140,7 +2141,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                           onClick={trackWaClick}
                           style={{ color: "#25D366", textDecoration: "underline", cursor: "pointer" }}
                         >
-                          הזמן חברים
+                          {he.inviteFriends}
                         </a>
                       </>
                     )}
@@ -2152,14 +2153,14 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                   disabled={farmUpgrading}
                 >
                   {farmUpgrading
-                    ? "משדרג..."
-                    : `⬆️ שדרג לרמה ${(showFarmModal.cell.farmLevel || 1) + 1} – ${(showFarmModal.cell.farmLevel || 1) === 1 ? "600" : "1,200"} 🪙`}
+                    ? he.upgrading
+                    : he.farmUpgrade((showFarmModal.cell.farmLevel || 1) + 1, (showFarmModal.cell.farmLevel || 1) === 1 ? "600" : "1,200")}
                 </button>
               </>
             ) : (
-              <p style={{ margin: 0, fontSize: 12, color: "#4a7c3f", fontWeight: 600 }}>✅ חווה ברמה מקסימלית! (80 מטבעות לביצה)</p>
+              <p style={{ margin: 0, fontSize: 12, color: "#4a7c3f", fontWeight: 600 }}>{he.farmMaxLevel}</p>
             )}
-            <button className={styles.shopCloseBtn} onClick={() => { setShowFarmModal(null); setFarmUpgradeMsg(null); }}>סגור</button>
+            <button className={styles.shopCloseBtn} onClick={() => { setShowFarmModal(null); setFarmUpgradeMsg(null); }}>{he.farmClose}</button>
           </div>
         </div>
       )}
@@ -2168,10 +2169,10 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       {showHouseModal && (
         <div className={styles.shopBackdrop} onClick={() => { setShowHouseModal(null); setHouseUpgradeMsg(null); setCCMsg(null); }}>
           <div className={styles.shopModal} onClick={(e) => e.stopPropagation()}>
-            <p className={styles.shopTitle}>🏠 הבית שלי</p>
-            <p className={styles.shopBalance}>יתרה: {user?.money ?? 0} 🪙</p>
+            <p className={styles.shopTitle}>{he.houseTitle}</p>
+            <p className={styles.shopBalance}>{he.houseBalance(user?.money ?? 0)}</p>
             <div style={{ margin: "8px 0" }}>
-              <p style={{ margin: "0 0 6px 0", fontSize: 12, color: "#888" }}>עיצוב הבית:</p>
+              <p style={{ margin: "0 0 6px 0", fontSize: 12, color: "#888" }}>{he.houseSkinLabel}</p>
               <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
                 {HOUSE_IMAGES.map((img) => (
                   <button
@@ -2193,14 +2194,14 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
               </div>
             </div>
             <p style={{ margin: "4px 0", fontSize: 14 }}>
-              רמה {showHouseModal.cell.houseLevel || 1} מתוך 5
-              {" · "}בונוס: +{HOUSE_EGG_BONUS[showHouseModal.cell.houseLevel || 1]} מטבעות לביצה
+              {he.houseLevelOf5(showHouseModal.cell.houseLevel || 1)}
+              {" · "}{he.houseBonus(HOUSE_EGG_BONUS[showHouseModal.cell.houseLevel || 1])}
             </p>
             {(showHouseModal.cell.houseLevel || 1) < 5 && (() => {
               const req = HOUSE_UPGRADE_COSTS[(showHouseModal.cell.houseLevel || 1) + 1];
               return (
                 <p style={{ margin: "2px 0", fontSize: 11, color: "#888", direction: "rtl" }}>
-                  לרמה {(showHouseModal.cell.houseLevel || 1) + 1}: {req.cost} 🪙 +{" "}
+                  {he.houseRequirementsLine((showHouseModal.cell.houseLevel || 1) + 1, req.cost)}
                   {req.friendItems.map(({ id, count }) => `${count} ${ITEM_NAMES[id]} מחברים`).join(" + ")}
                 </p>
               );
@@ -2209,36 +2210,36 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
               <p style={{ margin: "4px 0", fontSize: 12, color: "#c0392b", direction: "rtl" }}>
                 {houseUpgradeMsg}
                 {houseUpgradeMsg.includes("חברים") && (
-                  <>{" "}<a href="https://wa.me/?text=%D7%91%D7%95%D7%90%D7%95%20%D7%9C%D7%A9%D7%97%D7%A7%20%D7%91%D7%9E%D7%99%D7%A0%D7%99%20%D7%99%D7%A9%D7%A8%D7%90%D7%9C%21%20https%3A%2F%2Fwww.mini-israel.com%2F" target="_blank" rel="noopener noreferrer" onClick={trackWaClick} style={{ color: "#25D366", textDecoration: "underline" }}>הזמן חברים</a></>
+                  <>{" "}<a href="https://wa.me/?text=%D7%91%D7%95%D7%90%D7%95%20%D7%9C%D7%A9%D7%97%D7%A7%20%D7%91%D7%9E%D7%99%D7%A0%D7%99%20%D7%99%D7%A9%D7%A8%D7%90%D7%9C%21%20https%3A%2F%2Fwww.mini-israel.com%2F" target="_blank" rel="noopener noreferrer" onClick={trackWaClick} style={{ color: "#25D366", textDecoration: "underline" }}>{he.inviteFriends}</a></>
                 )}
               </p>
             )}
             {(showHouseModal.cell.houseLevel || 1) < 5 ? (
               <button className={styles.shopBuyBtn} onClick={handleHouseUpgrade} disabled={houseUpgrading}>
-                {houseUpgrading ? "משדרג..." : `⬆️ שדרג לרמה ${(showHouseModal.cell.houseLevel || 1) + 1} – ${HOUSE_UPGRADE_COSTS[(showHouseModal.cell.houseLevel || 1) + 1].cost} 🪙`}
+                {houseUpgrading ? he.upgrading : he.houseUpgrade((showHouseModal.cell.houseLevel || 1) + 1, HOUSE_UPGRADE_COSTS[(showHouseModal.cell.houseLevel || 1) + 1].cost)}
               </button>
             ) : (
-              <p style={{ margin: 0, fontSize: 12, color: "#c8a200", fontWeight: 600 }}>✅ בית זהב! רמה מקסימלית (+35 מטבעות לביצה)</p>
+              <p style={{ margin: 0, fontSize: 12, color: "#c8a200", fontWeight: 600 }}>{he.houseGoldMax}</p>
             )}
             {(showHouseModal.cell.houseLevel || 1) >= 3 && !grid.flat().some((c) => c && c.building === "community-center" && c.ownerUid === (user?.firebaseUid || user?.uid)) && (
               <>
                 <hr style={{ margin: "10px 0", border: "none", borderTop: "1px solid #eee" }} />
-                <p style={{ margin: "4px 0", fontSize: 13, color: "#4a7c3f" }}>🏛️ מרכז קהילתי זמין לרכישה!</p>
-                <p style={{ margin: "2px 0", fontSize: 11, color: "#888", direction: "rtl" }}>600 🪙 + 2 דגלים מחברים</p>
+                <p style={{ margin: "4px 0", fontSize: 13, color: "#4a7c3f" }}>{he.houseCCAvailable}</p>
+                <p style={{ margin: "2px 0", fontSize: 11, color: "#888", direction: "rtl" }}>{he.houseCCCost}</p>
                 {ccMsg && (
                   <p style={{ margin: "4px 0", fontSize: 12, color: "#c0392b", direction: "rtl" }}>
                     {ccMsg}
                     {ccMsg.includes("חברים") && (
-                      <>{" "}<a href="https://wa.me/?text=%D7%91%D7%95%D7%90%D7%95%20%D7%9C%D7%A9%D7%97%D7%A7%20%D7%91%D7%9E%D7%99%D7%A0%D7%99%20%D7%99%D7%A9%D7%A8%D7%90%D7%9C%21%20https%3A%2F%2Fwww.mini-israel.com%2F" target="_blank" rel="noopener noreferrer" onClick={trackWaClick} style={{ color: "#25D366", textDecoration: "underline" }}>הזמן חברים</a></>
+                      <>{" "}<a href="https://wa.me/?text=%D7%91%D7%95%D7%90%D7%95%20%D7%9C%D7%A9%D7%97%D7%A7%20%D7%91%D7%9E%D7%99%D7%A0%D7%99%20%D7%99%D7%A9%D7%A8%D7%90%D7%9C%21%20https%3A%2F%2Fwww.mini-israel.com%2F" target="_blank" rel="noopener noreferrer" onClick={trackWaClick} style={{ color: "#25D366", textDecoration: "underline" }}>{he.inviteFriends}</a></>
                     )}
                   </p>
                 )}
                 <button className={styles.shopBuyBtn} onClick={handleBuyCC} disabled={ccBuying}>
-                  {ccBuying ? "רוכש..." : "🏛️ קנה מרכז קהילתי – 600 🪙"}
+                  {ccBuying ? he.buying : he.houseCCBuy}
                 </button>
               </>
             )}
-            <button className={styles.shopCloseBtn} onClick={() => { setShowHouseModal(null); setHouseUpgradeMsg(null); setCCMsg(null); }}>סגור</button>
+            <button className={styles.shopCloseBtn} onClick={() => { setShowHouseModal(null); setHouseUpgradeMsg(null); setCCMsg(null); }}>{he.houseClose}</button>
           </div>
         </div>
       )}
@@ -2247,17 +2248,17 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       {showCCModal && (
         <div className={styles.shopBackdrop} onClick={() => { setShowCCModal(null); setCCMsg(null); }}>
           <div className={styles.shopModal} onClick={(e) => e.stopPropagation()}>
-            <p className={styles.shopTitle}>🏛️ המרכז הקהילתי</p>
-            <p className={styles.shopBalance}>יתרה: {user?.money ?? 0} 🪙</p>
+            <p className={styles.shopTitle}>{he.ccTitle}</p>
+            <p className={styles.shopBalance}>{he.ccBalance(user?.money ?? 0)}</p>
             <p style={{ margin: "4px 0", fontSize: 14 }}>
-              רמה {showCCModal.cell.ccLevel || 1} מתוך 5
-              {" · "}בונוס: +{CC_ITEM_BONUS[showCCModal.cell.ccLevel || 1]} מטבעות על כל פריט שמתקבל מחבר
+              {he.ccLevelOf5(showCCModal.cell.ccLevel || 1)}
+              {" · "}{he.ccBonus(CC_ITEM_BONUS[showCCModal.cell.ccLevel || 1])}
             </p>
             {(showCCModal.cell.ccLevel || 1) < 5 && (() => {
               const req = CC_UPGRADE_COSTS[(showCCModal.cell.ccLevel || 1) + 1];
               return (
                 <p style={{ margin: "2px 0", fontSize: 11, color: "#888", direction: "rtl" }}>
-                  לרמה {(showCCModal.cell.ccLevel || 1) + 1}: {req.cost} 🪙 +{" "}
+                  {he.houseRequirementsLine((showCCModal.cell.ccLevel || 1) + 1, req.cost)}
                   {req.friendItems.map(({ id, count }) => `${count} ${ITEM_NAMES[id]} מחברים`).join(" + ")}
                 </p>
               );
@@ -2266,18 +2267,18 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
               <p style={{ margin: "4px 0", fontSize: 12, color: "#c0392b", direction: "rtl" }}>
                 {ccMsg}
                 {ccMsg.includes("חברים") && (
-                  <>{" "}<a href="https://wa.me/?text=%D7%91%D7%95%D7%90%D7%95%20%D7%9C%D7%A9%D7%97%D7%A7%20%D7%91%D7%9E%D7%99%D7%A0%D7%99%20%D7%99%D7%A9%D7%A8%D7%90%D7%9C%21%20https%3A%2F%2Fwww.mini-israel.com%2F" target="_blank" rel="noopener noreferrer" onClick={trackWaClick} style={{ color: "#25D366", textDecoration: "underline" }}>הזמן חברים</a></>
+                  <>{" "}<a href="https://wa.me/?text=%D7%91%D7%95%D7%90%D7%95%20%D7%9C%D7%A9%D7%97%D7%A7%20%D7%91%D7%9E%D7%99%D7%A0%D7%99%20%D7%99%D7%A9%D7%A8%D7%90%D7%9C%21%20https%3A%2F%2Fwww.mini-israel.com%2F" target="_blank" rel="noopener noreferrer" onClick={trackWaClick} style={{ color: "#25D366", textDecoration: "underline" }}>{he.inviteFriends}</a></>
                 )}
               </p>
             )}
             {(showCCModal.cell.ccLevel || 1) < 5 ? (
               <button className={styles.shopBuyBtn} onClick={handleCCUpgrade} disabled={ccUpgrading}>
-                {ccUpgrading ? "משדרג..." : `⬆️ שדרג לרמה ${(showCCModal.cell.ccLevel || 1) + 1} – ${CC_UPGRADE_COSTS[(showCCModal.cell.ccLevel || 1) + 1].cost} 🪙`}
+                {ccUpgrading ? he.upgrading : he.ccUpgrade((showCCModal.cell.ccLevel || 1) + 1, CC_UPGRADE_COSTS[(showCCModal.cell.ccLevel || 1) + 1].cost)}
               </button>
             ) : (
-              <p style={{ margin: 0, fontSize: 12, color: "#4a7c3f", fontWeight: 600 }}>✅ מרכז קהילתי ברמה מקסימלית! (+50 מטבעות לכל פריט)</p>
+              <p style={{ margin: 0, fontSize: 12, color: "#4a7c3f", fontWeight: 600 }}>{he.ccMaxLevelMsg}</p>
             )}
-            <button className={styles.shopCloseBtn} onClick={() => { setShowCCModal(null); setCCMsg(null); }}>סגור</button>
+            <button className={styles.shopCloseBtn} onClick={() => { setShowCCModal(null); setCCMsg(null); }}>{he.ccClose}</button>
           </div>
         </div>
       )}
@@ -2286,28 +2287,28 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       {showPowerPlant && (
         <div className={styles.shopBackdrop} onClick={() => setShowPowerPlant(false)}>
           <div className={styles.shopModal} onClick={(e) => e.stopPropagation()}>
-            <p className={styles.shopTitle}>⚡ תחנת הכוח</p>
-            <p className={styles.shopBalance}>יתרה: {user?.money ?? 0} 🪙</p>
+            <p className={styles.shopTitle}>{he.powerPlantTitle}</p>
+            <p className={styles.shopBalance}>{he.powerPlantBalance(user?.money ?? 0)}</p>
             {user?.powerBoostExpiry && new Date(user.powerBoostExpiry) > new Date() ? (
               <>
-                <p style={{ margin: 0, fontSize: 13, color: "#4a7c3f" }}>✅ מנוי חשמל פעיל! +20 מטבעות לכל ביצה</p>
+                <p style={{ margin: 0, fontSize: 13, color: "#4a7c3f" }}>{he.powerPlantActiveSubscription}</p>
                 <p style={{ margin: 0, fontSize: 11, color: "#888" }}>
-                  פג תוקף: {new Date(user.powerBoostExpiry).toLocaleDateString("he-IL")}
+                  {he.powerPlantExpiry(new Date(user.powerBoostExpiry).toLocaleDateString("he-IL"))}
                 </p>
               </>
             ) : (
               <>
-                <p style={{ margin: 0, fontSize: 13 }}>קנה מנוי חשמל ל-7 ימים וקבל +20 מטבעות על כל ביצה שאתה אוסף!</p>
+                <p style={{ margin: 0, fontSize: 13 }}>{he.powerPlantDesc}</p>
                 <button
                   className={styles.shopBuyBtn}
                   onClick={handlePowerSubscribe}
                   disabled={powerPlantSubscribing || !user || (user.money ?? 0) < 400}
                 >
-                  {powerPlantSubscribing ? "רוכש..." : "⚡ קנה מנוי – 400 🪙"}
+                  {powerPlantSubscribing ? he.buying : he.powerPlantSubscribe}
                 </button>
               </>
             )}
-            <button className={styles.shopCloseBtn} onClick={() => setShowPowerPlant(false)}>סגור</button>
+            <button className={styles.shopCloseBtn} onClick={() => setShowPowerPlant(false)}>{he.powerPlantClose}</button>
           </div>
         </div>
       )}
@@ -2316,16 +2317,15 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
         <div className={styles.shopBackdrop} onClick={() => setShowGodzilla(false)}>
           <div className={styles.shopModal} onClick={(e) => e.stopPropagation()} style={{ textAlign: "center" }}>
             <div style={{ fontSize: 64, lineHeight: 1, marginBottom: 8 }}>🦖</div>
-            <p className={styles.shopTitle} style={{ fontSize: 22 }}>גודזילה!</p>
-            <img src="/assets/godzilla.png" alt="גודזילה" style={{ width: 140, height: 140, objectFit: "contain", margin: "8px auto", display: "block" }} />
+            <p className={styles.shopTitle} style={{ fontSize: 22 }}>{he.godzillaTitle}</p>
+            <img src="/assets/godzilla.png" alt={he.godzillaAlt} style={{ width: 140, height: 140, objectFit: "contain", margin: "8px auto", display: "block" }} />
             <p style={{ margin: "8px 0 4px", fontSize: 15, direction: "rtl", color: "#333" }}>
-              🚨 <strong>אזהרה!</strong> גודזילה נמצא בשכונה!
+              {he.godzillaWarning}
             </p>
             <p style={{ margin: "4px 0 16px", fontSize: 13, color: "#666", direction: "rtl" }}>
-              המפלצת הענקית מסתובבת בין הבתים ומאיימת על כל מה שבנית.<br />
-              רק הבתים החזקים ישרדו...
+              {he.godzillaDesc}
             </p>
-            <button className={styles.shopCloseBtn} onClick={() => setShowGodzilla(false)}>ברח! 🏃</button>
+            <button className={styles.shopCloseBtn} onClick={() => setShowGodzilla(false)}>{he.godzillaRun}</button>
           </div>
         </div>
       )}

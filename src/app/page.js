@@ -7,6 +7,7 @@ import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut, } fro
 import { GameBoard, NameModal, ComposeModal, SplashScreen, LotteryPopup, ResourceBar, ScrollHint, MobilePortraitOverlay, Sidebar } from "../components";
 import useUserStore from "../store/useUserStore";
 import { fireConfetti } from "../utils/confetti";
+import he from "../lang/he";
 
 const provider = new GoogleAuthProvider();
 
@@ -95,7 +96,7 @@ export default function Home() {
         // Ensure the user exists in MongoDB
         syncUserWithBackend(firebaseUser).catch((err) => {
           console.error("Failed to sync user with backend", err);
-          setError("לא ניתן לשמור את הפרופיל שלך, נסה שוב מאוחר יותר.");
+          setError(he.profileSaveError);
         });
       }
     });
@@ -164,7 +165,7 @@ export default function Home() {
       await signInWithPopup(auth, provider);
     } catch (err) {
       console.error(err);
-      setError("ההתחברות באמצעות Google נכשלה, נסה שוב.");
+      setError(he.googleSignInError);
       setLoading(false);
     }
   };
@@ -177,7 +178,7 @@ export default function Home() {
       setBackendUser(null);
     } catch (err) {
       console.error(err);
-      setError("ההתנתקות נכשלה, נסה שוב.");
+      setError(he.logoutError);
     }
   };
 
@@ -219,7 +220,7 @@ export default function Home() {
       return true;
     } catch (err) {
       console.error(err);
-      setError("לא ניתן לשמור את השם, נסה שוב.");
+      setError(he.saveNameError);
       return false;
     }
   };
@@ -288,9 +289,9 @@ export default function Home() {
       const data = await res.json();
       if (!res.ok) {
         alert(
-          data.error === "Insufficient funds" ? "אין מספיק מטבעות" :
-          data.error === "Already VIP" ? "כבר VIP!" :
-          "שגיאה, נסה שוב"
+          data.error === "Insufficient funds" ? he.buyVipInsufficientFunds :
+          data.error === "Already VIP" ? he.buyVipAlready :
+          he.error
         );
         return;
       }
@@ -314,10 +315,10 @@ export default function Home() {
       const data = await res.json();
       if (!res.ok) {
         alert(
-          data.error === "Insufficient funds" ? "אין מספיק מטבעות" :
-          data.error === "No house found" ? "יש לבנות בית לפני קניית חווה" :
-          data.error === "Already has farm" ? "כבר יש לך חווה" :
-          "שגיאה, נסה שוב"
+          data.error === "Insufficient funds" ? he.buyFarmInsufficientFunds :
+          data.error === "No house found" ? he.buyFarmNoHouse :
+          data.error === "Already has farm" ? he.buyFarmAlreadyHas :
+          he.error
         );
         return;
       }
@@ -352,7 +353,7 @@ export default function Home() {
         setComposeTarget(null);
         setComposeItemIndex(null);
       } else {
-        alert(data.error || "שגיאה, נסה שוב");
+        alert(data.error || he.throwPoopError);
       }
     } catch (e) {
       console.error(e);

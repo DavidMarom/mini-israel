@@ -1,4 +1,5 @@
 import styles from "./ComposeModal.module.css";
+import he from "../../lang/he";
 
 export default function ComposeModal({
   composeTarget,
@@ -20,10 +21,10 @@ export default function ComposeModal({
   return (
     <div className={styles.composeBackdrop}>
       <div className={styles.composeModal}>
-        <p className={styles.composeTitle}>הודעה ל{composeTarget.ownerName}</p>
+        <p className={styles.composeTitle}>{he.composeTitle(composeTarget.ownerName)}</p>
         {storedUser?.inventory?.length > 0 && (
           <div>
-            <p className={styles.composeLabel}>שלח פריט (אופציונלי):</p>
+            <p className={styles.composeLabel}>{he.composeSendItem}</p>
             <div className={styles.inventoryGrid}>
               {storedUser.inventory.map((item, i) => (
                 <button
@@ -42,19 +43,19 @@ export default function ComposeModal({
           className={styles.composeTextarea}
           value={composeText}
           onChange={(e) => setComposeText(e.target.value)}
-          placeholder={composeItemIndex !== null ? "הוסף הודעה (אופציונלי)..." : "כתוב הודעה..."}
+          placeholder={composeItemIndex !== null ? he.composeAddMessageOptional : he.composeWriteMessage}
           rows={3}
         />
         {poopCount > 0 && (
           <button className={styles.poopThrowBtn} onClick={onThrowPoop} disabled={poopThrowing}>
-            {poopThrowing ? "זורק..." : `💩 זרוק קקי על הבית של ${composeTarget.ownerName}`}
+            {poopThrowing ? he.composeThrowing : he.composeThrowPoop(composeTarget.ownerName)}
           </button>
         )}
         <div className={styles.composeActions}>
           <button className={styles.composeSend} onClick={onSend} disabled={composeSending || (composeItemIndex === null && !composeText.trim())}>
-            {composeSending ? "שולח..." : "שלח"}
+            {composeSending ? he.composeSending : he.composeSend}
           </button>
-          <button className={styles.composeCancel} onClick={onClose}>ביטול</button>
+          <button className={styles.composeCancel} onClick={onClose}>{he.composeCancel}</button>
         </div>
       </div>
     </div>

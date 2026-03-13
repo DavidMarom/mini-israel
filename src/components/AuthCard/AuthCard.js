@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import styles from "./AuthCard.module.css";
+import he from "../../lang/he";
 
 export default function AuthCard({ loading, user, displayName, bio, money, inventory, photoURL, onGoogleSignIn, onLogout, error, onUpdateName, onBuyFarm, hasFarm, buyingFarm, isVIP, onBuyVip }) {
 
@@ -30,19 +31,19 @@ export default function AuthCard({ loading, user, displayName, bio, money, inven
 
   return (
     <div className={styles.card}>
-      {loading && <p className={styles.text}>טוען...</p>}
+      {loading && <p className={styles.text}>{he.authLoading}</p>}
 
       {!loading && !user && (
         <>
-          <p className={styles.text}>התחבר/י כדי להתחיל לשחק</p>
-          <button onClick={onGoogleSignIn} className={styles.primaryButton}>התחבר/י</button>
-          <a href="/horaot" target="_blank" rel="noopener noreferrer" className={styles.horaotLink}>📖 הוראות משחק</a>
+          <p className={styles.text}>{he.authSignInPrompt}</p>
+          <button onClick={onGoogleSignIn} className={styles.primaryButton}>{he.authSignIn}</button>
+          <a href="/horaot" target="_blank" rel="noopener noreferrer" className={styles.horaotLink}>{he.authGameRules}</a>
         </>
       )}
 
       {!loading && user && (
         <>
-          <button onClick={onLogout} className={styles.logoutBtn} aria-label="התנתק">
+          <button onClick={onLogout} className={styles.logoutBtn} aria-label={he.authLogout}>
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
               <path fillRule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/>
               <path fillRule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
@@ -57,15 +58,15 @@ export default function AuthCard({ loading, user, displayName, bio, money, inven
 
             {isEditingName ? (
               <div className={styles.nameEditColumn}>
-                <input className={styles.nameInput} value={editedName} onChange={(e) => setEditedName(e.target.value)} placeholder="שם תצוגה" />
-                <textarea className={styles.bioInput} value={editedBio} onChange={(e) => setEditedBio(e.target.value)} placeholder="ביו..." rows={2} />
-                <button type="button" className={styles.saveNameButton} onClick={handleSaveEdit}>שמור</button>
+                <input className={styles.nameInput} value={editedName} onChange={(e) => setEditedName(e.target.value)} placeholder={he.authDisplayNamePlaceholder} />
+                <textarea className={styles.bioInput} value={editedBio} onChange={(e) => setEditedBio(e.target.value)} placeholder={he.authBioPlaceholder} rows={2} />
+                <button type="button" className={styles.saveNameButton} onClick={handleSaveEdit}>{he.authSaveName}</button>
               </div>
             ) : (
               <div className={styles.nameRow}>
                 <p className={styles.text}>{displayName}</p>
                 {isVIP && <span className={styles.vipBadge}>👑 VIP</span>}
-                <button type="button" className={styles.editButton} onClick={handleStartEdit} aria-label="עריכת שם">✎</button>
+                <button type="button" className={styles.editButton} onClick={handleStartEdit} aria-label={he.authEditName}>✎</button>
               </div>
             )}
           </div>
@@ -74,11 +75,11 @@ export default function AuthCard({ loading, user, displayName, bio, money, inven
             <p className={styles.bio}>{bio}</p>
           )}
 
-          <p className={styles.balanceText}>מטבעות: <span className={styles.balanceValue}>{money ?? 0}</span> 🪙</p>
+          <p className={styles.balanceText}>{he.authCoins(money ?? 0)}</p>
 
           {inventory && inventory.length > 0 && (
             <div className={styles.inventorySection}>
-              <p className={styles.inventoryTitle}>חפצים:</p>
+              <p className={styles.inventoryTitle}>{he.authInventoryTitle}</p>
               <div className={styles.inventoryItems}>
                 {Object.values(
                   inventory.reduce((acc, item) => {
@@ -106,7 +107,7 @@ export default function AuthCard({ loading, user, displayName, bio, money, inven
               className={styles.farmButton}
               disabled={buyingFarm || (money ?? 0) < 500}
             >
-              {buyingFarm ? "קונה חווה..." : "🌾 קנה חווה – 500 🪙"}
+              {buyingFarm ? he.authBuyFarmBuying : he.authBuyFarm}
             </button>
           )}
 
@@ -116,11 +117,11 @@ export default function AuthCard({ loading, user, displayName, bio, money, inven
               className={styles.vipButton}
               disabled={!onBuyVip || (money ?? 0) < 1500}
             >
-              👑 שדרג ל-VIP – 1,500 🪙
+              {he.authBuyVip}
             </button>
           )}
 
-          <a href="/horaot" target="_blank" rel="noopener noreferrer" className={styles.horaotLink}>📖 הוראות משחק</a>
+          <a href="/horaot" target="_blank" rel="noopener noreferrer" className={styles.horaotLink}>{he.authGameRules}</a>
         </>
       )}
 
