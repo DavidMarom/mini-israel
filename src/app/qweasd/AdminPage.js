@@ -314,6 +314,19 @@ export default function AdminPage() {
     } catch (e) { console.error(e); } finally { setActionLoading(null); }
   };
 
+  const handleDeleteUser = async (uid, name) => {
+    if (!confirm(`למחוק את המשתמש "${name || uid}"? פעולה זו בלתי הפיכה.`)) return;
+    setActionLoading(uid);
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid }),
+      });
+      if (res.ok) setUsers((prev) => prev.filter((u) => u.uid !== uid));
+    } catch (e) { console.error(e); } finally { setActionLoading(null); }
+  };
+
   // ── Edit User ─────────────────────────────────────────
   const [editUser, setEditUser] = useState(null); // { uid, name, email, money, bio }
   const [editSaving, setEditSaving] = useState(false);
@@ -775,6 +788,9 @@ export default function AdminPage() {
                       {actionLoading === u.uid ? "..." : "השעה"}
                     </button>
                   )}
+                  <button onClick={() => handleDeleteUser(u.uid, u.name)} disabled={actionLoading === u.uid} style={{ ...actionBtn, background: "#7f1d1d" }}>
+                    {actionLoading === u.uid ? "..." : "🗑️ מחק"}
+                  </button>
                 </td>
               </tr>
             ))}

@@ -79,12 +79,13 @@ export default function Home() {
   const [buyingFarm, setBuyingFarm] = useState(false);
   const [boardRefreshKey, setBoardRefreshKey] = useState(0);
   const boardRef = useRef(null);
+  const pendingScrollRow = useRef(null);
 
   const {
     user: storedUser,
     setUser: setUserStore,
     clearUser,
-    setNeedsHousePlacement,
+    setMainHouse,
   } = useUserStore();
 
   useEffect(() => {
@@ -149,7 +150,11 @@ export default function Home() {
         if (data.created) {
           setNameInput(mergedUser.name || "");
           setShowNameModal(true);
-          setNeedsHousePlacement(true);
+          if (data.houseRow != null) {
+            setMainHouse({ row: data.houseRow, col: data.houseCol });
+            pendingScrollRow.current = data.houseRow;
+            setBoardRefreshKey((k) => k + 1);
+          }
         }
       }
     } catch (err) {
@@ -362,12 +367,21 @@ export default function Home() {
     }
   };
 
+  const handleBoardLoaded = () => {
+    if (pendingScrollRow.current != null && boardRef.current) {
+      const row = pendingScrollRow.current;
+      pendingScrollRow.current = null;
+      const targetTop = row * 64 - boardRef.current.clientHeight / 2 + 32;
+      boardRef.current.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
+    }
+  };
+
   return (
     <div className={styles.page}>
       <SplashScreen show={showSplash} fading={splashFading} />
       <MobilePortraitOverlay show={isMobilePortrait} />
       <div className={styles.boardLayer}>
-        <GameBoard onOtherHouseClick={(target) => { setComposeTarget(target); setComposeText(""); setComposeItemIndex(null); }} justPoopedUid={justPoopedUid} boardRefreshKey={boardRefreshKey} onHasFarmChange={setHasFarm} boardRef={boardRef} />
+        <GameBoard onOtherHouseClick={(target) => { setComposeTarget(target); setComposeText(""); setComposeItemIndex(null); }} justPoopedUid={justPoopedUid} boardRefreshKey={boardRefreshKey} onHasFarmChange={setHasFarm} boardRef={boardRef} onBoardLoaded={handleBoardLoaded} />
       </div>
 
       {storedUser && <ResourceBar money={storedUser.money} />}

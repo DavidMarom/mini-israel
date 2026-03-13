@@ -43,6 +43,30 @@ export async function POST(request) {
   }
 }
 
+export async function DELETE(request) {
+  try {
+    const { uid } = await request.json();
+    if (!uid) return NextResponse.json({ error: "Missing uid" }, { status: 400 });
+
+    const client = await clientPromise;
+    const db = client.db("main");
+    await db.collection("users").deleteOne({ uid });
+
+    // Remove the user's house from the board
+    const board = db.collection("board");
+    const boardDoc = await board.findOne({ _id: "main-board" });
+    if (boardDoc?.cells) {
+      const newCells = boardDoc.cells.filter((c) => c.ownerUid !== uid);
+      await board.updateOne({ _id: "main-board" }, { $set: { cells: newCells, updatedAt: new Date() } });
+    }
+
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    console.error("Error in DELETE /api/admin/users", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
+
 export async function PATCH(request) {
   try {
     const { uid, name, email, money, bio } = await request.json();
