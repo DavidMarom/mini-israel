@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./page.module.css";
 import { auth } from "../services/fb";
 import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut, } from "firebase/auth";
@@ -77,6 +77,7 @@ export default function Home() {
   const [hasFarm, setHasFarm] = useState(false);
   const [buyingFarm, setBuyingFarm] = useState(false);
   const [boardRefreshKey, setBoardRefreshKey] = useState(0);
+  const boardRef = useRef(null);
 
   const {
     user: storedUser,
@@ -376,7 +377,7 @@ export default function Home() {
         </div>
       )}
       <div className={styles.boardLayer}>
-        <GameBoard onOtherHouseClick={(target) => { setComposeTarget(target); setComposeText(""); setComposeItemIndex(null); }} justPoopedUid={justPoopedUid} boardRefreshKey={boardRefreshKey} onHasFarmChange={setHasFarm} />
+        <GameBoard onOtherHouseClick={(target) => { setComposeTarget(target); setComposeText(""); setComposeItemIndex(null); }} justPoopedUid={justPoopedUid} boardRefreshKey={boardRefreshKey} onHasFarmChange={setHasFarm} boardRef={boardRef} />
       </div>
 
       <div className={styles.scrollHint} aria-hidden="true">
@@ -401,6 +402,18 @@ export default function Home() {
         <div className={styles.siteHeader}>
           <img src="/assets/main-house.png" alt="מיני ישראל" className={styles.siteLogo} />
           <span className={styles.siteTitle}>מיני ישראל</span>
+          {storedUser?.mainHouse && (
+            <button
+              className={styles.scrollToHouseBtn}
+              title="מצא את הבית שלי"
+              onClick={() => {
+                if (!boardRef.current || !storedUser?.mainHouse) return;
+                const { row } = storedUser.mainHouse;
+                const targetTop = row * 64 - boardRef.current.clientHeight / 2 + 32;
+                boardRef.current.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
+              }}
+            >🎯</button>
+          )}
           <a
             href="https://wa.me/?text=%D7%91%D7%95%D7%90%D7%95%20%D7%9C%D7%A9%D7%97%D7%A7%20%D7%91%D7%9E%D7%99%D7%A0%D7%99%20%D7%99%D7%A9%D7%A8%D7%90%D7%9C%21%20https%3A%2F%2Fwww.mini-israel.com%2F"
             className={styles.whatsappLink}

@@ -83,7 +83,7 @@
 .msgActions {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 14px;
   opacity: 0;
   transition: opacity 0.15s ease;
 }

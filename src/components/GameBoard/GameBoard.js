@@ -104,7 +104,7 @@ const HOUSE_IMAGES = [
 const createEmptyGrid = () =>
   Array.from({ length: ROWS }, () => Array(COLS).fill(null));
 
-export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefreshKey, onHasFarmChange }) {
+export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefreshKey, onHasFarmChange, boardRef }) {
   const [grid, setGrid] = useState(createEmptyGrid);
   const [hover, setHover] = useState(null);
   const [houseTooltip, setHouseTooltip] = useState(null); // { x, y, ownerName, bio }
@@ -1278,12 +1278,37 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
           {houseTooltip.bio && <span className={styles.houseTooltipBio}>{houseTooltip.bio}</span>}
         </div>
       )}
-      <div className={styles.board}>
-        {Array.from({ length: ROWS }).map((_, row) =>
-          Array.from({ length: COLS }).map((_, col) => {
-            const key = `${row}-${col}`;
-            const cell = grid[row][col];
-            const ownerUid = user && (user.firebaseUid || user.uid);
+      <div className={styles.board} ref={boardRef}>
+        {(() => {
+          const ownerUid = user && (user.firebaseUid || user.uid);
+          let userHousePos = null;
+          if (ownerUid) {
+            outer: for (let r = 0; r < ROWS; r++) {
+              for (let c = 0; c < COLS; c++) {
+                if (grid[r][c]?.building === "main-house" && grid[r][c]?.ownerUid === ownerUid) {
+                  userHousePos = { row: r, col: c };
+                  break outer;
+                }
+              }
+            }
+          }
+          return (
+            <>
+              {userHousePos && (
+                <div
+                  className={styles.myHouseArrow}
+                  style={{
+                    right: userHousePos.col * TILE_SIZE + TILE_SIZE / 2,
+                    top: userHousePos.row * TILE_SIZE - 36,
+                  }}
+                >
+                  ▼
+                </div>
+              )}
+              {Array.from({ length: ROWS }).map((_, row) =>
+                Array.from({ length: COLS }).map((_, col) => {
+                  const key = `${row}-${col}`;
+                  const cell = grid[row][col];
             const hasMainHouse = cell && cell.building === "main-house";
             const hasFarm = cell && cell.building === "farm";
             const hasEgg = hasFarm && cell.eggReady && cell.ownerUid === ownerUid;
@@ -1411,9 +1436,12 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                     </div>
                   )}
               </div>
-            );
-          })
-        )}
+                  );
+                })
+              )}
+            </>
+          );
+        })()}
 
         {/* Azrieli Building */}
         <div

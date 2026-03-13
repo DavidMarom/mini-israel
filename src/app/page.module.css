@@ -175,6 +175,21 @@
   flex: 1;
 }
 
+.scrollToHouseBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 2px 4px;
+  line-height: 1;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+
+.scrollToHouseBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
 .whatsappLink {
   display: flex;
   align-items: center;
