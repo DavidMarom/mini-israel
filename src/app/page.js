@@ -380,6 +380,15 @@ export default function Home() {
         <GameBoard onOtherHouseClick={(target) => { setComposeTarget(target); setComposeText(""); setComposeItemIndex(null); }} justPoopedUid={justPoopedUid} boardRefreshKey={boardRefreshKey} onHasFarmChange={setHasFarm} boardRef={boardRef} />
       </div>
 
+      {storedUser && (
+        <div className={styles.resourceBar}>
+          <div className={styles.resourcePill}>
+            <span className={styles.resourceIcon}>🪙</span>
+            <span className={styles.resourceValue}>{(storedUser.money ?? 0).toLocaleString()}</span>
+          </div>
+        </div>
+      )}
+
       <div className={styles.scrollHint} aria-hidden="true">
         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M6 9l6 6 6-6" />
@@ -392,16 +401,18 @@ export default function Home() {
           <path d="M14 7l4 5-4 5" />
         </svg>
       </button>
+
       {sidebarOpen && <div className={styles.sidebarBackdrop} onClick={() => setSidebarOpen(false)} />}
+      
       <div className={`${styles.overlay} ${sidebarOpen ? styles.overlayOpen : ""}`}>
         <button className={styles.sidebarClose} onClick={() => setSidebarOpen(false)} aria-label="סגור תפריט">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M18 6L6 18M6 6l12 12" />
           </svg>
         </button>
+        
         <div className={styles.siteHeader}>
           <img src="/assets/main-house.png" alt="מיני ישראל" className={styles.siteLogo} />
-          <span className={styles.siteTitle}>מיני ישראל</span>
           {storedUser?.mainHouse && (
             <button
               className={styles.scrollToHouseBtn}
@@ -428,6 +439,7 @@ export default function Home() {
           </a>
           <a href="/advertisers" className={styles.advertisersLink} target="_blank" rel="noopener noreferrer">למפרסמים</a>
         </div>
+        
         <AuthCard
           loading={loading}
           user={user}
