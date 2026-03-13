@@ -105,12 +105,11 @@ const HOUSE_IMAGES = [
 const createEmptyGrid = () =>
   Array.from({ length: ROWS }, () => Array(COLS).fill(null));
 
-export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefreshKey, onHasFarmChange, boardRef }) {
+export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefreshKey, onHasFarmChange, boardRef, onBoardLoaded }) {
   const [grid, setGrid] = useState(createEmptyGrid);
-  const [hover, setHover] = useState(null);
   const [houseTooltip, setHouseTooltip] = useState(null); // { x, y, ownerName, bio }
   const tooltipTimer = useRef(null);
-  const { user, setUser, setMainHouse, needsHousePlacement } = useUserStore();
+  const { user, setUser, setMainHouse } = useUserStore();
 
   const [onlineCount, setOnlineCount] = useState(null);
   useEffect(() => { setOnlineCount(Math.floor(Math.random() * 500) + 500); }, []);
@@ -890,6 +889,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
             }
           });
           setGrid(g);
+          onBoardLoaded?.();
         }
       } catch (e) {
         console.error(e);
@@ -1144,47 +1144,6 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       return;
     }
 
-    // When guiding right after signup, enforce placement only in that mode
-    if (needsHousePlacement === true) {
-      // ok, we are in placement mode
-    } else {
-      // Outside explicit placement mode, only allow if user has no main house yet
-      const hasHouseAlready = grid.some((r) =>
-        r.some(
-          (cell) =>
-            cell &&
-            cell.building === "main-house" &&
-            cell.ownerUid === ownerUid
-        )
-      );
-      if (hasHouseAlready) return;
-    }
-
-    // Prevent more than one main house per user
-    const alreadyHasHouse = grid.some((r) =>
-      r.some(
-        (cell) =>
-          cell &&
-          cell.building === "main-house" &&
-          cell.ownerUid === ownerUid
-      )
-    );
-    if (alreadyHasHouse) return;
-
-    // Don't overwrite an occupied tile
-    if (grid[row][col]) return;
-
-    const next = grid.map((r) => r.slice());
-    next[row][col] = {
-      building: "main-house",
-      ownerUid,
-      ownerName: user.name || user.email,
-      houseImg: HOUSE_IMAGES[Math.floor(Math.random() * HOUSE_IMAGES.length)],
-    };
-
-    setGrid(next);
-    void persistBoard(next);
-    setMainHouse({ row, col });
   };
 
   const handleHouseMouseEnter = (e, cell) => {
@@ -1320,24 +1279,6 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
             const hasTreasure = cell && cell.item === "treasure";
             const isPoopHouse = hasMainHouse && cell.pooped;
             const isStarHouse = hasMainHouse && !isPoopHouse && starHouseUid && cell.ownerUid === starHouseUid;
-            const isEmpty = !cell;
-            const userHasHouse =
-              !!ownerUid &&
-              grid.some((r) =>
-                r.some(
-                  (c) =>
-                    c &&
-                    c.building === "main-house" &&
-                    c.ownerUid === ownerUid
-                )
-              );
-            const canPreview =
-              !!user &&
-              !!ownerUid &&
-              needsHousePlacement === true &&
-              !userHasHouse &&
-              isEmpty;
-
             const hasCC = !!(cell && cell.building === "community-center");
             const isClickable =
               hasApple ||
@@ -1350,24 +1291,15 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
               (hasMainHouse && cell.ownerUid !== ownerUid) ||
               (hasMainHouse && cell.ownerUid === ownerUid && isPoopHouse) ||
               (hasMainHouse && cell.ownerUid === ownerUid && !isPoopHouse) ||
-              (hasCC && cell.ownerUid === ownerUid) ||
-              canPreview;
+              (hasCC && cell.ownerUid === ownerUid);
 
             return (
               <div
                 key={key}
                 className={`${styles.tile}${!isClickable ? ` ${styles.tileDefault}` : ""}`}
                 onClick={() => handleClick(row, col)}
-                onMouseEnter={(e) => {
-                  setHover({ row, col });
-                  if (hasMainHouse) handleHouseMouseEnter(e, cell);
-                }}
-                onMouseLeave={() => {
-                  setHover((prev) =>
-                    prev && prev.row === row && prev.col === col ? null : prev
-                  );
-                  if (hasMainHouse) handleHouseMouseLeave();
-                }}
+                onMouseEnter={(e) => { if (hasMainHouse) handleHouseMouseEnter(e, cell); }}
+                onMouseLeave={() => { if (hasMainHouse) handleHouseMouseLeave(); }}
               >
                 {hasApple && (
                   <span className={styles.apple}>🍎</span>
@@ -1423,19 +1355,6 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                     )}
                   </div>
                 )}
-                {!hasMainHouse &&
-                  canPreview &&
-                  hover &&
-                  hover.row === row &&
-                  hover.col === col && (
-                    <div className={styles.houseWrapper}>
-                      <img
-                        src={HOUSE_IMAGES[0]}
-                        alt={he.mainHousePlacementAlt}
-                        className={styles.mainHouse}
-                      />
-                    </div>
-                  )}
               </div>
                   );
                 })
