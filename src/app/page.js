@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./page.module.css";
 import { auth } from "../services/fb";
 import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut, } from "firebase/auth";
@@ -77,6 +77,7 @@ export default function Home() {
   const [hasFarm, setHasFarm] = useState(false);
   const [buyingFarm, setBuyingFarm] = useState(false);
   const [boardRefreshKey, setBoardRefreshKey] = useState(0);
+  const boardRef = useRef(null);
 
   const {
     user: storedUser,
@@ -376,8 +377,17 @@ export default function Home() {
         </div>
       )}
       <div className={styles.boardLayer}>
-        <GameBoard onOtherHouseClick={(target) => { setComposeTarget(target); setComposeText(""); setComposeItemIndex(null); }} justPoopedUid={justPoopedUid} boardRefreshKey={boardRefreshKey} onHasFarmChange={setHasFarm} />
+        <GameBoard onOtherHouseClick={(target) => { setComposeTarget(target); setComposeText(""); setComposeItemIndex(null); }} justPoopedUid={justPoopedUid} boardRefreshKey={boardRefreshKey} onHasFarmChange={setHasFarm} boardRef={boardRef} />
       </div>
+
+      {storedUser && (
+        <div className={styles.resourceBar}>
+          <div className={styles.resourcePill}>
+            <span className={styles.resourceIcon}>🪙</span>
+            <span className={styles.resourceValue}>{(storedUser.money ?? 0).toLocaleString()}</span>
+          </div>
+        </div>
+      )}
 
       <div className={styles.scrollHint} aria-hidden="true">
         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -391,16 +401,30 @@ export default function Home() {
           <path d="M14 7l4 5-4 5" />
         </svg>
       </button>
+
       {sidebarOpen && <div className={styles.sidebarBackdrop} onClick={() => setSidebarOpen(false)} />}
+      
       <div className={`${styles.overlay} ${sidebarOpen ? styles.overlayOpen : ""}`}>
         <button className={styles.sidebarClose} onClick={() => setSidebarOpen(false)} aria-label="סגור תפריט">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M18 6L6 18M6 6l12 12" />
           </svg>
         </button>
+        
         <div className={styles.siteHeader}>
           <img src="/assets/main-house.png" alt="מיני ישראל" className={styles.siteLogo} />
-          <span className={styles.siteTitle}>מיני ישראל</span>
+          {storedUser?.mainHouse && (
+            <button
+              className={styles.scrollToHouseBtn}
+              title="מצא את הבית שלי"
+              onClick={() => {
+                if (!boardRef.current || !storedUser?.mainHouse) return;
+                const { row } = storedUser.mainHouse;
+                const targetTop = row * 64 - boardRef.current.clientHeight / 2 + 32;
+                boardRef.current.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
+              }}
+            >🎯</button>
+          )}
           <a
             href="https://wa.me/?text=%D7%91%D7%95%D7%90%D7%95%20%D7%9C%D7%A9%D7%97%D7%A7%20%D7%91%D7%9E%D7%99%D7%A0%D7%99%20%D7%99%D7%A9%D7%A8%D7%90%D7%9C%21%20https%3A%2F%2Fwww.mini-israel.com%2F"
             className={styles.whatsappLink}
@@ -415,6 +439,7 @@ export default function Home() {
           </a>
           <a href="/advertisers" className={styles.advertisersLink} target="_blank" rel="noopener noreferrer">למפרסמים</a>
         </div>
+        
         <AuthCard
           loading={loading}
           user={user}
