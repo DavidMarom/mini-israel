@@ -80,6 +80,7 @@ export default function Home() {
   const [boardRefreshKey, setBoardRefreshKey] = useState(0);
   const boardRef = useRef(null);
   const pendingScrollRow = useRef(null);
+  const hasScrolledToHouse = useRef(false);
 
   const {
     user: storedUser,
@@ -368,9 +369,11 @@ export default function Home() {
   };
 
   const handleBoardLoaded = () => {
-    if (pendingScrollRow.current != null && boardRef.current) {
-      const row = pendingScrollRow.current;
+    if (hasScrolledToHouse.current || !boardRef.current) return;
+    const row = pendingScrollRow.current ?? storedUser?.mainHouse?.row;
+    if (row != null) {
       pendingScrollRow.current = null;
+      hasScrolledToHouse.current = true;
       const targetTop = row * 64 - boardRef.current.clientHeight / 2 + 32;
       boardRef.current.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
     }
@@ -385,7 +388,6 @@ export default function Home() {
       </div>
 
       {storedUser && <ResourceBar money={storedUser.money} />}
-      <ScrollHint />
 
       <Sidebar
         isOpen={sidebarOpen}

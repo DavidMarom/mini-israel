@@ -703,6 +703,20 @@
   50% { transform: scale(1.18); filter: drop-shadow(0 0 14px #c084fc) drop-shadow(0 0 28px #a855f7); }
 }
 
+/* ── My House Badge ── */
+
+.myHouseBadge {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 18px;
+  line-height: 1;
+  z-index: 2;
+  pointer-events: none;
+  animation: starFloat 2s ease-in-out infinite;
+}
+
 /* ── Star House Badge ── */
 
 .starBadge {
@@ -1225,7 +1239,7 @@
   color: #f9fafb;
   background-color: rgba(15, 23, 42, 0.7);
   border-radius: 2px;
-  max-width: 100%;
+  max-width: 200%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

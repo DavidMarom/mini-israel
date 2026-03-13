@@ -1332,6 +1332,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                     {isPoopHouse && cell.ownerUid === ownerUid && (
                       <span className={styles.cleanHouseHint}>{he.cleanHouseHint}</span>
                     )}
+                    {cell.ownerUid === ownerUid && !isPoopHouse && <span className={styles.myHouseBadge}>🏠</span>}
                     {isStarHouse && <span className={styles.starBadge}>⭐</span>}
                     {cell.ownerUid === ownerUid && (cell.houseLevel || 1) > 1 && (
                       <span className={styles.houseLevelBadge}>L{cell.houseLevel}</span>
