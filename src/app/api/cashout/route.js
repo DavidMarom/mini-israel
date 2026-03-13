@@ -27,7 +27,13 @@ export async function POST(req) {
     const db = client.db("main");
 
     const userDoc = await db.collection("users").findOne({ uid });
-    if (!userDoc || (userDoc.money ?? 0) < coins) {
+    if (!userDoc) {
+      return NextResponse.json({ error: "אין מספיק מטבעות" }, { status: 400 });
+    }
+    if (!(userDoc.waClicks > 0)) {
+      return NextResponse.json({ error: "not_eligible" }, { status: 403 });
+    }
+    if ((userDoc.money ?? 0) < coins) {
       return NextResponse.json({ error: "אין מספיק מטבעות" }, { status: 400 });
     }
 
