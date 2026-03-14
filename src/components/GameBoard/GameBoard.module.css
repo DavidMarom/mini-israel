@@ -1294,9 +1294,9 @@
 .triviaBuildingLabel {
   font-size: 14px;
   font-weight: 700;
-  color: #1e1b4b;
+  color: #ffffff;
   letter-spacing: 0.5px;
-  text-shadow: 0 1px 3px rgba(255,255,255,0.8);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.6);
 }
 
 /* ── Trivia Modal ── */

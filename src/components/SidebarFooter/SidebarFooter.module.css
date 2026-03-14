@@ -2,42 +2,47 @@
   margin-top: auto;
   padding-top: 16px;
   font-size: 11px;
-  color: #888;
+  color: #a07840;
   text-align: center;
   width: 100%;
   line-height: 1.8;
   direction: rtl;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
 }
 
 .takanonLink {
   font-size: 12px;
-  color: #888;
+  color: #d4a84b;
   text-decoration: none;
-  padding: 4px 8px;
-  border-radius: 3px;
-  border: 1px solid #333;
+  padding: 4px 9px;
+  border-radius: 6px;
+  border: 2px solid #7a5500;
+  background: linear-gradient(180deg, #3a1e00 0%, #2a1200 100%);
   transition: color 0.15s, border-color 0.15s;
 }
 
 .takanonLink:hover {
-  color: #ccc;
-  border-color: #555;
+  color: #ffd84d;
+  border-color: #c8a000;
 }
 
 .sidebarFooterLink {
-  color: #60a5fa;
+  color: #ffd84d;
   text-decoration: none;
   font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
 }
 
 .sidebarFooterLink:hover {
   text-decoration: underline;
+  color: #fff8e1;
 }
 
 .sidebarFooterPhone {
-  color: #4ade80;
+  color: #4eff99;
   text-decoration: none;
   font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
 }
 
 .sidebarFooterPhone:hover {

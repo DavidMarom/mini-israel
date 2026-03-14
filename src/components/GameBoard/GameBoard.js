@@ -139,6 +139,71 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
   const [houseUpgradeMsg, setHouseUpgradeMsg] = useState(null);
   const [houseSkinChanging, setHouseSkinChanging] = useState(false);
 
+  // Move House Modal
+  const [showMoveModal, setShowMoveModal] = useState(false); // "choice" | "neighborhoods"
+  const [moveNeighborhoods, setMoveNeighborhoods] = useState([]);
+  const [moveLoading, setMoveLoading] = useState(false);
+
+  const handleOpenMoveModal = () => {
+    setShowHouseModal(null);
+    setShowMoveModal("choice");
+  };
+
+  const handleMoveToNeighborhood = async () => {
+    setShowMoveModal("neighborhoods");
+    if (moveNeighborhoods.length > 0) return;
+    try {
+      const res = await fetch("/api/neighborhoods");
+      const data = await res.json();
+      if (Array.isArray(data.neighborhoods)) setMoveNeighborhoods(data.neighborhoods);
+    } catch (e) { console.error(e); }
+  };
+
+  const handleConfirmMove = async (destination, centerRow, centerCol) => {
+    if (!user || moveLoading) return;
+    const uid = user.firebaseUid || user.uid;
+    setMoveLoading(true);
+    try {
+      const res = await fetch("/api/house/move", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid, destination, centerRow, centerCol }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(he.houseMoveError);
+        return;
+      }
+      setShowMoveModal(false);
+      // Reload the board
+      const boardRes = await fetch("/api/board");
+      if (boardRes.ok) {
+        const boardData = await boardRes.json();
+        if (Array.isArray(boardData.cells)) {
+          const g = createEmptyGrid();
+          boardData.cells.forEach((cell) => {
+            if (cell && typeof cell.row === "number" && typeof cell.col === "number" && cell.row >= 0 && cell.row < ROWS && cell.col >= 0 && cell.col < COLS) {
+              g[cell.row][cell.col] = { building: cell.building || null, ownerUid: cell.ownerUid || null, ownerName: cell.ownerName || null, item: cell.item || null, pooped: cell.pooped || false, eggReady: cell.eggReady || false, lastEggEpoch: cell.lastEggEpoch ?? null, farmLevel: cell.farmLevel ?? 1, houseLevel: cell.houseLevel ?? 1, houseImg: cell.houseImg || null, ccLevel: cell.ccLevel ?? 1 };
+            }
+          });
+          setGrid(g);
+        }
+      }
+      setUser((prev) => ({ ...prev, mainHouse: { row: data.row, col: data.col } }));
+      setTimeout(() => {
+        if (boardRef?.current) {
+          const targetTop = data.row * TILE_SIZE - boardRef.current.clientHeight / 2 + TILE_SIZE / 2;
+          boardRef.current.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
+        }
+      }, 400);
+    } catch (e) {
+      console.error(e);
+      alert(he.houseMoveError);
+    } finally {
+      setMoveLoading(false);
+    }
+  };
+
   // Community Center Modal
   const [showCCModal, setShowCCModal] = useState(null); // { row, col, cell }
   const [ccUpgrading, setCCUpgrading] = useState(false);
@@ -630,7 +695,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
   const [triviaAwarding, setTriviaAwarding] = useState(false);
   const triviaCountRef = useRef(0);
 
-  const openTrivia = () => {
+  const openTrivia = (withSound = true) => {
     triviaCountRef.current += 1;
     const isHard = triviaCountRef.current % 5 === 0;
     const pool = TRIVIA_QUESTIONS.filter((q) => q.hard === isHard);
@@ -638,7 +703,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
     setTriviaQuestion(q);
     setTriviaAnswered(false);
     setTriviaCorrect(false);
-    playSound("trivia-sound");
+    if (withSound) playSound("trivia-sound");
     setShowTrivia(true);
   };
 
@@ -2007,7 +2072,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                 ) : (
                   <p className={styles.triviaResultWrong}>{he.triviaWrong(triviaQuestion.options[triviaQuestion.answer])}</p>
                 )}
-                <button className={styles.triviaNextBtn} onClick={openTrivia}>{he.triviaNextQuestion}</button>
+                <button className={styles.triviaNextBtn} onClick={() => openTrivia(false)}>{he.triviaNextQuestion}</button>
               </div>
             )}
             <button className={styles.shopCloseBtn} onClick={() => setShowTrivia(false)}>{he.triviaClose}</button>
@@ -2175,7 +2240,64 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                 </button>
               </>
             )}
+            <hr style={{ margin: "10px 0", border: "none", borderTop: "1px solid rgba(200,160,0,0.3)" }} />
+            <button className={styles.shopBuyBtn} style={{ background: "linear-gradient(180deg,#7de84a 0%,#3db800 45%,#2a8000 100%)", borderColor: "#1a5c00", boxShadow: "0 4px 0 #164e00" }} onClick={handleOpenMoveModal}>
+              {he.houseMoveBtn}
+            </button>
             <button className={styles.shopCloseBtn} onClick={() => { setShowHouseModal(null); setHouseUpgradeMsg(null); setCCMsg(null); }}>{he.houseClose}</button>
+          </div>
+        </div>
+      )}
+
+      {/* Move House Modal */}
+      {showMoveModal && (
+        <div className={styles.shopBackdrop} onClick={() => setShowMoveModal(false)}>
+          <div className={styles.shopModal} onClick={(e) => e.stopPropagation()}>
+            <p className={styles.shopTitle}>{he.houseMoveTitle}</p>
+
+            {showMoveModal === "choice" && (
+              <>
+                <button
+                  className={styles.shopBuyBtn}
+                  onClick={() => handleConfirmMove("random")}
+                  disabled={moveLoading}
+                >
+                  {moveLoading ? he.houseMoveMoving : he.houseMoveRandom}
+                </button>
+                <button
+                  className={styles.shopBuyBtn}
+                  style={{ background: "linear-gradient(180deg,#7de84a 0%,#3db800 45%,#2a8000 100%)", borderColor: "#1a5c00", boxShadow: "0 4px 0 #164e00", marginTop: 8 }}
+                  onClick={handleMoveToNeighborhood}
+                  disabled={moveLoading}
+                >
+                  {he.houseMoveNeighborhood}
+                </button>
+                <button className={styles.shopCloseBtn} onClick={() => setShowMoveModal(false)}>{he.houseMoveCancel}</button>
+              </>
+            )}
+
+            {showMoveModal === "neighborhoods" && (
+              <>
+                <p style={{ margin: "4px 0 10px", fontSize: 13, color: "#000000", direction: "rtl" }}>{he.houseMovePickNeighborhood}</p>
+                {moveNeighborhoods.length === 0 && (
+                  <p style={{ fontSize: 13, color: "#d4a84b" }}>{he.loading}</p>
+                )}
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, maxHeight: 280, overflowY: "auto" }}>
+                  {moveNeighborhoods.map((nbhd) => (
+                    <button
+                      key={nbhd.id}
+                      className={styles.shopBuyBtn}
+                      style={{ textAlign: "right", direction: "rtl" }}
+                      onClick={() => handleConfirmMove("neighborhood", nbhd.centerRow, nbhd.centerCol)}
+                      disabled={moveLoading}
+                    >
+                      {moveLoading ? he.houseMoveMoving : `${nbhd.name} · ${he.houseMoveNeighborhoodMembers(nbhd.memberCount)}`}
+                    </button>
+                  ))}
+                </div>
+                <button className={styles.shopCloseBtn} onClick={() => setShowMoveModal("choice")} style={{ marginTop: 8 }}>{he.houseMoveCancel}</button>
+              </>
+            )}
           </div>
         </div>
       )}

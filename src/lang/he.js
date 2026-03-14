@@ -320,6 +320,17 @@ const he = {
   godzillaDesc: "המפלצת הענקית מסתובבת בין הבתים ומאיימת על כל מה שבנית.\nרק הבתים החזקים ישרדו...",
   godzillaRun: "ברח! 🏃",
 
+  // GameBoard — Move House
+  houseMoveBtn: "🏠 הזז את הבית שלי",
+  houseMoveTitle: "לאן להזיז את הבית?",
+  houseMoveRandom: "📍 מיקום אקראי",
+  houseMoveNeighborhood: "🏘️ הצטרף לשכונה",
+  houseMovePickNeighborhood: "בחר שכונה להצטרף אליה:",
+  houseMoveNeighborhoodMembers: (n) => `${n} שכנים`,
+  houseMoveMoving: "מזיז...",
+  houseMoveError: "לא ניתן להזיז את הבית כרגע",
+  houseMoveCancel: "ביטול",
+
   // GameBoard — Items (used in ITEM_NAMES map)
   itemFlowers: "פרחים",
   itemFalafel: "פלאפל",

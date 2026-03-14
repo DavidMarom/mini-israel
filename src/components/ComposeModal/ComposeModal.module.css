@@ -1,7 +1,7 @@
 .composeBackdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.65);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -10,9 +10,11 @@
   padding: 16px;
 }
 
+/* CoC dark wooden modal */
 .composeModal {
-  background: #1e1e2e;
-  border-radius: 8px;
+  background: linear-gradient(180deg, #4a2600 0%, #2a1200 100%);
+  border: 3px solid #c8a000;
+  border-radius: 14px;
   padding: 28px 24px;
   width: 100%;
   max-width: 340px;
@@ -22,21 +24,23 @@
   max-height: calc(100vh - 32px);
   overflow-y: auto;
   flex-shrink: 0;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,220,80,0.15);
 }
 
 .composeTitle {
   margin: 0;
-  font-size: 15px;
-  font-weight: 600;
-  color: #e0e0e0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffd84d;
+  text-shadow: 0 -1px 0 rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.5);
 }
 
 .composeTextarea {
   resize: none;
-  border-radius: 5px;
-  border: 1px solid #3a3a55;
-  background: #2a2a3e;
-  color: #e0e0e0;
+  border-radius: 8px;
+  border: 2px solid #c8a000;
+  background: #1a0800;
+  color: #fff8e1;
   font-size: 14px;
   padding: 10px 12px;
   font-family: inherit;
@@ -44,7 +48,7 @@
 }
 
 .composeTextarea::placeholder {
-  color: #666;
+  color: #a07840;
 }
 
 .composeActions {
@@ -53,21 +57,31 @@
   justify-content: flex-end;
 }
 
+/* CoC brown 3-D button for poop */
 .poopThrowBtn {
   width: 100%;
-  background: #8B4513;
+  background: linear-gradient(180deg, #b06020 0%, #7a3e00 45%, #5a2c00 100%);
   color: #fff;
-  border: none;
-  border-radius: 4px;
+  border: 2px solid #5a2c00;
+  border-radius: 8px;
   padding: 10px 16px;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
   cursor: pointer;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
+  box-shadow: 0 4px 0 #3a1800, inset 0 1px 0 rgba(255,180,80,0.3);
+  text-shadow: 0 -1px 0 rgba(0,0,0,0.5);
+  transition: transform 0.08s, box-shadow 0.08s;
 }
 
 .poopThrowBtn:hover:not(:disabled) {
-  background: #a0522d;
+  transform: translateY(-1px);
+  box-shadow: 0 5px 0 #3a1800, inset 0 1px 0 rgba(255,180,80,0.3);
+}
+
+.poopThrowBtn:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #3a1800;
 }
 
 .poopThrowBtn:disabled {
@@ -75,15 +89,29 @@
   cursor: default;
 }
 
+/* CoC orange send button */
 .composeSend {
-  background: #394a75;
+  background: linear-gradient(180deg, #f7c94a 0%, #e87e04 45%, #c05800 100%);
   color: #fff;
-  border: none;
-  border-radius: 4px;
+  border: 2px solid #8b4500;
+  border-radius: 8px;
   padding: 8px 20px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
+  box-shadow: 0 4px 0 #7a3200, inset 0 1px 0 rgba(255,230,120,0.4);
+  text-shadow: 0 -1px 0 rgba(0,0,0,0.5);
+  transition: transform 0.08s, box-shadow 0.08s;
+}
+
+.composeSend:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 0 #7a3200;
+}
+
+.composeSend:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #7a3200;
 }
 
 .composeSend:disabled {
@@ -92,18 +120,24 @@
 
 .composeCancel {
   background: transparent;
-  color: #aaa;
-  border: 1px solid #3a3a55;
-  border-radius: 4px;
+  color: #d4a84b;
+  border: 2px solid #7a5500;
+  border-radius: 8px;
   padding: 8px 14px;
   font-size: 13px;
   cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.composeCancel:hover {
+  color: #fff8e1;
+  border-color: #c8a000;
 }
 
 .composeLabel {
   margin: 0 0 6px 0;
   font-size: 12px;
-  color: #888;
+  color: #d4a84b;
 }
 
 .inventoryGrid {
@@ -113,24 +147,27 @@
 }
 
 .inventoryItem {
-  background: #2a2a3e;
-  border: 2px solid #3a3a55;
-  border-radius: 4px;
-  width: 40px;
-  height: 40px;
+  background: linear-gradient(180deg, #5a3000 0%, #3a1800 100%);
+  border: 2px solid #c8a000;
+  border-radius: 6px;
+  width: 42px;
+  height: 42px;
   font-size: 20px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: border-color 0.15s;
+  box-shadow: 0 2px 0 #8b5500;
+  transition: transform 0.08s, box-shadow 0.08s;
 }
 
 .inventoryItem:hover {
-  border-color: #6677aa;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 0 #8b5500;
 }
 
 .inventoryItemSelected {
-  border-color: #394a75;
-  background: #394a75;
+  border-color: #ffd84d;
+  background: linear-gradient(180deg, #7a5000 0%, #5a3200 100%);
+  box-shadow: 0 2px 0 #c8a000;
 }

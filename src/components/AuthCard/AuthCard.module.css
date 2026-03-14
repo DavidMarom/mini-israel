@@ -1,18 +1,31 @@
+/* CoC wooden card */
 .card {
-  background: linear-gradient(160deg, #c8952a 0%, #a87020 100%);
-  border: 2px solid #7a4a10;
-  border-radius: 8px;
-  padding: 32px 28px;
+  background: linear-gradient(180deg, #5a3000 0%, #3a1800 100%);
+  border: 3px solid #c8a000;
+  border-radius: 12px;
+  padding: 28px 22px;
   max-width: 280px;
   flex-shrink: 0;
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 14px;
   pointer-events: auto;
   margin-right: auto;
   position: relative;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 220, 80, 0.2);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,220,80,0.18);
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 14px;
+  right: 14px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255,230,100,0.35), transparent);
+  border-radius: 999px;
+  pointer-events: none;
 }
 
 .logoutBtn {
@@ -23,7 +36,7 @@
   border: none;
   padding: 4px;
   cursor: pointer;
-  color: #555;
+  color: #d4a84b;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -32,46 +45,63 @@
 }
 
 .logoutBtn:hover {
-  color: #111;
-  background-color: rgba(0, 0, 0, 0.08);
+  color: #fff8e1;
+  background-color: rgba(255,200,60,0.15);
 }
 
 .text {
   margin: 0;
   font-size: 14px;
-  color: #fff8e8;
+  color: #fff8e1;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
+/* CoC 3-D orange raised button */
 .primaryButton,
 .secondaryButton {
-  border-radius: 3px;
-  padding: 7px 0px;
-  border: 1px solid transparent;
-  font-size: 12px;
-  font-weight: 500;
+  border-radius: 8px;
+  padding: 9px 0;
+  font-size: 13px;
+  font-weight: 700;
   cursor: pointer;
-  transition: background-color 0.16s ease, border-color 0.16s ease,
-    transform 0.08s ease;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  text-shadow: 0 -1px 0 rgba(0,0,0,0.55);
+  letter-spacing: 0.3px;
 }
 
 .primaryButton {
-  background-color: #000;
+  background: linear-gradient(180deg, #f7c94a 0%, #e87e04 45%, #c05800 100%);
   color: #fff;
+  border: 2px solid #8b4500;
+  box-shadow: 0 4px 0 #7a3200, inset 0 1px 0 rgba(255,230,120,0.5);
 }
 
 .primaryButton:hover {
-  background-color: var(--button-primary-hover);
   transform: translateY(-1px);
+  box-shadow: 0 5px 0 #7a3200, inset 0 1px 0 rgba(255,230,120,0.5);
+}
+
+.primaryButton:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #7a3200;
 }
 
 .secondaryButton {
-  background-color: transparent;
-  color: var(--text-primary);
-  border-color: var(--button-secondary-border);
+  background: linear-gradient(180deg, #e0e0e0 0%, #b8b8b8 100%);
+  color: #3a1800;
+  border: 2px solid #888;
+  box-shadow: 0 4px 0 #666, inset 0 1px 0 rgba(255,255,255,0.5);
+  text-shadow: none;
 }
 
 .secondaryButton:hover {
-  background-color: var(--button-secondary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 5px 0 #666, inset 0 1px 0 rgba(255,255,255,0.5);
+}
+
+.secondaryButton:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #666;
 }
 
 .userRow {
@@ -92,16 +122,18 @@
   padding: 0;
   cursor: pointer;
   font-size: 14px;
-  color: #111827;
+  color: #ffd84d;
 }
 
 .nameInput {
-  border-radius: 999px;
-  border: 1px solid #d1d5db;
-  padding: 4px 10px;
+  border-radius: 6px;
+  border: 2px solid #c8a000;
+  padding: 5px 10px;
   font-size: 13px;
   width: 100%;
   box-sizing: border-box;
+  background: #1a0800;
+  color: #fff8e1;
 }
 
 .nameEditColumn {
@@ -113,39 +145,56 @@
 
 .saveNameButton {
   align-self: flex-start;
-  border-radius: 999px;
-  padding: 4px 10px;
-  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 5px 14px;
+  border: 2px solid #8b4500;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 700;
   cursor: pointer;
-  background-color: #000;
+  background: linear-gradient(180deg, #f7c94a 0%, #e87e04 45%, #c05800 100%);
   color: #fff;
+  box-shadow: 0 3px 0 #7a3200;
+  text-shadow: 0 -1px 0 rgba(0,0,0,0.5);
+  transition: transform 0.08s, box-shadow 0.08s;
+}
+
+.saveNameButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 0 #7a3200;
+}
+
+.saveNameButton:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #7a3200;
 }
 
 .avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 999px;
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  border: 2px solid #c8a000;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
 }
 
 .avatarFallback {
-  width: 40px;
-  height: 40px;
-  border-radius: 999px;
-  background-color: #4b5563;
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  border: 2px solid #c8a000;
+  background: linear-gradient(180deg, #5a3000 0%, #3a1800 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #f9fafb;
+  color: #ffd84d;
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .error {
   margin: 0;
   font-size: 13px;
-  color: #b91c1c;
+  color: #ff6b6b;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
 .bio {
@@ -157,25 +206,28 @@
 }
 
 .bioInput {
-  border-radius: 4px;
-  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  border: 2px solid #c8a000;
   padding: 6px 10px;
   font-size: 12px;
   width: 100%;
   box-sizing: border-box;
   resize: none;
   font-family: inherit;
+  background: #1a0800;
+  color: #fff8e1;
 }
 
 .balanceText {
   margin: 0;
   font-size: 13px;
-  color: #fff3cc;
+  color: #fde4a0;
 }
 
 .balanceValue {
   font-weight: 700;
-  color: #fff;
+  color: #ffd84d;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
 }
 
 .inventorySection {
@@ -187,7 +239,8 @@
 .inventoryTitle {
   margin: 0;
   font-size: 12px;
-  color: #ffffff;
+  color: #fde4a0;
+  font-weight: 600;
 }
 
 .inventoryItems {
@@ -197,39 +250,50 @@
 }
 
 .inventoryItem {
-  background: #e5e5e5;
-  border-radius: 4px;
+  background: linear-gradient(180deg, #5a3000 0%, #3a1800 100%);
+  border: 2px solid #c8a000;
+  border-radius: 6px;
   padding: 4px 8px;
-  font-size: 13px;
+  font-size: 14px;
+  box-shadow: 0 2px 0 #8b5500;
 }
 
 .horaotLink {
   font-size: 12px;
-  color: #ffffff;
+  color: #ffd84d;
   text-decoration: none;
   text-align: center;
   transition: color 0.15s;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
 .horaotLink:hover {
-  color: #222;
+  color: #fff8e1;
 }
 
+/* CoC green 3-D button for farm */
 .farmButton {
-  border-radius: 3px;
-  padding: 7px 0px;
-  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 9px 0;
+  border: 2px solid #1a5c00;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 700;
   cursor: pointer;
-  background-color: #4a7c3f;
+  background: linear-gradient(180deg, #7de84a 0%, #3db800 45%, #2a8000 100%);
   color: #fff;
-  transition: background-color 0.16s ease, transform 0.08s ease;
+  box-shadow: 0 4px 0 #164e00, inset 0 1px 0 rgba(180,255,120,0.4);
+  text-shadow: 0 -1px 0 rgba(0,0,0,0.5);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
 }
 
 .farmButton:hover:not(:disabled) {
-  background-color: #3a6230;
   transform: translateY(-1px);
+  box-shadow: 0 5px 0 #164e00, inset 0 1px 0 rgba(180,255,120,0.4);
+}
+
+.farmButton:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #164e00;
 }
 
 .farmButton:disabled {
@@ -237,36 +301,44 @@
   cursor: not-allowed;
 }
 
+/* CoC gold star VIP badge */
 .vipBadge {
   font-size: 11px;
   font-weight: 700;
-  color: #b8860b;
-  background: #fff9e6;
-  border: 1px solid #f0c040;
+  color: #3a1800;
+  background: linear-gradient(180deg, #ffd84d 0%, #c8a000 100%);
+  border: 1px solid #a07800;
   border-radius: 999px;
-  padding: 1px 7px;
+  padding: 2px 8px;
   white-space: nowrap;
+  box-shadow: 0 2px 0 #8b6500;
 }
 
+/* CoC gold 3-D VIP button */
 .vipButton {
-  border-radius: 3px;
-  padding: 7px 0px;
-  border: 1px solid #f0c040;
+  border-radius: 8px;
+  padding: 9px 0;
+  border: 2px solid #a07800;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  background-color: #fff9e6;
-  color: #b8860b;
-  transition: background-color 0.16s ease, transform 0.08s ease;
+  background: linear-gradient(180deg, #fff4a0 0%, #ffd84d 45%, #c8a000 100%);
+  color: #3a1800;
+  box-shadow: 0 4px 0 #8b6500, inset 0 1px 0 rgba(255,255,220,0.6);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
 }
 
 .vipButton:hover:not(:disabled) {
-  background-color: #ffeeba;
   transform: translateY(-1px);
+  box-shadow: 0 5px 0 #8b6500, inset 0 1px 0 rgba(255,255,220,0.6);
+}
+
+.vipButton:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #8b6500;
 }
 
 .vipButton:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
-
