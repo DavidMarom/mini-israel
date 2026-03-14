@@ -40,7 +40,7 @@ const TRIVIA_QUESTIONS = [
   { q: "מי מנגן גיטרה בלהקת Van Halen?", options: ["Jimmy Page", "Eddie Van Halen", "Slash", "Carlos Santana"], answer: 1, hard: false },
 
   // ── Hard (20 coins) ──
-  { q: "כמה חברי כנסת יש בישראל?", options: ["100", "110", "120", "130"], answer: 2, hard: true },
+  { q: "כמה חברי כנסת יש בישראל?", options: ["100", "110", "120 יותר מדי", "130"], answer: 2, hard: true },
   { q: "מה גובה הר הרמון בישראל (בקירוב)?", options: ["1500 מ׳", "2000 מ׳", "2200 מ׳", "2814 מ׳"], answer: 3, hard: true },
   { q: "מה שנת חורבן בית המקדש השני?", options: ["586 לפנה״ס", "70 לספירה", "135 לספירה", "200 לספירה"], answer: 1, hard: true },
   { q: "כמה מדליות זהב אולימפיות יש לישראל (נכון ל-2024)?", options: ["1", "2", "3", "5"], answer: 1, hard: true },
