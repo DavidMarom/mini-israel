@@ -6,6 +6,8 @@
   align-items: center;
   justify-content: center;
   z-index: 20;
+  overflow-y: auto;
+  padding: 12px;
 }
 
 .modal {
@@ -16,6 +18,9 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  max-height: calc(100dvh - 24px);
+  overflow-y: auto;
+  flex-shrink: 0;
 }
 
 .modalTitle {

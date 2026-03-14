@@ -382,7 +382,7 @@ export default function Home() {
       <SplashScreen show={showSplash} fading={splashFading} />
       <MobilePortraitOverlay show={isMobilePortrait} />
       <div className={styles.boardLayer}>
-        <GameBoard onOtherHouseClick={(target) => { setComposeTarget(target); setComposeText(""); setComposeItemIndex(null); }} justPoopedUid={justPoopedUid} boardRefreshKey={boardRefreshKey} onHasFarmChange={setHasFarm} boardRef={boardRef} onBoardLoaded={handleBoardLoaded} />
+        <GameBoard onOtherHouseClick={(target) => { setComposeTarget(target); setComposeItemIndex(null); }} justPoopedUid={justPoopedUid} boardRefreshKey={boardRefreshKey} onHasFarmChange={setHasFarm} boardRef={boardRef} onBoardLoaded={handleBoardLoaded} />
       </div>
 
       {storedUser && <ResourceBar money={storedUser.money} />}

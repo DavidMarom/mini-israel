@@ -190,6 +190,8 @@
   align-items: center;
   justify-content: center;
   z-index: 40;
+  overflow-y: auto;
+  padding: 12px;
 }
 
 .shopModal {
@@ -202,6 +204,9 @@
   flex-direction: column;
   gap: 16px;
   direction: rtl;
+  max-height: calc(100dvh - 24px);
+  overflow-y: auto;
+  flex-shrink: 0;
 }
 
 .shopTitle {
@@ -444,6 +449,8 @@
   align-items: center;
   justify-content: center;
   z-index: 40;
+  overflow-y: auto;
+  padding: 12px;
 }
 
 .adPopupModal {
@@ -456,6 +463,9 @@
   flex-direction: column;
   gap: 14px;
   direction: rtl;
+  max-height: calc(100dvh - 24px);
+  overflow-y: auto;
+  flex-shrink: 0;
 }
 
 .adPopupTitle {
@@ -596,6 +606,8 @@
   align-items: center;
   justify-content: center;
   z-index: 40;
+  overflow-y: auto;
+  padding: 12px;
 }
 
 .cameraModal {
@@ -607,6 +619,9 @@
   gap: 16px;
   align-items: flex-start;
   direction: rtl;
+  max-height: calc(100dvh - 24px);
+  overflow-y: auto;
+  flex-shrink: 0;
 }
 
 .cameraBody {
@@ -1099,8 +1114,9 @@
   flex-direction: column;
   gap: 14px;
   direction: rtl;
-  max-height: 90vh;
+  max-height: calc(100dvh - 24px);
   overflow-y: auto;
+  flex-shrink: 0;
 }
 
 .cashoutTitle {
