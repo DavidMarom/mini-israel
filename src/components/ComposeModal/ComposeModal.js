@@ -1,11 +1,10 @@
+import { useState } from "react";
 import styles from "./ComposeModal.module.css";
 import he from "../../lang/he";
 
 export default function ComposeModal({
   composeTarget,
   storedUser,
-  composeText,
-  setComposeText,
   composeItemIndex,
   setComposeItemIndex,
   composeSending,
@@ -14,6 +13,8 @@ export default function ComposeModal({
   onThrowPoop,
   onClose,
 }) {
+  const [composeText, setComposeText] = useState("");
+
   if (!composeTarget) return null;
 
   const poopCount = (storedUser?.inventory || []).filter((i) => i.id === "poop").length;
@@ -52,7 +53,7 @@ export default function ComposeModal({
           </button>
         )}
         <div className={styles.composeActions}>
-          <button className={styles.composeSend} onClick={onSend} disabled={composeSending || (composeItemIndex === null && !composeText.trim())}>
+          <button className={styles.composeSend} onClick={() => onSend(composeText)} disabled={composeSending || (composeItemIndex === null && !composeText.trim())}>
             {composeSending ? he.composeSending : he.composeSend}
           </button>
           <button className={styles.composeCancel} onClick={onClose}>{he.composeCancel}</button>
