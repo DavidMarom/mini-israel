@@ -1872,7 +1872,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
                     <div key={u.uid || i} className={`${styles.leaderboardRow} ${isMe ? styles.leaderboardRowMe : ""}`}>
                       <span className={styles.leaderboardRank}>{medals[i] || `#${i + 1}`}</span>
                       <span className={styles.leaderboardName}>{u.name || he.leaderboardAnonymous}</span>
-                      <span className={styles.leaderboardMoney}>{u.money ?? 0} ₪</span>
+                      <span className={styles.leaderboardMoney}>{u.money ?? 0} 🪙</span>
                     </div>
                   );
                 })}
