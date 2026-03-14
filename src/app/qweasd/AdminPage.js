@@ -444,6 +444,37 @@ export default function AdminPage() {
 
   const [tab, setTab] = useState("general");
 
+  // ── Push notifications ───────────────────────────────
+  const [pushTitle, setPushTitle] = useState("");
+  const [pushBody, setPushBody] = useState("");
+  const [pushLoading, setPushLoading] = useState(false);
+  const [pushResult, setPushResult] = useState(null);
+
+  const handleSendPush = async () => {
+    if (!pushBody.trim()) return;
+    setPushLoading(true);
+    setPushResult(null);
+    try {
+      const res = await fetch("/api/admin/notify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: pushTitle.trim() || "מיני ישראל 🏠", body: pushBody.trim() }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        setPushResult(`✅ נשלח ל-${data.sent} משתמשים (נכשל: ${data.failed})`);
+        setPushBody("");
+        setPushTitle("");
+      } else {
+        setPushResult("❌ שגיאה: " + (data.error || "Unknown"));
+      }
+    } catch (e) {
+      setPushResult("❌ בקשה נכשלה");
+    } finally {
+      setPushLoading(false);
+    }
+  };
+
   const TABS = [
     { id: "general", label: "כללי" },
     { id: "users", label: "משתמשים" },
@@ -739,6 +770,48 @@ export default function AdminPage() {
           </tbody>
         </table>
       )}
+
+      {/* ── Push Notifications ── */}
+      <h2>🔔 שליחת פוש לכל המשתמשים</h2>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12, maxWidth: 480 }}>
+        <input
+          type="text"
+          placeholder="כותרת (אופציונלי – ברירת מחדל: מיני ישראל 🏠)"
+          value={pushTitle}
+          onChange={(e) => setPushTitle(e.target.value)}
+          style={{
+            padding: "10px 14px", borderRadius: 8, border: "1px solid #ccc",
+            fontSize: 14, direction: "rtl", fontFamily: "sans-serif",
+          }}
+        />
+        <textarea
+          placeholder="תוכן ההודעה..."
+          value={pushBody}
+          onChange={(e) => setPushBody(e.target.value)}
+          rows={4}
+          style={{
+            padding: "10px 14px", borderRadius: 8, border: "1px solid #ccc",
+            fontSize: 14, direction: "rtl", fontFamily: "sans-serif", resize: "vertical",
+          }}
+        />
+        <button
+          onClick={handleSendPush}
+          disabled={pushLoading || !pushBody.trim()}
+          style={{
+            ...actionBtn, background: "#2563eb", padding: "11px 28px",
+            fontSize: 15, borderRadius: 8, alignSelf: "flex-start",
+            opacity: (!pushBody.trim() || pushLoading) ? 0.5 : 1,
+          }}
+        >
+          {pushLoading ? "שולח..." : "📤 שלח פוש"}
+        </button>
+        {pushResult && (
+          <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: pushResult.startsWith("✅") ? "#16a34a" : "#dc2626" }}>
+            {pushResult}
+          </p>
+        )}
+      </div>
+      <hr style={{ margin: "32px 0", border: "none", borderTop: "1px solid #eee" }} />
 
       </> /* end general tab */}
 
