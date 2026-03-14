@@ -1,11 +1,14 @@
+/* CoC wooden card */
 .card {
-  background-color: #c1c1c1;
-  border-radius: 8px;
+  background: linear-gradient(180deg, #4a2600 0%, #2a1200 100%);
+  border: 3px solid #c8a000;
+  border-radius: 10px;
   max-width: 280px;
   width: 100%;
   pointer-events: auto;
   margin-right: auto;
   overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,220,80,0.12);
 }
 
 .header {
@@ -13,30 +16,35 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 14px 20px;
-  background: none;
+  padding: 12px 18px;
+  background: linear-gradient(180deg, #6a3800 0%, #4a2200 100%);
   border: none;
+  border-bottom: 2px solid #c8a000;
   cursor: pointer;
   font-size: 14px;
-  font-weight: 600;
-  color: #111;
+  font-weight: 700;
+  color: #ffd84d;
   text-align: right;
+  text-shadow: 0 -1px 0 rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.4);
 }
 
 .badge {
-  background-color: #16a34a;
+  background: linear-gradient(180deg, #ff6b3d 0%, #cc3300 100%);
   color: #fff;
+  border: 1px solid #aa2200;
   border-radius: 999px;
   font-size: 11px;
   font-weight: 700;
   padding: 1px 7px;
   line-height: 1.4;
+  box-shadow: 0 2px 0 #881800;
+  text-shadow: 0 -1px 0 rgba(0,0,0,0.4);
 }
 
 .chevron {
   margin-right: auto;
   font-size: 11px;
-  color: #555;
+  color: #d4a84b;
 }
 
 .list {
@@ -45,27 +53,27 @@
   gap: 1px;
   max-height: 260px;
   overflow-y: auto;
-  border-top: 1px solid #aaa;
+  border-top: none;
 }
 
 .empty {
-  padding: 12px 20px;
+  padding: 12px 18px;
   font-size: 13px;
-  color: #666;
+  color: #d4a84b;
   margin: 0;
 }
 
 .message {
-  padding: 10px 20px;
-  background-color: #d0d0d0;
+  padding: 10px 18px;
+  background: linear-gradient(180deg, #3a1e00 0%, #2a1200 100%);
   display: flex;
   flex-direction: column;
   gap: 3px;
 }
 
 .unread {
-  background-color: #e8e8e8;
-  border-right: 3px solid #394a75;
+  background: linear-gradient(180deg, #5a3000 0%, #3a1800 100%);
+  border-right: 3px solid #ffd84d;
 }
 
 .messageTop {
@@ -77,7 +85,8 @@
 .from {
   font-size: 12px;
   font-weight: 700;
-  color: #394a75;
+  color: #ffd84d;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
 }
 
 .msgActions {
@@ -105,7 +114,7 @@
   font-size: 14px;
   padding: 0;
   line-height: 1;
-  color: #394a75;
+  color: #ffd84d;
 }
 
 .deleteBtn {
@@ -115,12 +124,14 @@
   font-size: 13px;
   padding: 0;
   line-height: 1;
+  color: #d4a84b;
 }
 
+/* CoC dark wooden reply modal */
 .replyBackdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.65);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -130,8 +141,9 @@
 }
 
 .replyModal {
-  background: #1e1e2e;
-  border-radius: 8px;
+  background: linear-gradient(180deg, #4a2600 0%, #2a1200 100%);
+  border: 3px solid #c8a000;
+  border-radius: 14px;
   padding: 28px 24px;
   width: 100%;
   max-width: 340px;
@@ -142,12 +154,13 @@
   max-height: calc(100vh - 32px);
   overflow-y: auto;
   flex-shrink: 0;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,220,80,0.15);
 }
 
 .replyLabel {
   margin: 0 0 6px 0;
   font-size: 12px;
-  color: #888;
+  color: #d4a84b;
 }
 
 .replyInventoryGrid {
@@ -157,41 +170,43 @@
 }
 
 .replyInventoryItem {
-  background: #2a2a3e;
-  border: 2px solid #3a3a55;
-  border-radius: 4px;
-  width: 40px;
-  height: 40px;
+  background: linear-gradient(180deg, #5a3000 0%, #3a1800 100%);
+  border: 2px solid #c8a000;
+  border-radius: 6px;
+  width: 42px;
+  height: 42px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   font-size: 18px;
-  transition: border-color 0.15s;
+  box-shadow: 0 2px 0 #8b5500;
+  transition: transform 0.08s;
 }
 
 .replyInventoryItem:hover {
-  border-color: #6677aa;
+  transform: translateY(-1px);
 }
 
 .replyInventoryItemSelected {
-  border-color: #394a75;
-  background: #394a75;
+  border-color: #ffd84d;
+  background: linear-gradient(180deg, #7a5000 0%, #5a3200 100%);
 }
 
 .replyTitle {
   margin: 0;
   font-size: 15px;
-  font-weight: 600;
-  color: #e0e0e0;
+  font-weight: 700;
+  color: #ffd84d;
+  text-shadow: 0 -1px 0 rgba(0,0,0,0.6);
 }
 
 .replyTextarea {
   resize: none;
-  border-radius: 5px;
-  border: 1px solid #3a3a55;
-  background: #2a2a3e;
-  color: #e0e0e0;
+  border-radius: 8px;
+  border: 2px solid #c8a000;
+  background: #1a0800;
+  color: #fff8e1;
   font-size: 14px;
   padding: 10px 12px;
   font-family: inherit;
@@ -199,7 +214,7 @@
 }
 
 .replyTextarea::placeholder {
-  color: #666;
+  color: #a07840;
 }
 
 .replyActions {
@@ -209,40 +224,58 @@
 }
 
 .replySend {
-  background: #394a75;
+  background: linear-gradient(180deg, #f7c94a 0%, #e87e04 45%, #c05800 100%);
   color: #fff;
-  border: none;
-  border-radius: 4px;
+  border: 2px solid #8b4500;
+  border-radius: 8px;
   padding: 8px 20px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
+  box-shadow: 0 4px 0 #7a3200, inset 0 1px 0 rgba(255,230,120,0.4);
+  text-shadow: 0 -1px 0 rgba(0,0,0,0.5);
+  transition: transform 0.08s, box-shadow 0.08s;
+}
+
+.replySend:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 0 #7a3200;
+}
+
+.replySend:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #7a3200;
 }
 
 .replySend:disabled {
   opacity: 0.45;
-  /* cursor: default; */
 }
 
 .replyCancel {
   background: transparent;
-  color: #aaa;
-  border: 1px solid #3a3a55;
-  border-radius: 4px;
+  color: #d4a84b;
+  border: 2px solid #7a5500;
+  border-radius: 8px;
   padding: 8px 14px;
   font-size: 13px;
   cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.replyCancel:hover {
+  color: #fff8e1;
+  border-color: #c8a000;
 }
 
 .text {
   font-size: 13px;
-  color: #222;
+  color: #fde4a0;
   margin: 0;
   word-break: break-word;
 }
 
 .time {
   font-size: 11px;
-  color: #888;
+  color: #a07840;
   align-self: flex-end;
 }

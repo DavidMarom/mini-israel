@@ -1,6 +1,25 @@
 :root {
   --background: #ffffff;
   --foreground: #444444;
+
+  /* Clash of Clans palette */
+  --coc-brown-dark:   #1a0800;
+  --coc-brown-mid:    #3d1c00;
+  --coc-brown-panel:  linear-gradient(180deg, #4a2600 0%, #2a1200 100%);
+  --coc-gold:         #c8a000;
+  --coc-gold-light:   #ffd84d;
+  --coc-text:         #fff8e1;
+  --coc-text-dim:     #d4a84b;
+
+  /* CoC button – orange 3-D raised */
+  --coc-btn-bg:       linear-gradient(180deg, #f7c94a 0%, #e87e04 45%, #c05800 100%);
+  --coc-btn-border:   #8b4500;
+  --coc-btn-shadow:   0 4px 0 #7a3200, inset 0 1px 0 rgba(255,230,120,0.5);
+
+  /* CoC green button (farm / positive action) */
+  --coc-btn-green-bg:     linear-gradient(180deg, #7de84a 0%, #3db800 45%, #2a8000 100%);
+  --coc-btn-green-border: #1a5c00;
+  --coc-btn-green-shadow: 0 4px 0 #164e00, inset 0 1px 0 rgba(180,255,120,0.4);
 }
 
 

@@ -1,41 +1,61 @@
 .resourceBar {
   position: fixed;
-  top: 14px;
+  top: 12px;
   right: 14px;
   z-index: 19;
   pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 @media (max-width: 1220px) {
   .resourceBar {
-    top: 72px;
+    top: 68px;
   }
 }
 
+/* CoC-style resource pill */
 .resourcePill {
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: linear-gradient(135deg, #1a0e00 0%, #2d1a00 100%);
-  border: 2px solid #b8860b;
+  background: linear-gradient(180deg, #2a1400 0%, #1a0800 100%);
+  border: 2px solid #c8a000;
   border-radius: 999px;
-  padding: 6px 16px 6px 10px;
-  min-width: 120px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 220, 80, 0.12);
+  min-width: 140px;
+  height: 36px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,220,80,0.12);
+  overflow: visible;
+  position: relative;
+  padding-right: 14px;
 }
 
-.resourceIcon {
-  font-size: 22px;
-  line-height: 1;
+/* Circular icon bubble – like CoC gold/elixir icon */
+.resourceIconWrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #f7c94a 0%, #d48000 55%, #a05800 100%);
+  border: 2px solid #8b5500;
+  box-shadow: 0 3px 0 #6a3800, inset 0 1px 0 rgba(255,230,120,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
   flex-shrink: 0;
+  margin-left: -4px;
+  position: relative;
+  z-index: 1;
 }
 
 .resourceValue {
-  font-size: 15px;
-  font-weight: 700;
-  color: #fde68a;
-  letter-spacing: 0.3px;
   flex: 1;
-  text-align: left;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff8e1;
+  letter-spacing: 0.5px;
+  text-shadow: 0 -1px 0 rgba(0,0,0,0.7), 0 1px 2px rgba(0,0,0,0.5);
   direction: ltr;
+  padding-left: 6px;
 }
