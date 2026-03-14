@@ -1,0 +1,12 @@
+Problem:
+--------
+Every time you typed a letter in the message box, React re-rendered the entire page.
+Why? Because the text you typed was stored as state in page.js — the top-level component.
+page.js contains the whole game (board, sidebar, modals, everything), so updating its state
+forced React to re-check and re-render all of it on every single keystroke. That caused the lag.
+
+Fix:
+----
+Moved the text state from page.js into ComposeModal itself.
+Now when you type, only the small modal re-renders — not the whole page.
+When you click Send, the modal passes the final text up to the parent as a function argument.

@@ -70,7 +70,6 @@ export default function Home() {
   const [showNameModal, setShowNameModal] = useState(false);
   const [nameInput, setNameInput] = useState("");
   const [composeTarget, setComposeTarget] = useState(null); // { ownerUid, ownerName }
-  const [composeText, setComposeText] = useState("");
   const [composeSending, setComposeSending] = useState(false);
   const [composeItemIndex, setComposeItemIndex] = useState(null);
   const [poopThrowing, setPoopThrowing] = useState(false);
@@ -238,7 +237,7 @@ export default function Home() {
     }
   };
 
-  const handleSendMessage = async () => {
+  const handleSendMessage = async (composeText) => {
     if (!composeTarget || !storedUser) return;
     if (composeItemIndex === null && !composeText.trim()) return;
     setComposeSending(true);
@@ -274,7 +273,6 @@ export default function Home() {
         });
       }
       setComposeTarget(null);
-      setComposeText("");
       setComposeItemIndex(null);
     } catch (err) {
       console.error(err);
@@ -384,7 +382,7 @@ export default function Home() {
       <SplashScreen show={showSplash} fading={splashFading} />
       <MobilePortraitOverlay show={isMobilePortrait} />
       <div className={styles.boardLayer}>
-        <GameBoard onOtherHouseClick={(target) => { setComposeTarget(target); setComposeText(""); setComposeItemIndex(null); }} justPoopedUid={justPoopedUid} boardRefreshKey={boardRefreshKey} onHasFarmChange={setHasFarm} boardRef={boardRef} onBoardLoaded={handleBoardLoaded} />
+        <GameBoard onOtherHouseClick={(target) => { setComposeTarget(target); setComposeItemIndex(null); }} justPoopedUid={justPoopedUid} boardRefreshKey={boardRefreshKey} onHasFarmChange={setHasFarm} boardRef={boardRef} onBoardLoaded={handleBoardLoaded} />
       </div>
 
       {storedUser && <ResourceBar money={storedUser.money} />}
@@ -419,8 +417,6 @@ export default function Home() {
       <ComposeModal
         composeTarget={composeTarget}
         storedUser={storedUser}
-        composeText={composeText}
-        setComposeText={setComposeText}
         composeItemIndex={composeItemIndex}
         setComposeItemIndex={setComposeItemIndex}
         composeSending={composeSending}
