@@ -73,7 +73,7 @@
 
 .houseLevelBadge {
   position: absolute;
-  bottom: 2px;
+  top: -16px;
   right: 2px;
   background: #c8a200;
   color: #fff;

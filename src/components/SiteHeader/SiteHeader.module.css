@@ -20,18 +20,23 @@
 .scrollToHouseBtn {
   background: linear-gradient(180deg, #f7c94a 0%, #e87e04 45%, #c05800 100%);
   border: 2px solid #8b4500;
-  border-radius: 8px;
+  border-radius: 999px;
   cursor: pointer;
-  font-size: 16px;
-  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  padding: 5px 12px;
   line-height: 1;
   box-shadow: 0 3px 0 #7a3200, inset 0 1px 0 rgba(255,230,120,0.4);
+  text-shadow: 0 -1px 0 rgba(0,0,0,0.5);
   transition: transform 0.08s, box-shadow 0.08s;
+  white-space: nowrap;
+  font-family: inherit;
 }
 
 .scrollToHouseBtn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 0 #7a3200;
+  box-shadow: 0 4px 0 #7a3200, inset 0 1px 0 rgba(255,230,120,0.4);
 }
 
 .scrollToHouseBtn:active {

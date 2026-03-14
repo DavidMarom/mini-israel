@@ -179,14 +179,15 @@ export default function Home() {
 
         setUserStore(mergedUser);
 
+        if (data.houseRow != null) {
+          setMainHouse({ row: data.houseRow, col: data.houseCol });
+          pendingScrollRow.current = data.houseRow;
+        }
+
         if (data.created) {
           setNameInput(mergedUser.name || "");
           setShowNameModal(true);
-          if (data.houseRow != null) {
-            setMainHouse({ row: data.houseRow, col: data.houseCol });
-            pendingScrollRow.current = data.houseRow;
-            setBoardRefreshKey((k) => k + 1);
-          }
+          setBoardRefreshKey((k) => k + 1);
         }
       }
     } catch (err) {
@@ -419,6 +420,7 @@ export default function Home() {
       </div>
 
       {storedUser && <ResourceBar money={storedUser.money} />}
+
 
       <Sidebar
         isOpen={sidebarOpen}

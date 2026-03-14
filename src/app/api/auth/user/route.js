@@ -44,14 +44,21 @@ export async function POST(request) {
       if (Object.keys(update).length > 0) {
         update.updatedAt = now;
         await users.updateOne({ _id: existing._id }, { $set: update });
-        return NextResponse.json(
-          { user: { ...existing, ...update }, created: false },
-          { status: 200 }
-        );
       }
 
+      // Always return house position so the client can scroll to it
+      const boardCollection = db.collection("board");
+      const boardDoc = await boardCollection.findOne({ _id: BOARD_ID });
+      const cells = boardDoc?.cells || [];
+      const houseCell = cells.find((c) => c.building === "main-house" && c.ownerUid === uid);
+
       return NextResponse.json(
-        { user: existing, created: false },
+        {
+          user: { ...existing, ...update },
+          created: false,
+          houseRow: houseCell?.row ?? null,
+          houseCol: houseCell?.col ?? null,
+        },
         { status: 200 }
       );
     }
