@@ -7,6 +7,7 @@ import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut, } fro
 import { GameBoard, NameModal, ComposeModal, SplashScreen, LotteryPopup, ResourceBar, ScrollHint, MobilePortraitOverlay, Sidebar } from "../components";
 import useUserStore from "../store/useUserStore";
 import { fireConfetti } from "../utils/confetti";
+import { playSound } from "../utils/sounds";
 import he from "../lang/he";
 
 const provider = new GoogleAuthProvider();
@@ -59,11 +60,22 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const playOnce = () => {
+      playSound("intro-sound");
+      window.removeEventListener("click", playOnce);
+      window.removeEventListener("keydown", playOnce);
+    };
+    window.addEventListener("click", playOnce);
+    window.addEventListener("keydown", playOnce);
     const t = setTimeout(() => {
       setSplashFading(true);
       setTimeout(() => setShowSplash(false), 300);
     }, 2000);
-    return () => clearTimeout(t);
+    return () => {
+      clearTimeout(t);
+      window.removeEventListener("click", playOnce);
+      window.removeEventListener("keydown", playOnce);
+    };
   }, []);
   const [error, setError] = useState(null);
   const [backendUser, setBackendUser] = useState(null);
@@ -299,6 +311,7 @@ export default function Home() {
         );
         return;
       }
+      playSound("money-sound");
       setUserStore((prev) => ({ ...prev, money: data.money, isVIP: true }));
       fireConfetti();
     } catch (e) {

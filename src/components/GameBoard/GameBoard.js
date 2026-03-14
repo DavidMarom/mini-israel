@@ -5,6 +5,7 @@ import styles from "./GameBoard.module.css";
 import useUserStore from "../../store/useUserStore";
 import TRIVIA_QUESTIONS from "../../data/triviaQuestions";
 import { fireConfetti } from "../../utils/confetti";
+import { playSound } from "../../utils/sounds";
 import he from "../../lang/he";
 
 const ROWS = 230;
@@ -333,7 +334,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
         body: JSON.stringify({ uid: ownerUid }),
       });
       const data = await res.json();
-      if (data.money != null) { setUser((prev) => ({ ...prev, money: data.money })); fireConfetti(); }
+      if (data.money != null) { playSound("chicken-sound"); setUser((prev) => ({ ...prev, money: data.money })); fireConfetti(); }
     } catch (e) { console.error(e); }
     finally { setFarmCollecting(false); }
   };
@@ -481,6 +482,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
         );
         return;
       }
+      playSound("money-sound");
       setUser((prev) => ({ ...prev, money: data.money, inventory: data.inventory }));
       fireConfetti();
       const next = grid.map((r) => r.slice());
@@ -636,6 +638,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
     setTriviaQuestion(q);
     setTriviaAnswered(false);
     setTriviaCorrect(false);
+    playSound("trivia-sound");
     setShowTrivia(true);
   };
 
@@ -656,6 +659,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
         });
         const data = await res.json();
         if (typeof data.money === "number") {
+          playSound("money-sound");
           setUser((prev) => ({ ...prev, money: data.money }));
         }
       } catch (e) {
@@ -699,6 +703,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
       });
       const data = await res.json();
       if (data.ok) {
+        playSound("money-sound");
         setUser((prev) => ({ ...prev, money: data.money }));
         setNbhdClaimedTodayId(neighborhoodId);
       }
@@ -811,6 +816,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
         alert(data.error === "Insufficient funds" ? he.insufficientFunds : he.error);
         return;
       }
+      playSound("money-sound");
       setUser((prev) => ({ ...prev, money: data.money, inventory: data.inventory }));
       fireConfetti();
       setCandleDone(true);
@@ -838,6 +844,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
         alert(data.error === "Insufficient funds" ? he.insufficientMoney : he.error);
         return;
       }
+      playSound("money-sound");
       setUser((prev) => ({ ...prev, money: data.money, inventory: data.inventory }));
       fireConfetti();
     } finally {
@@ -1045,6 +1052,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
             const next = grid.map((r) => r.slice());
             next[row][col] = null;
             setGrid(next);
+            playSound("money-sound");
             setUser((prev) => ({ ...prev, money: data.money }));
             fireConfetti();
             const toast = { name: user.name, sponsor: data.sponsor };
@@ -1142,6 +1150,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
 
     // Clicking another user's house → open message compose
     if (cell && cell.building === "main-house" && cell.ownerUid !== ownerUid) {
+      playSound("doorbell-sound");
       onOtherHouseClick && onOtherHouseClick({ ownerUid: cell.ownerUid, ownerName: cell.ownerName });
       return;
     }
