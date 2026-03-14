@@ -94,6 +94,56 @@
   }
 }
 
+/* Row containing close + scroll-to-house buttons */
+.sidebarTopRow {
+  display: none;
+}
+
+@media (max-width: 1220px) {
+  .sidebarTopRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    align-self: stretch;
+    gap: 8px;
+    flex-shrink: 0;
+    margin-bottom: 4px;
+  }
+}
+
+.scrollToHouseBtn {
+  display: none;
+}
+
+@media (max-width: 1220px) {
+  .scrollToHouseBtn {
+    background: linear-gradient(180deg, #f7c94a 0%, #e87e04 45%, #c05800 100%);
+    border: 2px solid #8b4500;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    padding: 6px 14px;
+    line-height: 1;
+    box-shadow: 0 3px 0 #7a3200, inset 0 1px 0 rgba(255,230,120,0.4);
+    text-shadow: 0 -1px 0 rgba(0,0,0,0.5);
+    transition: transform 0.08s, box-shadow 0.08s;
+    white-space: nowrap;
+    font-family: inherit;
+  }
+
+  .scrollToHouseBtn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 0 #7a3200, inset 0 1px 0 rgba(255,230,120,0.4);
+  }
+
+  .scrollToHouseBtn:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 #7a3200;
+  }
+}
+
 /* CoC-style close button (smaller orange) */
 .sidebarClose {
   display: none;
@@ -104,7 +154,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    align-self: flex-end;
+    flex-shrink: 0;
     width: 34px;
     height: 34px;
     border-radius: 8px;

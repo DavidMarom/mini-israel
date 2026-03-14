@@ -45,11 +45,26 @@ export default function Sidebar({
       {isOpen && <div className={styles.sidebarBackdrop} onClick={onClose} />}
 
       <div className={`${styles.overlay} ${isOpen ? styles.overlayOpen : ""}`}>
-        <button className={styles.sidebarClose} onClick={onClose} aria-label={he.sidebarCloseMenu}>
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M18 6L6 18M6 6l12 12" />
-          </svg>
-        </button>
+        <div className={styles.sidebarTopRow}>
+          {storedUser?.mainHouse && (
+            <button
+              className={styles.scrollToHouseBtn}
+              onClick={() => {
+                if (!boardRef?.current) return;
+                const { row } = storedUser.mainHouse;
+                const targetTop = row * 64 - boardRef.current.clientHeight / 2 + 32;
+                boardRef.current.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
+              }}
+            >{he.siteScrollToMyHouse}
+            </button>
+          )}
+          
+          <button className={styles.sidebarClose} onClick={onClose} aria-label={he.sidebarCloseMenu}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
 
         <SiteHeader storedUser={storedUser} boardRef={boardRef} onWaClick={onWaClick} />
 
