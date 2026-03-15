@@ -179,6 +179,29 @@
   }
 }
 
+/* Ideas link */
+.ideasLink {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #3a1e00 0%, #2a1200 100%);
+  border: 2px solid #c8a000;
+  color: #ffd84d;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 3px 0 #7a5500;
+  text-shadow: 0 1px 0 rgba(0,0,0,0.4);
+  transition: filter 0.15s;
+  box-sizing: border-box;
+}
+
+.ideasLink:hover {
+  filter: brightness(1.15);
+}
+
 /* CoC yellow note style for taglines */
 .tagline {
   margin: 0;

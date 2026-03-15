@@ -68,6 +68,8 @@ export default function Sidebar({
 
         <SiteHeader storedUser={storedUser} boardRef={boardRef} onWaClick={onWaClick} />
 
+        <a href="/ideas" className={styles.ideasLink}>💡 יש לך רעיון לפיצ'ר? לחץ כאן!</a>
+
         <AuthCard
           loading={loading}
           user={user}
