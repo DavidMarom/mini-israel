@@ -513,6 +513,25 @@ export default function AdminPage() {
     } catch (e) { console.error(e); } finally { setIdeasActionLoading(null); }
   };
 
+  const handleImplementIdea = async (id) => {
+    if (!confirm("להפעיל את הבינה המלאכותית ליישום הרעיון? תיווצר ענף ו-PR אוטומטית.")) return;
+    setIdeasActionLoading(id + "implement");
+    try {
+      const res = await fetch("/api/admin/implement-idea", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        setIdeas((prev) => prev.map((r) => String(r._id) === id ? { ...r, status: "implementing" } : r));
+        alert("✅ הבינה המלאכותית התחילה לעבוד! עקוב אחרי הלוג בשרת. ה-PR ייפתח בעוד מספר דקות.");
+      } else {
+        alert("❌ שגיאה: " + (data.error || "Unknown"));
+      }
+    } catch (e) { alert("❌ שגיאה בשליחה"); } finally { setIdeasActionLoading(null); }
+  };
+
   const TABS = [
     { id: "general", label: "כללי" },
     { id: "users", label: "משתמשים" },
@@ -1059,8 +1078,8 @@ export default function AdminPage() {
           <tbody>
             {ideas.map((r) => {
               const id = String(r._id);
-              const statusColors = { new: "#2563eb", read: "#d97706", done: "#16a34a" };
-              const statusLabels = { new: "חדש", read: "נקרא", done: "יושם" };
+              const statusColors = { new: "#2563eb", read: "#d97706", implementing: "#7c3aed", done: "#16a34a" };
+              const statusLabels = { new: "חדש", read: "נקרא", implementing: "מיישם...", done: "יושם" };
               return (
                 <tr key={id} style={{ borderBottom: "1px solid #ddd", background: r.status === "new" ? "#eff6ff" : "white" }}>
                   <td style={td}>{r.name || "-"}</td>
@@ -1081,6 +1100,16 @@ export default function AdminPage() {
                       <button onClick={() => handleIdeaStatus(id, "done")} disabled={!!ideasActionLoading} style={{ ...actionBtn, background: "#16a34a" }}>
                         {ideasActionLoading === id + "done" ? "..." : "יושם"}
                       </button>
+                    )}
+                    {r.status !== "implementing" && r.status !== "done" && (
+                      <button onClick={() => handleImplementIdea(id)} disabled={!!ideasActionLoading} style={{ ...actionBtn, background: "#7c3aed" }}>
+                        {ideasActionLoading === id + "implement" ? "..." : "🤖 יישם"}
+                      </button>
+                    )}
+                    {r.prUrl && (
+                      <a href={r.prUrl} target="_blank" rel="noopener noreferrer" style={{ ...actionBtn, background: "#0f172a", border: "1px solid #334155", textDecoration: "none", display: "inline-block" }}>
+                        PR
+                      </a>
                     )}
                     <button onClick={() => handleIdeaDelete(id)} disabled={!!ideasActionLoading} style={{ ...actionBtn, background: "#dc2626" }}>
                       {ideasActionLoading === id + "delete" ? "..." : "מחק"}
