@@ -48,3 +48,10 @@
 .sidebarFooterPhone:hover {
   text-decoration: underline;
 }
+
+.footerText {
+  margin-top: 4px;
+  font-size: 11px;
+  color: #a07840;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+}
