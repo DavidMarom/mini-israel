@@ -88,7 +88,7 @@ const he = {
   // LotteryPopup
   lotteryTitle: "הגרלה שבועית!",
   lotteryBody1: "ביום שלישי הקרוב תיערך הגרלה על",
-  lotteryPrize: "₪100 אמיתיים",
+  lotteryPrize: "₪100",
   lotteryCondition: "תנאי להשתתפות: הזמן/י 2 חברים.",
   lotteryNoRegistration: "אין צורך להירשם",
   lotteryInviteWhatsapp: "📲 הזמן חברים בוואטסאפ",

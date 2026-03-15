@@ -475,11 +475,50 @@ export default function AdminPage() {
     }
   };
 
+  // ── Feature Ideas ─────────────────────────────────────
+  const [ideas, setIdeas] = useState([]);
+  const [ideasLoading, setIdeasLoading] = useState(false);
+  const [ideasActionLoading, setIdeasActionLoading] = useState(null);
+
+  const loadIdeas = async () => {
+    setIdeasLoading(true);
+    try {
+      const res = await fetch("/api/feature-ideas");
+      const data = await res.json();
+      if (Array.isArray(data.ideas)) setIdeas(data.ideas);
+    } catch (e) { console.error(e); } finally { setIdeasLoading(false); }
+  };
+
+  const handleIdeaStatus = async (id, status) => {
+    setIdeasActionLoading(id + status);
+    try {
+      await fetch("/api/feature-ideas", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, status }),
+      });
+      setIdeas((prev) => prev.map((r) => String(r._id) === id ? { ...r, status } : r));
+    } catch (e) { console.error(e); } finally { setIdeasActionLoading(null); }
+  };
+
+  const handleIdeaDelete = async (id) => {
+    setIdeasActionLoading(id + "delete");
+    try {
+      await fetch("/api/feature-ideas", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      setIdeas((prev) => prev.filter((r) => String(r._id) !== id));
+    } catch (e) { console.error(e); } finally { setIdeasActionLoading(null); }
+  };
+
   const TABS = [
     { id: "general", label: "כללי" },
     { id: "users", label: "משתמשים" },
     { id: "yadsara", label: "יד שרה" },
     { id: "advertisers", label: "פניות מפרסמים" },
+    { id: "ideas", label: "רעיונות" },
     { id: "fictive", label: "משתמשים פיקטיביים" },
   ];
 
@@ -998,6 +1037,63 @@ export default function AdminPage() {
       )}
 
       </> /* end advertisers tab */}
+
+      {tab === "ideas" && <>
+
+      {/* ── Feature Ideas ── */}
+      <h2>💡 רעיונות לפיצ'רים</h2>
+      <button onClick={loadIdeas} disabled={ideasLoading} style={{ marginBottom: 16, padding: "6px 16px", cursor: "pointer" }}>
+        {ideasLoading ? "טוען..." : "רענן"}
+      </button>
+      {ideasLoading ? <p>טוען...</p> : ideas.length === 0 ? <p style={{ color: "#888" }}>אין רעיונות עדיין.</p> : (
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+          <thead>
+            <tr style={{ background: "#f0f0f0", textAlign: "right" }}>
+              <th style={th}>שם</th>
+              <th style={th}>רעיון</th>
+              <th style={th}>תאריך</th>
+              <th style={th}>סטטוס</th>
+              <th style={th}>פעולות</th>
+            </tr>
+          </thead>
+          <tbody>
+            {ideas.map((r) => {
+              const id = String(r._id);
+              const statusColors = { new: "#2563eb", read: "#d97706", done: "#16a34a" };
+              const statusLabels = { new: "חדש", read: "נקרא", done: "יושם" };
+              return (
+                <tr key={id} style={{ borderBottom: "1px solid #ddd", background: r.status === "new" ? "#eff6ff" : "white" }}>
+                  <td style={td}>{r.name || "-"}</td>
+                  <td style={{ ...td, maxWidth: 320, wordBreak: "break-word" }}>{r.idea}</td>
+                  <td style={{ ...td, whiteSpace: "nowrap" }}>{r.createdAt ? new Date(r.createdAt).toLocaleDateString("he-IL") : "-"}</td>
+                  <td style={td}>
+                    <span style={{ color: statusColors[r.status] || "#333", fontWeight: 600 }}>
+                      {statusLabels[r.status] || r.status}
+                    </span>
+                  </td>
+                  <td style={{ ...td, display: "flex", gap: 6, flexWrap: "wrap" }}>
+                    {r.status !== "read" && (
+                      <button onClick={() => handleIdeaStatus(id, "read")} disabled={!!ideasActionLoading} style={{ ...actionBtn, background: "#d97706" }}>
+                        {ideasActionLoading === id + "read" ? "..." : "נקרא"}
+                      </button>
+                    )}
+                    {r.status !== "done" && (
+                      <button onClick={() => handleIdeaStatus(id, "done")} disabled={!!ideasActionLoading} style={{ ...actionBtn, background: "#16a34a" }}>
+                        {ideasActionLoading === id + "done" ? "..." : "יושם"}
+                      </button>
+                    )}
+                    <button onClick={() => handleIdeaDelete(id)} disabled={!!ideasActionLoading} style={{ ...actionBtn, background: "#dc2626" }}>
+                      {ideasActionLoading === id + "delete" ? "..." : "מחק"}
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      )}
+
+      </> /* end ideas tab */}
 
       {tab === "fictive" && <>
         <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24, flexWrap: "wrap" }}>
