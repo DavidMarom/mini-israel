@@ -7,7 +7,9 @@ export async function POST(req) {
     const { id } = await req.json();
     if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
 
-    const scriptPath = path.join(process.cwd(), "scripts", "implement-idea.mjs");
+    // Split filename to prevent Next.js output file tracer from bundling the script
+    const scriptFile = ["implement", "idea"].join("-") + ".mjs";
+    const scriptPath = path.join(process.cwd(), "scripts", scriptFile);
 
     const child = spawn("node", [scriptPath, id], {
       cwd: process.cwd(),
