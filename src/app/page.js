@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import styles from "./page.module.css";
 import { auth } from "../services/fb";
 import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut, } from "firebase/auth";
-import { GameBoard, NameModal, ComposeModal, SplashScreen, LotteryPopup, ResourceBar, ScrollHint, MobilePortraitOverlay, Sidebar } from "../components";
+import { GameBoard, NameModal, ComposeModal, SplashScreen, LotteryPopup, ResourceBar, ScrollHint, MobilePortraitOverlay, Sidebar, WanderingSheep } from "../components";
 import useUserStore from "../store/useUserStore";
 import { fireConfetti } from "../utils/confetti";
 import { playSound } from "../utils/sounds";
@@ -466,6 +466,7 @@ export default function Home() {
 
       <LotteryPopup show={showLotteryPopup} onClose={() => setShowLotteryPopup(false)} storedUser={storedUser} />
 
+      <WanderingSheep />
     </div>
   );
 }

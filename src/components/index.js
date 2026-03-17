@@ -12,4 +12,5 @@ export { default as MobilePortraitOverlay } from "./MobilePortraitOverlay/Mobile
 export { default as SiteHeader } from "./SiteHeader/SiteHeader";
 export { default as SidebarFooter } from "./SidebarFooter/SidebarFooter";
 export { default as Sidebar } from "./Sidebar/Sidebar";
+export { default as WanderingSheep } from "./WanderingSheep/WanderingSheep";
 
