@@ -1,0 +1,60 @@
+.container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 25;
+  overflow: hidden;
+}
+
+.sheep {
+  position: absolute;
+  font-size: 42px;
+  line-height: 1;
+  transition: transform 0.15s ease;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
+  animation: sheepBob 0.6s ease-in-out infinite alternate;
+  cursor: default;
+  user-select: none;
+}
+
+.flipped {
+  transform: scaleX(-1);
+}
+
+.poop {
+  position: absolute;
+  font-size: 22px;
+  line-height: 1;
+  animation: poopDrop 4s ease-out forwards;
+  user-select: none;
+  pointer-events: auto;
+  cursor: pointer;
+  z-index: 26;
+}
+
+@keyframes sheepBob {
+  from {
+    translate: 0 0;
+  }
+  to {
+    translate: 0 -4px;
+  }
+}
+
+@keyframes poopDrop {
+  0% {
+    opacity: 1;
+    scale: 0.5;
+  }
+  15% {
+    opacity: 1;
+    scale: 1;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    scale: 1;
+  }
+}
