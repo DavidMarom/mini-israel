@@ -27,7 +27,9 @@
   line-height: 1;
   animation: poopDrop 4s ease-out forwards;
   user-select: none;
-  pointer-events: none;
+  pointer-events: auto;
+  cursor: pointer;
+  z-index: 26;
 }
 
 @keyframes sheepBob {

@@ -9,12 +9,30 @@ const POOP_INTERVAL = 3000;
 const MOVE_INTERVAL = 50;
 const SPEED = 2;
 
-export default function WanderingSheep() {
-  const [pos, setPos] = useState({ x: 200, y: 300 });
+export default function WanderingSheep({ boardRef, onPoopCollect }) {
+  const [pos, setPos] = useState(null);
   const [flipped, setFlipped] = useState(false);
   const [poops, setPoops] = useState([]);
   const dirRef = useRef({ dx: SPEED, dy: SPEED * 0.6 });
   const poopIdRef = useRef(0);
+
+  const getBounds = useCallback(() => {
+    if (boardRef?.current) {
+      const rect = boardRef.current.getBoundingClientRect();
+      return {
+        minX: rect.left,
+        minY: rect.top,
+        maxX: rect.right - SHEEP_SIZE,
+        maxY: rect.bottom - SHEEP_SIZE,
+      };
+    }
+    return {
+      minX: 0,
+      minY: 0,
+      maxX: window.innerWidth - SHEEP_SIZE,
+      maxY: window.innerHeight - SHEEP_SIZE,
+    };
+  }, [boardRef]);
 
   const changeDirection = useCallback(() => {
     const angle = Math.random() * Math.PI * 2;
@@ -25,25 +43,40 @@ export default function WanderingSheep() {
     };
   }, []);
 
+  // Init position on board and start movement
+  useEffect(() => {
+    const init = () => {
+      const bounds = getBounds();
+      const midX = bounds.minX + (bounds.maxX - bounds.minX) * 0.5;
+      const midY = bounds.minY + (bounds.maxY - bounds.minY) * 0.3;
+      setPos({ x: midX, y: midY });
+    };
+    // Small delay so boardRef is mounted
+    const t = setTimeout(init, 150);
+    return () => clearTimeout(t);
+  }, [getBounds]);
+
   // Movement
   useEffect(() => {
+    if (!pos) return;
+
     changeDirection();
     const dirChangeTimer = setInterval(changeDirection, 2000 + Math.random() * 2000);
 
     const moveTimer = setInterval(() => {
+      const b = getBounds();
       setPos((prev) => {
-        const maxX = window.innerWidth - SHEEP_SIZE;
-        const maxY = window.innerHeight - SHEEP_SIZE;
+        if (!prev) return prev;
         let nx = prev.x + dirRef.current.dx;
         let ny = prev.y + dirRef.current.dy;
 
-        if (nx <= 0 || nx >= maxX) {
+        if (nx <= b.minX || nx >= b.maxX) {
           dirRef.current.dx *= -1;
-          nx = Math.max(0, Math.min(maxX, nx));
+          nx = Math.max(b.minX, Math.min(b.maxX, nx));
         }
-        if (ny <= 0 || ny >= maxY) {
+        if (ny <= b.minY || ny >= b.maxY) {
           dirRef.current.dy *= -1;
-          ny = Math.max(0, Math.min(maxY, ny));
+          ny = Math.max(b.minY, Math.min(b.maxY, ny));
         }
 
         setFlipped(dirRef.current.dx < 0);
@@ -55,14 +88,19 @@ export default function WanderingSheep() {
       clearInterval(moveTimer);
       clearInterval(dirChangeTimer);
     };
-  }, [changeDirection]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [!!pos, changeDirection, getBounds]);
 
   // Poop dropping
   useEffect(() => {
     const poopTimer = setInterval(() => {
       setPos((current) => {
+        if (!current) return current;
         const id = ++poopIdRef.current;
-        setPoops((prev) => [...prev, { id, x: current.x + SHEEP_SIZE / 2 - 10, y: current.y + SHEEP_SIZE - 8 }]);
+        setPoops((prev) => [
+          ...prev,
+          { id, x: current.x + SHEEP_SIZE / 2 - 10, y: current.y + SHEEP_SIZE - 8 },
+        ]);
         setTimeout(() => {
           setPoops((prev) => prev.filter((p) => p.id !== id));
         }, POOP_LIFETIME);
@@ -73,6 +111,8 @@ export default function WanderingSheep() {
     return () => clearInterval(poopTimer);
   }, []);
 
+  if (!pos) return null;
+
   return (
     <div className={styles.container} aria-hidden="true">
       {poops.map((p) => (
@@ -80,6 +120,11 @@ export default function WanderingSheep() {
           key={p.id}
           className={styles.poop}
           style={{ left: p.x, top: p.y }}
+          title="לחץ לאסוף קקי!"
+          onClick={() => {
+            setPoops((prev) => prev.filter((pp) => pp.id !== p.id));
+            onPoopCollect?.();
+          }}
         >
           💩
         </span>

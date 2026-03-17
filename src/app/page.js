@@ -466,7 +466,26 @@ export default function Home() {
 
       <LotteryPopup show={showLotteryPopup} onClose={() => setShowLotteryPopup(false)} storedUser={storedUser} />
 
-      <WanderingSheep />
+      <WanderingSheep
+        boardRef={boardRef}
+        onPoopCollect={() => {
+          const uid = storedUser?.firebaseUid;
+          if (!uid) return;
+          fetch("/api/items/collect", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ uid, itemId: "poop" }),
+          })
+            .then((r) => r.json())
+            .then((data) => {
+              if (data.inventory) {
+                setUserStore((prev) => ({ ...prev, inventory: data.inventory }));
+                fireConfetti();
+              }
+            })
+            .catch(console.error);
+        }}
+      />
     </div>
   );
 }
