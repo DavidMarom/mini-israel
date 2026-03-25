@@ -32,6 +32,8 @@ const he = {
   buyFarmNoHouse: "יש לבנות בית לפני קניית חווה",
   buyFarmAlreadyHas: "כבר יש לך חווה",
   throwPoopError: "שגיאה, נסה שוב",
+  poopNotifTitle: "💩 זרקו לך קקי על הבית!",
+  poopNotifBody: (name) => `${name} זרק לך קקי על הבית! לחץ כדי לזרוק בחזרה`,
 
   // NameModal
   nameModalTitle: "בחר שם לשחקן",
