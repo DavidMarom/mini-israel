@@ -131,6 +131,22 @@ export default function Home() {
           console.error("Failed to sync user with backend", err);
           setError(he.profileSaveError);
         });
+
+        // Re-register push subscription with uid so targeted notifications work
+        if ("serviceWorker" in navigator && "PushManager" in window) {
+          navigator.serviceWorker.ready.then(async (reg) => {
+            try {
+              const sub = await reg.pushManager.getSubscription();
+              if (sub) {
+                await fetch("/api/push/subscribe", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ subscription: sub.toJSON(), uid: firebaseUser.uid }),
+                });
+              }
+            } catch (e) { console.error("Push uid update failed:", e); }
+          });
+        }
       }
     });
 
@@ -399,6 +415,34 @@ export default function Home() {
       setPoopThrowing(false);
     }
   };
+
+  // Handle ?goto=<uid> URL parameter – scroll to that user's house
+  const gotoHandled = useRef(false);
+  useEffect(() => {
+    if (gotoHandled.current) return;
+    const params = new URLSearchParams(window.location.search);
+    const gotoUid = params.get("goto");
+    if (!gotoUid) return;
+    gotoHandled.current = true;
+    // Fetch the target user's house row from the board
+    fetch("/api/board/find-house?" + new URLSearchParams({ uid: gotoUid }))
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.row != null) {
+          pendingScrollRow.current = data.row;
+          hasScrolledToHouse.current = false;
+          // If board already loaded, scroll now
+          if (boardRef.current) {
+            const targetTop = data.row * 64 - boardRef.current.clientHeight / 2 + 32;
+            boardRef.current.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
+            hasScrolledToHouse.current = true;
+          }
+        }
+      })
+      .catch(console.error);
+    // Clean up URL without reload
+    window.history.replaceState({}, "", "/");
+  }, []);
 
   const handleBoardLoaded = () => {
     if (hasScrolledToHouse.current || !boardRef.current) return;

@@ -1,60 +1,66 @@
+// ── Internal generic factories ────────────────────────
+
+const createReseedHandler = (endpoint, dataKey, label) =>
+  (setLoading, setStatus) => async () => {
+    setLoading(true);
+    setStatus(null);
+    try {
+      const res = await fetch(endpoint, { method: "POST" });
+      const data = await res.json();
+      setStatus(data.ok ? `✅ Seeded ${data[dataKey]} ${label}.` : "❌ Error: " + (data.error || "Unknown error"));
+    } catch (e) {
+      setStatus("❌ Request failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+const createToggleHandler = (endpoint, key) =>
+  (currentValue, setValue, setLoading) => async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ [key]: !currentValue }),
+      });
+      const data = await res.json();
+      if (data.ok) setValue(data[key]);
+    } catch (e) { console.error(e); } finally { setLoading(false); }
+  };
+
+const createStatusHandler = (endpoint) =>
+  (setActionLoading, setItems) => async (id, status) => {
+    setActionLoading(id + status);
+    try {
+      await fetch(endpoint, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, status }),
+      });
+      setItems((prev) => prev.map((r) => String(r._id) === id ? { ...r, status } : r));
+    } catch (e) { console.error(e); } finally { setActionLoading(null); }
+  };
+
+const createDeleteItemHandler = (endpoint) =>
+  (setActionLoading, setItems) => async (id) => {
+    setActionLoading(id + "delete");
+    try {
+      await fetch(endpoint, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      setItems((prev) => prev.filter((r) => String(r._id) !== id));
+    } catch (e) { console.error(e); } finally { setActionLoading(null); }
+  };
+
 // ── Board ────────────────────────────────────────────
 
-export const createHandleReseed = (setLoading, setStatus) => async () => {
-  setLoading(true);
-  setStatus(null);
-  try {
-    const res = await fetch("/api/admin/reseed-apples", { method: "POST" });
-    const data = await res.json();
-    setStatus(data.ok ? `✅ Seeded ${data.apples} apples.` : "❌ Error: " + (data.error || "Unknown error"));
-  } catch (e) {
-    setStatus("❌ Request failed");
-  } finally {
-    setLoading(false);
-  }
-};
-
-export const createHandleReseedOranges = (setOrangeLoading, setStatus) => async () => {
-  setOrangeLoading(true);
-  setStatus(null);
-  try {
-    const res = await fetch("/api/admin/reseed-oranges", { method: "POST" });
-    const data = await res.json();
-    setStatus(data.ok ? `✅ Seeded ${data.oranges} oranges.` : "❌ Error: " + (data.error || "Unknown error"));
-  } catch (e) {
-    setStatus("❌ Request failed");
-  } finally {
-    setOrangeLoading(false);
-  }
-};
-
-export const createHandleReseedShirts = (setShirtLoading, setStatus) => async () => {
-  setShirtLoading(true);
-  setStatus(null);
-  try {
-    const res = await fetch("/api/admin/reseed-shirts", { method: "POST" });
-    const data = await res.json();
-    setStatus(data.ok ? `✅ Seeded ${data.shirts} shirts.` : "❌ Error: " + (data.error || "Unknown error"));
-  } catch (e) {
-    setStatus("❌ Request failed");
-  } finally {
-    setShirtLoading(false);
-  }
-};
-
-export const createHandleReseedPoop = (setPoopLoading, setStatus) => async () => {
-  setPoopLoading(true);
-  setStatus(null);
-  try {
-    const res = await fetch("/api/admin/reseed-poop", { method: "POST" });
-    const data = await res.json();
-    setStatus(data.ok ? `✅ Seeded ${data.count} poops.` : "❌ Error: " + (data.error || "Unknown error"));
-  } catch (e) {
-    setStatus("❌ Request failed");
-  } finally {
-    setPoopLoading(false);
-  }
-};
+export const createHandleReseed = createReseedHandler("/api/admin/reseed-apples", "apples", "apples");
+export const createHandleReseedOranges = createReseedHandler("/api/admin/reseed-oranges", "oranges", "oranges");
+export const createHandleReseedShirts = createReseedHandler("/api/admin/reseed-shirts", "shirts", "shirts");
+export const createHandleReseedPoop = createReseedHandler("/api/admin/reseed-poop", "count", "poops");
 
 // ── Treasure Drop ────────────────────────────────────
 
@@ -116,61 +122,16 @@ export const createHandleClearStarHouse = (setStarLoading, setStatus) => async (
 
 // ── Lottery Popup ────────────────────────────────────
 
-export const createHandleToggleLotteryPopup =
-  (lotteryPopupEnabled, setLotteryPopupEnabled, setLotteryPopupLoading) => async () => {
-    setLotteryPopupLoading(true);
-    try {
-      const res = await fetch("/api/admin/lottery-popup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ enabled: !lotteryPopupEnabled }),
-      });
-      const data = await res.json();
-      if (data.ok) setLotteryPopupEnabled(data.enabled);
-    } catch (e) { console.error(e); } finally { setLotteryPopupLoading(false); }
-  };
+export const createHandleToggleLotteryPopup = createToggleHandler("/api/admin/lottery-popup", "enabled");
 
 // ── Yad Sara Visibility ──────────────────────────────
 
-export const createHandleToggleYadSara =
-  (yadSaraVisible, setYadSaraVisible, setYadSaraToggleLoading) => async () => {
-    setYadSaraToggleLoading(true);
-    try {
-      const res = await fetch("/api/admin/yad-sara", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ visible: !yadSaraVisible }),
-      });
-      const data = await res.json();
-      if (data.ok) setYadSaraVisible(data.visible);
-    } catch (e) { console.error(e); } finally { setYadSaraToggleLoading(false); }
-  };
+export const createHandleToggleYadSara = createToggleHandler("/api/admin/yad-sara", "visible");
 
 // ── Advertise Requests ───────────────────────────────
 
-export const createHandleAdvStatus = (setAdvActionLoading, setAdvRequests) => async (id, status) => {
-  setAdvActionLoading(id + status);
-  try {
-    await fetch("/api/advertise", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, status }),
-    });
-    setAdvRequests((prev) => prev.map((r) => String(r._id) === id ? { ...r, status } : r));
-  } catch (e) { console.error(e); } finally { setAdvActionLoading(null); }
-};
-
-export const createHandleAdvDelete = (setAdvActionLoading, setAdvRequests) => async (id) => {
-  setAdvActionLoading(id + "delete");
-  try {
-    await fetch("/api/advertise", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
-    });
-    setAdvRequests((prev) => prev.filter((r) => String(r._id) !== id));
-  } catch (e) { console.error(e); } finally { setAdvActionLoading(null); }
-};
+export const createHandleAdvStatus = createStatusHandler("/api/advertise");
+export const createHandleAdvDelete = createDeleteItemHandler("/api/advertise");
 
 // ── Users ─────────────────────────────────────────────
 
@@ -227,29 +188,8 @@ export const createHandleEditSave =
 
 // ── Cashout Requests ─────────────────────────────────
 
-export const createHandleCashoutStatus = (setCashoutActionLoading, setCashouts) => async (id, status) => {
-  setCashoutActionLoading(id + status);
-  try {
-    await fetch("/api/cashout", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, status }),
-    });
-    setCashouts((prev) => prev.map((r) => String(r._id) === id ? { ...r, status } : r));
-  } catch (e) { console.error(e); } finally { setCashoutActionLoading(null); }
-};
-
-export const createHandleCashoutDelete = (setCashoutActionLoading, setCashouts) => async (id) => {
-  setCashoutActionLoading(id + "delete");
-  try {
-    await fetch("/api/cashout", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
-    });
-    setCashouts((prev) => prev.filter((r) => String(r._id) !== id));
-  } catch (e) { console.error(e); } finally { setCashoutActionLoading(null); }
-};
+export const createHandleCashoutStatus = createStatusHandler("/api/cashout");
+export const createHandleCashoutDelete = createDeleteItemHandler("/api/cashout");
 
 // ── Fictive Users ─────────────────────────────────────
 
@@ -304,29 +244,8 @@ export const createHandleSendPush =
 
 // ── Feature Ideas ─────────────────────────────────────
 
-export const createHandleIdeaStatus = (setIdeasActionLoading, setIdeas) => async (id, status) => {
-  setIdeasActionLoading(id + status);
-  try {
-    await fetch("/api/feature-ideas", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, status }),
-    });
-    setIdeas((prev) => prev.map((r) => String(r._id) === id ? { ...r, status } : r));
-  } catch (e) { console.error(e); } finally { setIdeasActionLoading(null); }
-};
-
-export const createHandleIdeaDelete = (setIdeasActionLoading, setIdeas) => async (id) => {
-  setIdeasActionLoading(id + "delete");
-  try {
-    await fetch("/api/feature-ideas", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
-    });
-    setIdeas((prev) => prev.filter((r) => String(r._id) !== id));
-  } catch (e) { console.error(e); } finally { setIdeasActionLoading(null); }
-};
+export const createHandleIdeaStatus = createStatusHandler("/api/feature-ideas");
+export const createHandleIdeaDelete = createDeleteItemHandler("/api/feature-ideas");
 
 export const createHandleImplementIdea = (setIdeasActionLoading, setIdeas) => async (id) => {
   if (!confirm("להפעיל את הבינה המלאכותית ליישום הרעיון? תיווצר ענף ו-PR אוטומטית.")) return;
