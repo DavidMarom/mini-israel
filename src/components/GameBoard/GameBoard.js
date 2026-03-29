@@ -96,6 +96,11 @@ const GODZILLA_COL = 5;
 const GODZILLA_W = 4;
 const GODZILLA_H = 4;
 
+const WEAPONS_ROW = 40;
+const WEAPONS_COL = 10;
+const WEAPONS_W = 2;
+const WEAPONS_H = 2;
+
 const HOUSE_IMAGES = [
   "/assets/house/house_1.png",
   "/assets/house/house_2.png",
@@ -678,6 +683,39 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
     { id: "shirt",       img: "/assets/items/shirt.png",       name: he.shopItemShirt,       price: 30,  sellPrice: 20  },
   ];
   const DEFAULT_SELL_PRICE = 5;
+
+  const WEAPONS_ITEMS = [
+    { id: "rifle",        img: "/assets/weapons/rifle.png",        name: he.weaponsItemRifle,        price: 150 },
+    { id: "grenade",      img: "/assets/weapons/grenade.png",      name: he.weaponsItemGrenade,      price: 80  },
+    { id: "flamethrower", img: "/assets/weapons/flamethrower.png", name: he.weaponsItemFlamethrower, price: 200 },
+    { id: "tank",         img: "/assets/weapons/tank.png",         name: he.weaponsItemTank,         price: 300 },
+  ];
+
+  const [showWeaponsShop, setShowWeaponsShop] = useState(false);
+  const [buyingWeapon, setBuyingWeapon] = useState(null);
+
+  const handleBuyWeapon = async (item) => {
+    if (!user || buyingWeapon) return;
+    const uid = user.firebaseUid || user.uid;
+    setBuyingWeapon(item.id);
+    try {
+      const res = await fetch("/api/weapons/buy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid, itemId: item.id }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error === "Insufficient funds" ? he.insufficientMoney : he.error);
+        return;
+      }
+      playSound("money-sound");
+      setUser((prev) => ({ ...prev, money: data.money, inventory: data.inventory }));
+      fireConfetti();
+    } finally {
+      setBuyingWeapon(null);
+    }
+  };
 
   const [showKnesset, setShowKnesset] = useState(false);
   const [sellingItem, setSellingItem] = useState(null); // index being sold
@@ -1458,6 +1496,20 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
           <img src="/assets/synagogue.png" alt={he.synagogueAlt} className={styles.azrieliBuilding} />
         </div>
 
+        {/* Weapons Building */}
+        <div
+          className={styles.azrieliBoard}
+          style={{
+            top: WEAPONS_ROW * TILE_SIZE,
+            left: WEAPONS_COL * TILE_SIZE,
+            width: WEAPONS_W * TILE_SIZE,
+            height: WEAPONS_H * TILE_SIZE,
+          }}
+          onClick={() => setShowWeaponsShop(true)}
+        >
+          <img src="/assets/weapons-building.png" alt={he.weaponsBuildingAlt} className={styles.azrieliBuilding} />
+        </div>
+
         {/* Knesset */}
         <div
           className={styles.azrieliBoard}
@@ -1790,6 +1842,32 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
               ))}
             </div>
             <button className={styles.shopCloseBtn} onClick={() => setShowAzrieliShop(false)}>{he.azrieliShopClose}</button>
+          </div>
+        </div>
+      )}
+
+      {/* Weapons Shop */}
+      {showWeaponsShop && (
+        <div className={styles.shopBackdrop} onClick={() => setShowWeaponsShop(false)}>
+          <div className={styles.shopModal} onClick={(e) => e.stopPropagation()}>
+            <p className={styles.shopTitle}>{he.weaponsShopTitle}</p>
+            <p className={styles.shopBalance}>{he.weaponsShopBalance(user?.money ?? 0)}</p>
+            <div className={styles.shopItems}>
+              {WEAPONS_ITEMS.map((item) => (
+                <div key={item.id} className={styles.shopItem}>
+                  <img src={item.img} alt={item.name} className={styles.shopItemImg} />
+                  <span className={styles.shopItemName}>{item.name}</span>
+                  <button
+                    className={styles.shopBuyBtn}
+                    onClick={() => handleBuyWeapon(item)}
+                    disabled={!user || (user.money ?? 0) < item.price || !!buyingWeapon}
+                  >
+                    {buyingWeapon === item.id ? <span className={styles.shopSpinner} /> : `${item.price} 🪙`}
+                  </button>
+                </div>
+              ))}
+            </div>
+            <button className={styles.shopCloseBtn} onClick={() => setShowWeaponsShop(false)}>{he.weaponsShopClose}</button>
           </div>
         </div>
       )}

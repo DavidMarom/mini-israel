@@ -171,3 +171,14 @@
   background: linear-gradient(180deg, #7a5000 0%, #5a3200 100%);
   box-shadow: 0 2px 0 #c8a000;
 }
+
+.itemCountBadge {
+  position: absolute;
+  bottom: 1px;
+  right: 3px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #ffd84d;
+  line-height: 1;
+  pointer-events: none;
+}
