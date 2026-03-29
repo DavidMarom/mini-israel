@@ -16,6 +16,28 @@
   background-color: var(--background);
 }
 
+.attackEarnedToast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 56px;
+  font-weight: 900;
+  color: #ffd700;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.7);
+  pointer-events: none;
+  z-index: 999;
+  animation: attackEarnedPop 1s ease-out forwards;
+  white-space: nowrap;
+}
+
+@keyframes attackEarnedPop {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.4); }
+  20%  { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
+  50%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -70%) scale(1); }
+}
+
 .missile {
   position: fixed;
   left: 0;

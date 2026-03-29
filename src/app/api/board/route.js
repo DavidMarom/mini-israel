@@ -12,6 +12,9 @@ const AZRIELI_COL = 5;
 const SYNAGOGUE_ROW = 50;
 const SYNAGOGUE_COL = 7;
 
+const WEAPONS_ROW = 40;
+const WEAPONS_COL = 10;
+
 function seedApples(existingCells) {
   const occupied = new Set(existingCells.map((c) => `${c.row}-${c.col}`));
   const apples = [];
@@ -58,6 +61,16 @@ export async function GET() {
       cells.some((c) => c.row === t.row && c.col === t.col && c.building === "synagogue")
     );
 
+    const weaponsTiles = [
+      { row: WEAPONS_ROW,     col: WEAPONS_COL },
+      { row: WEAPONS_ROW,     col: WEAPONS_COL + 1 },
+      { row: WEAPONS_ROW + 1, col: WEAPONS_COL },
+      { row: WEAPONS_ROW + 1, col: WEAPONS_COL + 1 },
+    ];
+    const hasWeapons = weaponsTiles.every((t) =>
+      cells.some((c) => c.row === t.row && c.col === t.col && c.building === "weapons")
+    );
+
     // Generate eggs for farm cells every round hour
     const currentHourEpoch = Math.floor(Date.now() / 3600000);
     let farmUpdated = false;
@@ -69,7 +82,7 @@ export async function GET() {
       return c;
     });
 
-    if (farmUpdated || !hasApples || !hasAzrieli || !hasSynagogue) {
+    if (farmUpdated || !hasApples || !hasAzrieli || !hasSynagogue || !hasWeapons) {
       if (!hasApples) {
         const apples = seedApples(cells);
         cells = [...cells, ...apples];
@@ -81,6 +94,10 @@ export async function GET() {
       if (!hasSynagogue) {
         cells = cells.filter((c) => !synagogueTiles.some((t) => t.row === c.row && t.col === c.col));
         synagogueTiles.forEach((t) => cells.push({ row: t.row, col: t.col, building: "synagogue" }));
+      }
+      if (!hasWeapons) {
+        cells = cells.filter((c) => !weaponsTiles.some((t) => t.row === c.row && t.col === c.col));
+        weaponsTiles.forEach((t) => cells.push({ row: t.row, col: t.col, building: "weapons" }));
       }
       await board.updateOne(
         { _id: BOARD_ID },

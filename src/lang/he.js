@@ -350,6 +350,16 @@ const he = {
   shopItemHeadphones: "אוזניות",
   shopItemPC: "מחשב",
   shopItemShirt: "חולצה",
+
+  // Weapons building
+  weaponsBuildingAlt: "מחסן נשקים",
+  weaponsShopTitle: "⚔️ מחסן נשקים",
+  weaponsShopBalance: (amount) => `יתרה: ${amount} 🪙`,
+  weaponsShopClose: "סגור",
+  weaponsItemRifle: "רובה",
+  weaponsItemGrenade: "רימון",
+  weaponsItemFlamethrower: "להביור",
+  weaponsItemTank: "טנק",
 };
 
 export default he;
