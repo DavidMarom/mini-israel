@@ -105,6 +105,9 @@ export default function Home() {
   const [composeSending, setComposeSending] = useState(false);
   const [composeItemIndex, setComposeItemIndex] = useState(null);
   const [poopThrowing, setPoopThrowing] = useState(false);
+  const [weaponAttacking, setWeaponAttacking] = useState(null); // weaponId being used
+  const [attackEarned, setAttackEarned] = useState(null); // { amount, key }
+  const attackEarnedKey = useRef(0);
   const [justPoopedUid, setJustPoopedUid] = useState(null);
   const [hasFarm, setHasFarm] = useState(false);
   const [buyingFarm, setBuyingFarm] = useState(false);
@@ -416,6 +419,41 @@ export default function Home() {
     }
   };
 
+  const handleWeaponAttack = async (weaponId) => {
+    if (!composeTarget || !storedUser || weaponAttacking) return;
+    const uid = storedUser.firebaseUid || storedUser.uid;
+    setWeaponAttacking(weaponId);
+    try {
+      const res = await fetch("/api/weapons/attack", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid, targetUid: composeTarget.ownerUid, weaponId }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        playSound("boom");
+        setUserStore((prev) => ({
+          ...prev,
+          inventory: data.inventory,
+          money: (prev.money ?? 0) + (data.stolen ?? 0),
+        }));
+        if (data.stolen > 0) {
+          attackEarnedKey.current += 1;
+          setAttackEarned({ amount: data.stolen, key: attackEarnedKey.current });
+          setTimeout(() => setAttackEarned(null), 1000);
+        }
+        setComposeTarget(null);
+        setComposeItemIndex(null);
+      } else {
+        alert(data.error || he.error);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setWeaponAttacking(null);
+    }
+  };
+
   // Handle ?goto=<uid> URL parameter – scroll to that user's house
   const gotoHandled = useRef(false);
   useEffect(() => {
@@ -500,13 +538,18 @@ export default function Home() {
         setComposeItemIndex={setComposeItemIndex}
         composeSending={composeSending}
         poopThrowing={poopThrowing}
+        weaponAttacking={weaponAttacking}
         onSend={handleSendMessage}
         onThrowPoop={handleThrowPoop}
+        onWeaponAttack={handleWeaponAttack}
         onClose={() => { setComposeTarget(null); setComposeItemIndex(null); }}
       />
 
       {showNameModal && (<NameModal name={nameInput} onChangeName={setNameInput} onSave={handleSaveName} />)}
       {showMissile && (<img src="/assets/missile.png" alt="" className={styles.missile} style={{ bottom: `${missileBottom}vh` }} />)}
+      {attackEarned !== null && (
+        <div key={attackEarned.key} className={styles.attackEarnedToast}>+{attackEarned.amount} 🪙</div>
+      )}
 
       <LotteryPopup show={showLotteryPopup} onClose={() => setShowLotteryPopup(false)} storedUser={storedUser} />
 
