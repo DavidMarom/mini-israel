@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import styles from "./Sidebar.module.css";
 import { AuthCard, MessagesCard, StarHouseBanner, SiteHeader, SidebarFooter } from "../index";
 import he from "../../lang/he";
@@ -29,6 +30,24 @@ export default function Sidebar({
   isVIP,
   onBuyVip,
 }) {
+  const [installPrompt, setInstallPrompt] = useState(null);
+
+  useEffect(() => {
+    const handler = (e) => {
+      e.preventDefault();
+      setInstallPrompt(e);
+    };
+    window.addEventListener("beforeinstallprompt", handler);
+    return () => window.removeEventListener("beforeinstallprompt", handler);
+  }, []);
+
+  const handleInstall = async () => {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    const { outcome } = await installPrompt.userChoice;
+    if (outcome === "accepted") setInstallPrompt(null);
+  };
+
   return (
     <>
       <button
@@ -69,6 +88,12 @@ export default function Sidebar({
         <SiteHeader storedUser={storedUser} boardRef={boardRef} onWaClick={onWaClick} />
 
         <a href="/ideas" className={styles.ideasLink}>💡 יש לך רעיון לפיצ'ר? לחץ כאן!</a>
+
+        {installPrompt && (
+          <button className={styles.installBtn} onClick={handleInstall}>
+            📲 התקן את מיני-ישראל כאפליקציה
+          </button>
+        )}
 
         <AuthCard
           loading={loading}

@@ -202,6 +202,37 @@
   filter: brightness(1.15);
 }
 
+/* PWA install button */
+.installBtn {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #4caf6e 0%, #2e7d4f 45%, #1a5c35 100%);
+  border: 2px solid #1a5c35;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 3px 0 #0d3d22;
+  text-shadow: 0 1px 0 rgba(0,0,0,0.4);
+  transition: filter 0.15s, transform 0.08s, box-shadow 0.08s;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.installBtn:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 0 #0d3d22;
+}
+
+.installBtn:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #0d3d22;
+}
+
 /* CoC yellow note style for taglines */
 .tagline {
   margin: 0;
