@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import clientPromise from "../../../services/mongo";
+import { sendPushToUser } from "../../../services/pushNotify";
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -50,6 +51,13 @@ export async function POST(request) {
     };
 
     const result = await db.collection("messages").insertOne(doc);
+
+    sendPushToUser(db, toUid, {
+      title: "✉️ קיבלת הודעה",
+      body: `קיבלת הודעה מ${fromName || "אנונימי"}`,
+      url: "/",
+    }).catch((e) => console.error("Push notification failed:", e));
+
     return NextResponse.json({ message: { ...doc, _id: result.insertedId } });
   } catch (error) {
     console.error("Error in POST /api/messages", error);
