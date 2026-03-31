@@ -6,15 +6,15 @@
   align-items: center;
   justify-content: center;
   z-index: 30;
-  overflow-y: auto;
+  overflow-y: scroll;
   padding: 16px;
 }
 
 /* CoC dark wooden modal */
 .composeModal {
   background: linear-gradient(180deg, #4a2600 0%, #2a1200 100%);
-  border: 3px solid #c8a000;
-  border-radius: 14px;
+  border:  1px solid #c8a000;
+  /* border-radius: 14px; */
   padding: 28px 24px;
   width: 100%;
   max-width: 340px;
@@ -22,9 +22,23 @@
   flex-direction: column;
   gap: 14px;
   max-height: calc(100vh - 32px);
-  overflow-y: auto;
+  overflow-y: scroll;
   flex-shrink: 0;
   box-shadow: 0 8px 32px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,220,80,0.15);
+}
+
+.composeModal::-webkit-scrollbar {
+  width: 6px;
+}
+
+.composeModal::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
+}
+
+.composeModal::-webkit-scrollbar-thumb {
+  background: #c8a000;
+  border-radius: 3px;
 }
 
 .composeTitle {
@@ -38,13 +52,14 @@
 .composeTextarea {
   resize: none;
   border-radius: 8px;
-  border: 2px solid #c8a000;
+  border:  1px solid #c8a000;
   background: #1a0800;
   color: #fff8e1;
   font-size: 14px;
   padding: 10px 12px;
   font-family: inherit;
   outline: none;
+  min-height: 90px;
 }
 
 .composeTextarea::placeholder {
@@ -62,7 +77,7 @@
   width: 100%;
   background: linear-gradient(180deg, #6b1010 0%, #3d0000 45%, #2a0000 100%);
   color: #fff;
-  border: 2px solid #8b0000;
+  border:  1px solid #8b0000;
   border-radius: 8px;
   padding: 10px 16px;
   font-size: 13px;
@@ -93,7 +108,7 @@
   width: 100%;
   background: linear-gradient(180deg, #b06020 0%, #7a3e00 45%, #5a2c00 100%);
   color: #fff;
-  border: 2px solid #5a2c00;
+  border:  1px solid #5a2c00;
   border-radius: 8px;
   padding: 10px 16px;
   font-size: 13px;
@@ -124,7 +139,7 @@
 .composeSend {
   background: linear-gradient(180deg, #f7c94a 0%, #e87e04 45%, #c05800 100%);
   color: #fff;
-  border: 2px solid #8b4500;
+  border:  1px solid #8b4500;
   border-radius: 8px;
   padding: 8px 20px;
   font-size: 13px;
@@ -152,7 +167,7 @@
 .composeCancel {
   background: transparent;
   color: #d4a84b;
-  border: 2px solid #7a5500;
+  border:  1px solid #7a5500;
   border-radius: 8px;
   padding: 8px 14px;
   font-size: 13px;
@@ -186,7 +201,7 @@
 
 .inventoryItem {
   background: linear-gradient(180deg, #5a3000 0%, #3a1800 100%);
-  border: 2px solid #c8a000;
+  border:  1px solid #c8a000;
   border-radius: 6px;
   width: 42px;
   height: 42px;

@@ -284,7 +284,7 @@
   display: inline-block;
   width: 14px;
   height: 14px;
-  border: 2px solid rgba(26, 26, 46, 0.3);
+  border:  1px solid rgba(26, 26, 46, 0.3);
   border-top-color: #1a1a2e;
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
@@ -370,7 +370,7 @@
 .adBoard {
   position: absolute;
   background: linear-gradient(160deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
-  border: 2px solid #e2b455;
+  border:  1px solid #e2b455;
   border-radius: 4px;
   box-shadow: 0 0 18px rgba(226, 180, 85, 0.45), inset 0 0 12px rgba(0, 0, 0, 0.4);
   z-index: 10;
@@ -540,7 +540,7 @@
   z-index: 10;
   cursor: pointer;
   background: #111827;
-  border: 2px solid #374151;
+  border:  1px solid #374151;
   border-radius: 5px;
   overflow: hidden;
   display: flex;
@@ -749,7 +749,7 @@
   left: 50%;
   transform: translateX(-50%);
   background: linear-gradient(135deg, #1e1b4b 0%, #312e81 60%, #4c1d95 100%);
-  border: 2px solid #a855f7;
+  border:  1px solid #a855f7;
   border-radius: 8px;
   padding: 14px 20px;
   display: flex;
@@ -810,7 +810,7 @@
   z-index: 10;
   cursor: pointer;
   background: linear-gradient(160deg, #78350f 0%, #92400e 60%, #b45309 100%);
-  border: 2px solid #f59e0b;
+  border:  1px solid #f59e0b;
   border-radius: 5px;
   box-shadow: 0 0 18px rgba(245, 158, 11, 0.4), inset 0 0 10px rgba(0,0,0,0.3);
   display: flex;
@@ -933,7 +933,7 @@
   cursor: pointer;
   border-radius: 5px;
   overflow: hidden;
-  border: 2px solid #e11d48;
+  border:  1px solid #e11d48;
   box-shadow: 0 0 16px rgba(225, 29, 72, 0.4);
   transition: box-shadow 0.15s;
 }
@@ -1072,7 +1072,7 @@
   z-index: 10;
   cursor: pointer;
   background: linear-gradient(135deg, #14532d, #166534);
-  border: 2px solid #4ade80;
+  border:  1px solid #4ade80;
   border-radius: 5px;
   display: flex;
   flex-direction: column;
@@ -1303,7 +1303,7 @@
 
 .triviaModal {
   background: #1e1b4b;
-  border: 2px solid #818cf8;
+  border:  1px solid #818cf8;
   border-radius: 7px;
   padding: 28px 24px 20px;
   width: 420px;
@@ -1348,7 +1348,7 @@
 .triviaOption {
   background: #312e81;
   color: #e0e7ff;
-  border: 2px solid #4f46e5;
+  border:  1px solid #4f46e5;
   border-radius: 4px;
   padding: 10px 8px;
   font-size: 14px;
@@ -1421,7 +1421,7 @@
 
 .poopPopup {
   background: #1a1a1a;
-  border: 2px solid #8B4513;
+  border:  1px solid #8B4513;
   border-radius: 7px;
   padding: 24px 20px 18px;
   width: 320px;
@@ -1668,7 +1668,7 @@
 
 .pollModal {
   background: #1a1a2e;
-  border: 2px solid #e2b714;
+  border:  1px solid #e2b714;
   border-radius: 7px;
   padding: 28px 24px 20px;
   width: 400px;
@@ -1724,7 +1724,7 @@
   gap: 8px;
   padding: 12px 8px;
   border-radius: 6px;
-  border: 2px solid transparent;
+  border:  1px solid transparent;
   cursor: pointer;
   transition: transform 0.15s, border-color 0.15s, background 0.15s;
   background: #16213e;

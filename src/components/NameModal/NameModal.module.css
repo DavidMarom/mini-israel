@@ -13,7 +13,7 @@
 /* CoC dark wooden modal */
 .modal {
   background: linear-gradient(180deg, #4a2600 0%, #2a1200 100%);
-  border: 3px solid #c8a000;
+  border:  1px solid #c8a000;
   border-radius: 14px;
   padding: 28px 24px;
   width: 320px;
@@ -43,7 +43,7 @@
 
 .modalInput {
   border-radius: 8px;
-  border: 2px solid #c8a000;
+  border:  1px solid #c8a000;
   padding: 9px 14px;
   font-size: 14px;
   background: #1a0800;
@@ -60,7 +60,7 @@
 .primaryButton {
   border-radius: 8px;
   padding: 11px 18px;
-  border: 2px solid #8b4500;
+  border:  1px solid #8b4500;
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;

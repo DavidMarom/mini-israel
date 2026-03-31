@@ -20,7 +20,7 @@
   display: flex;
   align-items: center;
   background: linear-gradient(180deg, #2a1400 0%, #1a0800 100%);
-  border: 2px solid #c8a000;
+  border:  1px solid #c8a000;
   border-radius: 999px;
   min-width: 140px;
   height: 36px;
@@ -36,7 +36,7 @@
   height: 40px;
   border-radius: 50%;
   background: linear-gradient(180deg, #f7c94a 0%, #d48000 55%, #a05800 100%);
-  border: 2px solid #8b5500;
+  border:  1px solid #8b5500;
   box-shadow: 0 3px 0 #6a3800, inset 0 1px 0 rgba(255,230,120,0.5);
   display: flex;
   align-items: center;

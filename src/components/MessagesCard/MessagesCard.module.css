@@ -1,7 +1,7 @@
 /* CoC wooden card */
 .card {
   background: linear-gradient(180deg, #4a2600 0%, #2a1200 100%);
-  border: 3px solid #c8a000;
+  border:  1px solid #c8a000;
   border-radius: 10px;
   max-width: 280px;
   width: 100%;
@@ -19,7 +19,7 @@
   padding: 12px 18px;
   background: linear-gradient(180deg, #6a3800 0%, #4a2200 100%);
   border: none;
-  border-bottom: 2px solid #c8a000;
+  border-bottom:  1px solid #c8a000;
   cursor: pointer;
   font-size: 14px;
   font-weight: 700;
@@ -73,7 +73,7 @@
 
 .unread {
   background: linear-gradient(180deg, #5a3000 0%, #3a1800 100%);
-  border-right: 3px solid #ffd84d;
+  border-right:  1px solid #ffd84d;
 }
 
 .messageTop {
@@ -142,7 +142,7 @@
 
 .replyModal {
   background: linear-gradient(180deg, #4a2600 0%, #2a1200 100%);
-  border: 3px solid #c8a000;
+  border:  1px solid #c8a000;
   border-radius: 14px;
   padding: 28px 24px;
   width: 100%;
@@ -171,7 +171,7 @@
 
 .replyInventoryItem {
   background: linear-gradient(180deg, #5a3000 0%, #3a1800 100%);
-  border: 2px solid #c8a000;
+  border:  1px solid #c8a000;
   border-radius: 6px;
   width: 42px;
   height: 42px;
@@ -204,7 +204,7 @@
 .replyTextarea {
   resize: none;
   border-radius: 8px;
-  border: 2px solid #c8a000;
+  border:  1px solid #c8a000;
   background: #1a0800;
   color: #fff8e1;
   font-size: 14px;
@@ -226,7 +226,7 @@
 .replySend {
   background: linear-gradient(180deg, #f7c94a 0%, #e87e04 45%, #c05800 100%);
   color: #fff;
-  border: 2px solid #8b4500;
+  border:  1px solid #8b4500;
   border-radius: 8px;
   padding: 8px 20px;
   font-size: 13px;
@@ -254,7 +254,7 @@
 .replyCancel {
   background: transparent;
   color: #d4a84b;
-  border: 2px solid #7a5500;
+  border:  1px solid #7a5500;
   border-radius: 8px;
   padding: 8px 14px;
   font-size: 13px;

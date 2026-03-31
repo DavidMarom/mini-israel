@@ -5,7 +5,7 @@
   gap: 10px;
   width: 100%;
   padding-bottom: 14px;
-  border-bottom: 2px solid #c8a000;
+  border-bottom:  1px solid #c8a000;
   position: relative;
   /* subtle gold glow under border */
   filter: drop-shadow(0 2px 4px rgba(200,160,0,0.25));
@@ -19,7 +19,7 @@
 
 .scrollToHouseBtn {
   background: linear-gradient(180deg, #f7c94a 0%, #e87e04 45%, #c05800 100%);
-  border: 2px solid #8b4500;
+  border:  1px solid #8b4500;
   border-radius: 999px;
   cursor: pointer;
   font-size: 12px;
@@ -73,7 +73,7 @@
   text-decoration: none;
   padding: 4px 9px;
   border-radius: 6px;
-  border: 2px solid #c8a000;
+  border:  1px solid #c8a000;
   background: linear-gradient(180deg, #5a3800 0%, #3a2000 100%);
   box-shadow: 0 2px 0 #8b5500;
   transition: transform 0.08s, box-shadow 0.08s, color 0.15s;

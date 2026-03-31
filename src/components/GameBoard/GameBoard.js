@@ -97,9 +97,9 @@ const GODZILLA_W = 4;
 const GODZILLA_H = 4;
 
 const WEAPONS_ROW = 40;
-const WEAPONS_COL = 10;
-const WEAPONS_W = 2;
-const WEAPONS_H = 2;
+const WEAPONS_COL = 7;
+const WEAPONS_W = 3;
+const WEAPONS_H = 3;
 
 const HOUSE_IMAGES = [
   "/assets/house/house_1.png",

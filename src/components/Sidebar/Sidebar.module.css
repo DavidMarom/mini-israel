@@ -1,7 +1,7 @@
 /* CoC dark wooden panel */
 .overlay {
   background: linear-gradient(180deg, #4a2600 0%, #2a1200 100%);
-  border-left: 3px solid #c8a000;
+  border-left:  1px solid #c8a000;
   box-shadow: inset 0 1px 0 rgba(255,220,80,0.1), inset 2px 0 0 rgba(255,180,40,0.08);
   width: 100%;
   height: 100%;
@@ -57,7 +57,7 @@
     height: 48px;
     border-radius: 10px;
     background: linear-gradient(180deg, #f7c94a 0%, #e87e04 45%, #c05800 100%);
-    border: 2px solid #8b4500;
+    border:  1px solid #8b4500;
     box-shadow: 0 5px 0 #7a3200, inset 0 1px 0 rgba(255,230,120,0.5);
     color: #fff;
     cursor: pointer;
@@ -118,7 +118,7 @@
 @media (max-width: 1220px) {
   .scrollToHouseBtn {
     background: linear-gradient(180deg, #f7c94a 0%, #e87e04 45%, #c05800 100%);
-    border: 2px solid #8b4500;
+    border:  1px solid #8b4500;
     border-radius: 999px;
     cursor: pointer;
     font-size: 12px;
@@ -159,7 +159,7 @@
     height: 34px;
     border-radius: 8px;
     background: linear-gradient(180deg, #f7c94a 0%, #e87e04 45%, #c05800 100%);
-    border: 2px solid #8b4500;
+    border:  1px solid #8b4500;
     box-shadow: 0 3px 0 #7a3200, inset 0 1px 0 rgba(255,230,120,0.4);
     color: #fff;
     cursor: pointer;
@@ -187,7 +187,7 @@
   padding: 10px 16px;
   border-radius: 8px;
   background: linear-gradient(180deg, #3a1e00 0%, #2a1200 100%);
-  border: 2px solid #c8a000;
+  border:  1px solid #c8a000;
   color: #ffd84d;
   font-size: 14px;
   font-weight: 700;
@@ -210,7 +210,7 @@
   padding: 10px 16px;
   border-radius: 8px;
   background: linear-gradient(180deg, #4caf6e 0%, #2e7d4f 45%, #1a5c35 100%);
-  border: 2px solid #1a5c35;
+  border:  1px solid #1a5c35;
   color: #fff;
   font-size: 14px;
   font-weight: 700;

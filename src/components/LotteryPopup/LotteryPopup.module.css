@@ -13,7 +13,7 @@
 /* CoC golden wooden popup */
 .modal {
   background: linear-gradient(180deg, #5a3000 0%, #3a1800 100%);
-  border: 3px solid #c8a000;
+  border:  1px solid #c8a000;
   border-radius: 18px;
   padding: 32px 28px;
   max-width: 360px;
@@ -73,7 +73,7 @@
   display: inline-block;
   background: linear-gradient(180deg, #4eff99 0%, #25d366 40%, #1aaa50 100%);
   color: #fff;
-  border: 2px solid #148a3c;
+  border:  1px solid #148a3c;
   border-radius: 10px;
   padding: 13px 28px;
   font-size: 16px;
