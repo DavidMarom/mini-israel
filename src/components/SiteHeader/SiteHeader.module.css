@@ -6,9 +6,6 @@
   width: 100%;
   padding-bottom: 14px;
   border-bottom:  1px solid #c8a000;
-  position: relative;
-  /* subtle gold glow under border */
-  filter: drop-shadow(0 2px 4px rgba(200,160,0,0.25));
 }
 
 .siteLogo {
@@ -50,10 +47,6 @@
   justify-content: center;
   color: #25d366;
   transition: color 0.15s, filter 0.15s;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.5));
 }
 
 .whatsappLink:hover {
