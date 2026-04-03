@@ -1600,20 +1600,7 @@ export default function GameBoard({ onOtherHouseClick, justPoopedUid, boardRefre
           {he.cameraLabel}
         </div>
 
-        {/* Cashout Building */}
-        <div
-          className={styles.cashoutBuilding}
-          style={{
-            top: CASHOUT_ROW * TILE_SIZE,
-            left: CASHOUT_COL * TILE_SIZE,
-            width: CASHOUT_W * TILE_SIZE,
-            height: CASHOUT_H * TILE_SIZE,
-          }}
-          onClick={() => { setShowCashout(true); setCashoutDone(false); setCashoutError(""); }}
-        >
-          <span className={styles.cashoutBuildingIcon}>💵</span>
-          <span className={styles.cashoutBuildingLabel}>{he.cashoutBuildingLabel}</span>
-        </div>
+        {/* Cashout Building - hidden */}
 
         {/* Godzilla */}
         <div
