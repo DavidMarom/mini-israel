@@ -229,7 +229,7 @@ const he = {
   yadSaraTitle: "❤️ תרומה לעמותת יד שרה",
   yadSaraThanks: "תודה רבה על תרומתך! 🙏",
   yadSaraCooldown: "כבר תרמת השבוע — תודה! ניתן לתרום שוב בשבוע הבא 💙",
-  yadSaraMsg: "בכל תרומה של 100 🪙 משחק, אנחנו נתרום ₪2 לעמותת יד שרה!",
+  yadSaraMsg: "בכל תרומה של 100 🪙 משחק, אנחנו נתרום ₪1 לעמותת יד שרה!",
   yadSaraBalance: (amount) => `יתרתך: ${amount} מטבעות`,
   yadSaraDonating: "שולח תרומה...",
   yadSaraDonate: "תרום 100 מטבעות",

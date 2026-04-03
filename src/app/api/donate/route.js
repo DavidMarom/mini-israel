@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import clientPromise from "../../../services/mongo";
 
 const DONATION_COINS = 100;
-const DONATION_ILS = 2;
+const DONATION_ILS = 1;
 
 export async function GET() {
   try {
