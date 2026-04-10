@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(perl -i -pe 's/\\(border\\(?:-\\(?:top|bottom|left|right\\)\\)?:\\\\s*\\)\\([2-9]\\)px/$1 1px/g' src/app/advertisers/advertisers.module.css src/app/horaot/horaot.module.css src/app/takanon/takanon.module.css src/components/LotteryPopup/LotteryPopup.module.css src/components/MessagesCard/MessagesCard.module.css src/components/NameModal/NameModal.module.css src/components/ResourceBar/ResourceBar.module.css src/components/SplashScreen/SplashScreen.module.css src/components/GameBoard/GameBoard.module.css src/components/SiteHeader/SiteHeader.module.css src/app/ideas/ideas.module.css src/components/SidebarFooter/SidebarFooter.module.css src/components/AuthCard/AuthCard.module.css src/components/ComposeModal/ComposeModal.module.css src/components/Sidebar/Sidebar.module.css src/app/globals.css src/components/StarHouseBanner/StarHouseBanner.module.css)"
+      "Bash(perl -i -pe 's/\\(border\\(?:-\\(?:top|bottom|left|right\\)\\)?:\\\\s*\\)\\([2-9]\\)px/$1 1px/g' src/app/advertisers/advertisers.module.css src/app/horaot/horaot.module.css src/app/takanon/takanon.module.css src/components/LotteryPopup/LotteryPopup.module.css src/components/MessagesCard/MessagesCard.module.css src/components/NameModal/NameModal.module.css src/components/ResourceBar/ResourceBar.module.css src/components/SplashScreen/SplashScreen.module.css src/components/GameBoard/GameBoard.module.css src/components/SiteHeader/SiteHeader.module.css src/app/ideas/ideas.module.css src/components/SidebarFooter/SidebarFooter.module.css src/components/AuthCard/AuthCard.module.css src/components/ComposeModal/ComposeModal.module.css src/components/Sidebar/Sidebar.module.css src/app/globals.css src/components/StarHouseBanner/StarHouseBanner.module.css)",
+      "Bash(grep -E \"\\\\.js$|^d\")"
     ]
   }
 }

@@ -1,0 +1,223 @@
+MINI ISRAEL — PLAYER PROGRESS MATHEMATICS
+==========================================
+This document describes the full economic model of the game in a precise,
+machine-readable format intended for use by LLMs reasoning about game state,
+balance, or player advice. All values are authoritative (sourced from API routes).
+
+
+─────────────────────────────────────────
+1. INITIALIZATION
+─────────────────────────────────────────
+new_player.coins = 180
+new_player.farm_level = null          # no farm yet
+new_player.house_level = 1
+new_player.vip = false
+new_player.power_boost_active = false
+new_player.community_center_level = null
+
+
+─────────────────────────────────────────
+2. COIN SOURCES (income)
+─────────────────────────────────────────
+
+2a. Farm (hourly passive income)
+  Trigger: player clicks farm cell, server checks if currentHour > lastEggEpoch
+  currentHourEpoch = floor(Date.now() / 3_600_000)
+
+  Base farm coins by level:
+    farm_level=1 → 20
+    farm_level=2 → 40
+    farm_level=3 → 60  (NOTE: README says 80 but API source gives 60 base)
+
+  House adjacency bonus (applied on top of farm base):
+    house_level=1 → +0
+    house_level=2 → +5
+    house_level=3 → +10
+    house_level=4 → +20
+    house_level=5 → +35
+
+  Power boost bonus (active if powerBoostExpiry > now):
+    +20 per egg collection
+
+  VIP bonus (permanent after purchase):
+    +20 per egg collection
+
+  Full formula:
+    egg_value = farm_base[farm_level]
+              + house_bonus[house_level]
+              + (20 if power_boost_active else 0)
+              + (20 if vip else 0)
+
+  Maximum possible egg value:
+    60 + 35 + 20 + 20 = 135 coins/hour
+
+2b. Neighborhood Claim (daily)
+  Cooldown: once per calendar day (UTC date string, not rolling 24h)
+  base_bonus    = 50
+  vip_bonus     = 100
+  coins_gained  = vip_bonus if vip else base_bonus
+
+2c. Trivia (per correct answer)
+  easy question → +10 coins
+  hard question → +20 coins
+  No cooldown documented; limited by available questions.
+
+2d. Treasure
+  Collect a treasure tile → +200 coins
+  Supply controlled by admin (re-seeded periodically).
+
+2e. Community Center gift bonus (passive, triggered by receiving items)
+  When another player sends you any item, if you own a community center:
+    cc_level=1 → +5 coins
+    cc_level=2 → +10 coins
+    cc_level=3 → +20 coins
+    cc_level=4 → +30 coins
+    cc_level=5 → +50 coins
+
+2f. Weapon attack (attacker gains)
+  steal = floor(defender.coins * steal_pct[weapon])
+  attacker.coins += steal
+  defender.coins -= steal
+
+  steal_pct by weapon:
+    rifle       → 0.10
+    grenade     → 0.40
+    flamethrower→ 0.20
+    tank        → 1.00   # takes ALL defender coins
+
+
+─────────────────────────────────────────
+3. COIN SINKS (spending)
+─────────────────────────────────────────
+
+3a. Farm purchase
+  cost = 500
+  unlocks: hourly egg collection
+
+3b. Farm upgrade
+  L1 → L2: cost = 600
+  L2 → L3: cost = 1200
+  cumulative to L3: 500 + 600 + 1200 = 2300
+
+3c. Power Plant subscription
+  cost     = 400
+  duration = 7 days
+  effect   = +20 coins per egg (see 2a)
+  ROI breakeven (vs L1 farm, no VIP, no house bonus):
+    400 / 20 = 20 eggs = 20 hours ≈ 0.83 days
+
+3d. VIP upgrade (one-time, permanent)
+  cost   = 1500
+  effect = +20 coins/egg + double neighborhood bonus
+  ROI breakeven (vs L1 farm, no power, no house bonus):
+    1500 / 20 = 75 eggs = 75 hours ≈ 3.1 days of farming
+
+3e. House upgrade (requires coins + friend-sourced items)
+  L1 → L2: 200 coins  + 1 flower (from friend)
+  L2 → L3: 400 coins  + 2 flags  (from friends)
+  L3 → L4: 800 coins  + 2 falafels + 1 shirt (from friends)
+  L4 → L5: 1500 coins + 2 shirts  + 1 headphones (from friends)
+  cumulative coin cost to L5: 200 + 400 + 800 + 1500 = 2900
+
+3f. Community Center (requires coins + friend-sourced items)
+  Buy:      600 coins  + 2 flags (from friends)
+  L1 → L2: 1000 coins + 3 falafels (from friends)
+  L2 → L3: 1500 coins + 2 shirts + 1 flag (from friends)
+  L3 → L4: 2200 coins + 2 shirts + 1 PC (from friends)
+  L4 → L5: 3500 coins + 3 headphones (from friends)
+  cumulative coin cost to L5: 600 + 1000 + 1500 + 2200 + 3500 = 10800
+
+3g. Shop items (Azrieli Mall)
+  item          buy    sell   net_loss
+  flower        10     7      3
+  flag          10     7      3
+  falafel       25     17     8
+  bike          80     55     25
+  shirt         30     20     10
+  headphones    50     35     15
+  PC            120    85     35
+  (other items) —      5      —
+
+3h. Weapons (single use, consumed on attack)
+  rifle        150
+  grenade       80
+  flamethrower 200
+  tank         300
+
+3i. Candle (memorial)
+  cost = 40
+  no in-game return
+
+3j. Ad placement
+  cost     = 100 coins
+  duration = 5 days
+
+3k. Donation (Yad Sara charity)
+  cost     = 100 coins
+  cooldown = 7 days per player
+  real-world effect: ₪1 donated to Yad Sara
+
+
+─────────────────────────────────────────
+4. CASHOUT (coins → real money)
+─────────────────────────────────────────
+  minimum coins required : 1000
+  conversion rate        : 200 coins = ₪1
+  prerequisite           : player must have waClicks >= 1
+                           (invited at least one friend via WhatsApp)
+  formula: ils = floor(coins / 200)
+  example: 1000 coins → ₪5
+
+
+─────────────────────────────────────────
+5. RATE LIMITS SUMMARY
+─────────────────────────────────────────
+  Farm egg          : once per clock-hour (epoch-gated, not rolling)
+  Neighborhood claim: once per UTC calendar day
+  Donation          : once per 7-day rolling window
+  Trivia            : no documented hard limit
+  Treasure          : supply-limited (admin re-seeds)
+  Weapon attack     : no cooldown documented; cost is weapon price
+
+
+─────────────────────────────────────────
+6. PROGRESSION PHASES (derived)
+─────────────────────────────────────────
+Early game  (0 – ~500 coins)
+  - Earn via trivia (10-20/answer) and neighborhood claims (50/day)
+  - Goal: save 500 to buy farm
+  - Time to farm: ~2-3 days without farm, faster with trivia
+
+Mid game  (~500 – ~3000 coins)
+  - Farm running at L1 (20/hr baseline)
+  - Upgrade farm to L2 (600) then L3 (1200)
+  - Purchase power boost (400) for ROI < 1 day
+  - Collect friend items for house upgrades
+  - Daily income at L2 farm + neighborhood: 40*24 + 50 = 1010/day
+
+Late game  (~3000+ coins)
+  - Buy VIP (1500) for permanent +20/egg and double neighborhood
+  - Upgrade house to L4-L5 for +20-35 bonus/egg
+  - Build community center for passive gift income
+  - Consider weapon attacks (tank = 100% steal if target is rich)
+  - Daily income at L3 farm + VIP + power + L5 house + neighborhood:
+      (60 + 35 + 20 + 20) * 24 + 100 = 135 * 24 + 100 = 3340/day
+
+
+─────────────────────────────────────────
+7. ITEM DEPENDENCY GRAPH (for upgrades requiring friend items)
+─────────────────────────────────────────
+Items that unlock upgrades (must be received FROM another player, not self-bought):
+
+  flower      → house L2
+  flag        → house L3, community center buy, community center L3
+  falafel     → house L4, community center L2
+  shirt       → house L4, house L5, community center L3, community center L4
+  headphones  → house L5, community center L5
+  PC          → community center L4
+
+Implication: late-game upgrades are GATED on social interaction.
+A player who never receives items from friends is capped at:
+  - house L1 (no bonus)
+  - no community center
+  - max egg = 60 + 0 + 20 + 20 = 100/hr (L3 farm + VIP + power, no house bonus)
