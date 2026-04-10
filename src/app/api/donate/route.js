@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import clientPromise from "../../../services/mongo";
-import { withHandler } from "../../../services/withHandler";
+import { withHandler, ApiError } from "../../../services/withHandler";
 
 const DONATION_COINS = 100;
 const DONATION_ILS = 1;
@@ -19,25 +19,21 @@ export const GET = withHandler(async () => {
 
 export const POST = withHandler(async (req) => {
   const { uid, name } = await req.json();
-  if (!uid) return NextResponse.json({ error: "Missing uid" }, { status: 400 });
+  if (!uid) throw new ApiError(400, "Missing uid");
 
   const client = await clientPromise;
   const db = client.db("main");
 
   const user = await db.collection("users").findOne({ uid });
-  if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
-  if ((user.money || 0) < DONATION_COINS) {
-    return NextResponse.json({ error: "Insufficient funds" }, { status: 400 });
-  }
+  if (!user) throw new ApiError(404, "User not found");
+  if ((user.money || 0) < DONATION_COINS) throw new ApiError(400, "Insufficient funds");
 
   const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
   const recentDonation = await db.collection("donations").findOne({
     uid,
     createdAt: { $gte: oneWeekAgo },
   });
-  if (recentDonation) {
-    return NextResponse.json({ error: "Already donated this week" }, { status: 429 });
-  }
+  if (recentDonation) throw new ApiError(429, "Already donated this week");
 
   const newMoney = user.money - DONATION_COINS;
   await db.collection("users").updateOne(

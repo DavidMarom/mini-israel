@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import clientPromise from "../../../../services/mongo";
 import { sendPushToUser } from "../../../../services/pushNotify";
 import { sendMail } from "../../../../services/mail";
-import { withHandler } from "../../../../services/withHandler";
+import { withHandler, ApiError } from "../../../../services/withHandler";
 
 const BOARD_ID = "main-board";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://mini-israel.com";
@@ -17,26 +17,18 @@ const WEAPON_META = {
 export const POST = withHandler(async (req) => {
   const { uid, targetUid, weaponId } = await req.json();
 
-  if (!uid || !targetUid || !weaponId) {
-    return NextResponse.json({ error: "Missing fields" }, { status: 400 });
-  }
-  if (uid === targetUid) {
-    return NextResponse.json({ error: "Cannot attack yourself" }, { status: 400 });
-  }
-  if (!WEAPON_META[weaponId]) {
-    return NextResponse.json({ error: "Unknown weapon" }, { status: 400 });
-  }
+  if (!uid || !targetUid || !weaponId) throw new ApiError(400, "Missing fields");
+  if (uid === targetUid) throw new ApiError(400, "Cannot attack yourself");
+  if (!WEAPON_META[weaponId]) throw new ApiError(400, "Unknown weapon");
 
   const client = await clientPromise;
   const db = client.db("main");
 
   const attacker = await db.collection("users").findOne({ uid });
-  if (!attacker) return NextResponse.json({ error: "User not found" }, { status: 404 });
+  if (!attacker) throw new ApiError(404, "User not found");
 
   const weaponIndex = (attacker.inventory || []).findIndex((item) => item.id === weaponId);
-  if (weaponIndex === -1) {
-    return NextResponse.json({ error: "Weapon not in inventory" }, { status: 400 });
-  }
+  if (weaponIndex === -1) throw new ApiError(400, "Weapon not in inventory");
 
   // Remove one weapon from inventory
   const newInventory = [...attacker.inventory];

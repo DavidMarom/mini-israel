@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import clientPromise from "../../../../services/mongo";
-import { withHandler } from "../../../../services/withHandler";
+import { withHandler, ApiError } from "../../../../services/withHandler";
 
 const BOARD_ID = "main-board";
 const BASE_EGG_REWARD = 20;
@@ -8,10 +8,7 @@ const HOUSE_EGG_BONUS = { 1: 0, 2: 5, 3: 10, 4: 20, 5: 35 };
 
 export const POST = withHandler(async (request) => {
   const { uid } = await request.json();
-
-  if (!uid) {
-    return NextResponse.json({ error: "Missing uid" }, { status: 400 });
-  }
+  if (!uid) throw new ApiError(400, "Missing uid");
 
   const client = await clientPromise;
   const db = client.db("main");
@@ -22,9 +19,7 @@ export const POST = withHandler(async (request) => {
   let cells = board?.cells || [];
 
   const farmIndex = cells.findIndex((c) => c.building === "farm" && c.ownerUid === uid && c.eggReady);
-  if (farmIndex === -1) {
-    return NextResponse.json({ error: "No egg to collect" }, { status: 400 });
-  }
+  if (farmIndex === -1) throw new ApiError(400, "No egg to collect");
 
   const farmLevel = cells[farmIndex].farmLevel || 1;
   const houseCell = cells.find((c) => c.building === "main-house" && c.ownerUid === uid);
@@ -59,9 +54,7 @@ export const POST = withHandler(async (request) => {
     { returnDocument: "after" }
   );
 
-  if (!result) {
-    return NextResponse.json({ error: "User not found" }, { status: 404 });
-  }
+  if (!result) throw new ApiError(404, "User not found");
 
   return NextResponse.json({ ok: true, money: result.money, reward });
 });
